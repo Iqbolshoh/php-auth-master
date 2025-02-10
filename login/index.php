@@ -1,6 +1,20 @@
 <?php
 session_start();
 
+function generateToken()
+{
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+}
+
+function validateToken($token)
+{
+    return hash_equals($_SESSION['csrf_token'], $token);
+}
+
+generateToken();
+
 include '../config.php';
 $query = new Database();
 
@@ -44,7 +58,7 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
     }
 }
 
-if (isset($_POST['submit'])) {
+if (isset($_POST['submit']) && validateToken($_POST['csrf_token'])) {
     $username = strtolower($_POST['username']);
     $password = $query->hashPassword($_POST['password']);
     $result = $query->select('users', '*', "username = ? AND password = ?", [$username, $password], 'ss');
@@ -114,6 +128,7 @@ if (isset($_POST['submit'])) {
     <div class="form-container">
         <h1>Login</h1>
         <form method="post" action="">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required maxlength="30">
