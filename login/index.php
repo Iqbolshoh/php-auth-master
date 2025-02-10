@@ -9,13 +9,10 @@ $roles = [
     'user' => '../'
 ];
 
-if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true && isset($_SESSION['role'])) {
-
-    if ($_SESSION['role'] == 'admin') {
-        header("Location: ../admin/");
-        exit;
-    } else {
-        header("Location: ../");
+if (isset($_SESSION['loggedin'], $_SESSION['role']) && $_SESSION['loggedin']) {
+    $role = $_SESSION['role'];
+    if (isset($roles[$role])) {
+        header("Location: {$roles[$role]}");
         exit;
     }
 }
