@@ -122,7 +122,6 @@ if (isset($_POST['submit'])) {
     <div class="form-container">
         <h1>Login</h1>
         <form method="post" action="">
-            <input type="hidden" name="csrf_token" value="<?= $csrf_token; ?>">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required maxlength="30">
@@ -135,6 +134,9 @@ if (isset($_POST['submit'])) {
                     <button type="button" id="toggle-password" class="password-toggle"><i
                             class="fas fa-eye"></i></button>
                 </div>
+            </div>
+            <div class="form-group">
+                <input type="hidden" name="csrf_token" value="<?= $csrf_token; ?>">
             </div>
             <div class="form-group">
                 <button type="submit" name="submit" id="submit" disabled>Login</button>

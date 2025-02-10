@@ -166,7 +166,10 @@ if (isset($_POST['submit'])) {
                 </div>
             </div>
             <div class="form-group">
-                <button type="submit" name="submit" id="submit">Sign Up</button>
+                <input type="hidden" name="csrf_token" value="<?= $csrf_token; ?>">
+            </div>
+            <div class="form-group">
+                <button type="submit" name="submit" id="submit" disabled>Login</button>
             </div>
         </form>
         <div class="text-center">
