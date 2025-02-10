@@ -1,19 +1,26 @@
 <?php
 session_start();
 
-if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true && isset($_SESSION['role'])) {
+include '../config.php';
+$query = new Database();
 
-    if ($_SESSION['role'] == 'admin') {
-        header("Location: ../admin/");
-        exit;
-    } else {
-        header("Location: ../");
+$roles = [
+    'admin' => '../admin/',
+    'user' => '../'
+];
+
+function redirect($role)
+{
+    global $roles;
+    if (isset($roles[$role])) {
+        header("Location: {$roles[$role]}");
         exit;
     }
 }
 
-include '../config.php';
-$query = new Database();
+if (!empty($_SESSION['loggedin']) && !empty($_SESSION['role'])) {
+    redirect($_SESSION['role']);
+}
 
 if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
     if (session_id() !== $_COOKIE['session_token']) {
