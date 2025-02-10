@@ -48,7 +48,7 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
 }
 
 if (isset($_POST['submit'])) {
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $csrf_token . "a") {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $csrf_token) {
         echo "<style>
         .error-message {
             background-color: red;
