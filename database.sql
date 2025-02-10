@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE active_sessions (
+CREATE TABLE IF NOT EXISTS active_sessions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     device_name VARCHAR(255) NOT NULL,
@@ -25,8 +25,7 @@ CREATE TABLE active_sessions (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Login: iqbolshoh
--- Password: 1
+-- admin and user (password: '1')
 INSERT INTO
     users (
         first_name,
@@ -46,10 +45,10 @@ VALUES
         'admin'
     ),
     (
-        'user',
-        'user',
+        'User',
+        'User',
         'user@gmail.com',
         'user',
         '65c2a32982abe41b1e6ff888d351ee6b7ade33affd4a595667ea7db910aecaa8',
         'user'
-    )
+    );
