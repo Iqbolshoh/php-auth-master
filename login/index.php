@@ -10,6 +10,7 @@ $roles = [
 ];
 
 if (!empty($_SESSION['loggedin']) && !empty($_SESSION['role'])) {
+    $role = $_SESSION['role'];
     if (isset($roles[$role])) {
         header("Location: {$roles[$role]}");
         exit;
@@ -35,6 +36,7 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
             'role' => $user['role']
         ];
 
+        $role = $user['role'];
         if (isset($roles[$role])) {
             header("Location: {$roles[$role]}");
             exit;
