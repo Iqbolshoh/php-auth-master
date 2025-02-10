@@ -48,15 +48,15 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
 }
 
 if (isset($_POST['submit'])) {
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $csrf_token) {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $csrf_token . "a") {
         echo "<script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Security Error',
-                text: 'CSRF verification failed! Please reload the page and try again.',
-                confirmButtonText: 'OK'
-            });
-        </script>";
+        Swal.fire({
+            icon: 'error',
+            title: 'Security Error',
+            text: 'CSRF verification failed! Please reload the page and try again.',
+            confirmButtonText: 'OK'
+        });
+    </script>";
         exit;
     }
     $username = strtolower($_POST['username']);
@@ -151,7 +151,7 @@ if (isset($_POST['submit'])) {
             <p>Don't have an account? <a href="../signup/">Sign Up</a></p>
         </div>
     </div>
-    <script src="../src/js/sweetalert2.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         const usernameField = document.getElementById('username');
         const usernameError = document.getElementById('username-error');
