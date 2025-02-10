@@ -9,16 +9,20 @@ $roles = [
     'user' => '../'
 ];
 
-if (isset($_SESSION['loggedin'], $_SESSION['role']) && $_SESSION['loggedin']) {
-    $role = $_SESSION['role'];
+function redirect($role)
+{
+    global $roles;
     if (isset($roles[$role])) {
         header("Location: {$roles[$role]}");
         exit;
     }
 }
 
-if (isset($_COOKIE['username']) && isset($_COOKIE['session_token'])) {
+if (isset($_SESSION['loggedin'], $_SESSION['role']) && $_SESSION['loggedin']) {
+    redirect($_SESSION['role']);
+}
 
+if (isset($_COOKIE['username'], $_COOKIE['session_token'])) {
     if (session_id() !== $_COOKIE['session_token']) {
         session_write_close();
         session_id($_COOKIE['session_token']);
@@ -35,13 +39,7 @@ if (isset($_COOKIE['username']) && isset($_COOKIE['session_token'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['role'] = $user['role'];
 
-        if ($user['role'] == 'admin') {
-            header("Location: ../admin/");
-            exit;
-        } else {
-            header("Location: ../");
-            exit;
-        }
+        redirect($user['role']);
     }
 }
 
