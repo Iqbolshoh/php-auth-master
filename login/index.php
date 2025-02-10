@@ -6,8 +6,9 @@ $roles = [
     'user' => '../user/'
 ];
 
-function redirectUser($role, $roles)
+function redirectUser($role)
 {
+    global $roles;
     if (isset($roles[$role])) {
         header("Location: {$roles[$role]}");
         exit;
@@ -42,7 +43,7 @@ function createSession($user, $query, $roles)
     setcookie('username', $user['username'], time() + (86400 * 30), "/", "", true, true);
     setcookie('session_token', $session_token, time() + (86400 * 30), "/", "", true, true);
 
-    redirectUser($user['role'], $roles);
+    redirectUser($user['role']);
 }
 
 if (isset($_COOKIE['username']) && isset($_COOKIE['session_token'])) {
