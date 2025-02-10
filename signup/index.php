@@ -1,20 +1,6 @@
 <?php
 session_start();
 
-function generateToken()
-{
-    if (empty($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
-}
-
-function validateToken($token)
-{
-    return hash_equals($_SESSION['csrf_token'], $token);
-}
-
-generateToken();
-
 include '../config.php';
 $query = new Database();
 
@@ -58,7 +44,16 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
     }
 }
 
-if (isset($_POST['submit']) && validateToken($_POST['csrf_token'])) {
+if (!isset($_SESSION['_token'])) {
+    $_SESSION['_token'] = bin2hex(random_bytes(32));
+}
+
+function validateToken($token)
+{
+    return hash_equals($_SESSION['_token'], $token);
+}
+
+if (isset($_POST['submit']) && validateToken($_POST['_token'])) {
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
     $email = $query->validate(strtolower($_POST['email']));
@@ -145,7 +140,7 @@ if (isset($_POST['submit']) && validateToken($_POST['csrf_token'])) {
     <div class="form-container">
         <h1>Sign Up</h1>
         <form id="signupForm" method="post" action="">
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
+            <input type="hidden" name="_token" value="<?= $_SESSION['_token']; ?>">
             <div class="form-group">
                 <label for="first_name">First Name</label>
                 <input type="text" id="first_name" name="first_name" required maxlength="30">
