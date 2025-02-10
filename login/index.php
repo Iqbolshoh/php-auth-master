@@ -16,13 +16,13 @@ function redirectUser($role)
 }
 
 if (isset($_SESSION['loggedin']) && isset($_SESSION['role'])) {
-    redirectUser($_SESSION['role'], $roles);
+    redirectUser($_SESSION['role']);
 }
 
 include '../config.php';
 $query = new Database();
 
-function createSession($user, $query, $roles)
+function createSession($user, $query)
 {
     $_SESSION['loggedin'] = true;
     $_SESSION['user_id'] = $user['id'];
@@ -55,7 +55,7 @@ if (isset($_COOKIE['username']) && isset($_COOKIE['session_token'])) {
 
     $result = $query->select('users', 'id, role', "username = ?", [$_COOKIE['username']], 's');
     if (!empty($result)) {
-        createSession($result[0], $query, $roles);
+        createSession($result[0], $query);
     }
 }
 
@@ -65,7 +65,7 @@ if (isset($_POST['submit'])) {
     $result = $query->select('users', '*', "username = ? AND password = ?", [$username, $password], 'ss');
 
     if (!empty($result)) {
-        createSession($result[0], $query, $roles);
+        createSession($result[0], $query);
     } else {
         echo "<script>
             window.onload = function () {
