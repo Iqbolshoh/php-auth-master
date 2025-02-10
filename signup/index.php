@@ -45,8 +45,7 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
     }
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
+if (isset($_POST['submit'])) {
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
     $email = $query->validate(strtolower($_POST['email']));
@@ -68,10 +67,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!empty($result)) {
         $user_id = $query->select('users', 'id', 'username = ?', [$username], 's')[0]['id'];
 
-        $_SESSION['loggedin'] = true;
-        $_SESSION['username'] = $username;
-        $_SESSION['user_id'] = $user_id;
-        $_SESSION['role'] = $role;
+        $_SESSION = [
+            'loggedin' => true,
+            'user_id' => $user_id,
+            'username' => $username,
+            'role' => $role
+        ];
 
         setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
         setcookie('session_token', session_id(), time() + (86400 * 30), "/", "", true, true);
