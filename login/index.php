@@ -44,16 +44,7 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
     }
 }
 
-if (!isset($_SESSION['_token'])) {
-    $_SESSION['_token'] = bin2hex(random_bytes(32));
-}
-
-function validateToken($token)
-{
-    return hash_equals($_SESSION['_token'], $token);
-}
-
-if (isset($_POST['submit']) && validateToken($_POST['_token'])) {
+if (isset($_POST['submit'])) {
     $username = strtolower($_POST['username']);
     $password = $query->hashPassword($_POST['password']);
     $result = $query->select('users', '*', "username = ? AND password = ?", [$username, $password], 'ss');
@@ -123,7 +114,6 @@ if (isset($_POST['submit']) && validateToken($_POST['_token'])) {
     <div class="form-container">
         <h1>Login</h1>
         <form method="post" action="">
-            <input type="hidden" name="_token" value="<?= $_SESSION['_token']; ?>">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required maxlength="30">
