@@ -34,10 +34,12 @@ if (isset($_COOKIE['username'], $_COOKIE['session_token'])) {
     if (!empty($result)) {
         $user = $result[0];
 
-        $_SESSION['loggedin'] = true;
-        $_SESSION['username'] = $_COOKIE['username'];
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['role'] = $user['role'];
+        $_SESSION = [
+            'loggedin' => true,
+            'username' => $_COOKIE['username'],
+            'user_id' => $user['id'],
+            'role' => $user['role']
+        ];
 
         redirect($user['role']);
     }
