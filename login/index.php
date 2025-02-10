@@ -18,8 +18,6 @@ function redirectUser($role)
     }
 }
 
-
-
 function createSession($user, $query)
 {
     $_SESSION = [
