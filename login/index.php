@@ -2,24 +2,26 @@
 session_start();
 
 $roles = [
-    ['role' => 'admin', 'redirect_path' => '../admin/'],
-    ['role' => 'user', 'redirect_path' => '../user/'],
+    'admin' => '../admin/',
+    'user' => '../user/'
 ];
 
-if (isset($_SESSION['loggedin']) && isset($_SESSION['role'])) {
-
-    foreach ($roles as $role) {
-        if ($_SESSION['role'] == $role['role']) {
-            header("Location: {$role['redirect_path']}");
-            exit;
-        }
+function redirectUser($role, $roles)
+{
+    if (isset($roles[$role])) {
+        header("Location: {$roles[$role]}");
+        exit;
     }
+}
+
+if (isset($_SESSION['loggedin']) && isset($_SESSION['role'])) {
+    redirectUser($_SESSION['role'], $roles);
 }
 
 include '../config.php';
 $query = new Database();
 
-function createSession($user, $query)
+function createSession($user, $query, $roles)
 {
     $_SESSION['loggedin'] = true;
     $_SESSION['user_id'] = $user['id'];
@@ -39,6 +41,8 @@ function createSession($user, $query)
 
     setcookie('username', $user['username'], time() + (86400 * 30), "/", "", true, true);
     setcookie('session_token', $session_token, time() + (86400 * 30), "/", "", true, true);
+
+    redirectUser($user['role'], $roles);
 }
 
 if (isset($_COOKIE['username']) && isset($_COOKIE['session_token'])) {
@@ -50,13 +54,7 @@ if (isset($_COOKIE['username']) && isset($_COOKIE['session_token'])) {
 
     $result = $query->select('users', 'id, role', "username = ?", [$_COOKIE['username']], 's');
     if (!empty($result)) {
-        createSession($result[0], $query);
-        foreach ($roles as $role) {
-            if ($result[0]['role'] == $role['role']) {
-                header("Location: {$role['redirect_path']}");
-                exit;
-            }
-        }
+        createSession($result[0], $query, $roles);
     }
 }
 
@@ -66,25 +64,7 @@ if (isset($_POST['submit'])) {
     $result = $query->select('users', '*', "username = ? AND password = ?", [$username, $password], 'ss');
 
     if (!empty($result)) {
-        createSession($result[0], $query);
-        foreach ($roles as $role) {
-            if ($result[0]['role'] == $role['role']) {
-                echo "<script>
-                    window.onload = function () {
-                        Swal.fire({
-                            position: 'top-end',
-                            icon: 'success',
-                            title: 'Login successful',
-                            showConfirmButton: false,
-                            timer: 1500
-                        }).then(() => {
-                            window.location.href = '{$role['redirect_path']}';
-                        });
-                    };
-                </script>";
-                break;
-            }
-        }
+        createSession($result[0], $query, $roles);
     } else {
         echo "<script>
             window.onload = function () {
