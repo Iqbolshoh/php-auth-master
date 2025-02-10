@@ -1,9 +1,7 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
 include '../config.php';
 $query = new Database();
@@ -22,27 +20,20 @@ if (!empty($_SESSION['loggedin']) && !empty($_SESSION['role'])) {
 }
 
 if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
-    if (session_id() !== $_COOKIE['session_token']) {
-        session_write_close();
-        session_id($_COOKIE['session_token']);
-        session_start();
-    }
-
-    $result = $query->select('users', 'id, role', "username = ?", [$_COOKIE['username']], 's');
+    $result = $query->select('users', 'id, role, session_token', "username = ?", [$_COOKIE['username']], 's');
 
     if (!empty($result)) {
         $user = $result[0];
 
-        $_SESSION = [
-            'loggedin' => true,
-            'user_id' => $user['id'],
-            'username' => $_COOKIE['username'],
-            'role' => $user['role']
-        ];
+        if (hash_equals($user['session_token'], $_COOKIE['session_token'])) {
+            $_SESSION = [
+                'loggedin' => true,
+                'user_id' => $user['id'],
+                'username' => $_COOKIE['username'],
+                'role' => $user['role']
+            ];
 
-        $role = $user['role'];
-        if (isset($roles[$role])) {
-            header("Location: {$roles[$role]}");
+            header("Location: {$roles[$user['role']]}");
             exit;
         }
     }
@@ -52,12 +43,14 @@ if (isset($_POST['submit'])) {
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         die('CSRF verification failed!');
     }
-    $username = strtolower($_POST['username']);
-    $password = $query->hashPassword($_POST['password']);
-    $result = $query->select('users', '*', "username = ? AND password = ?", [$username, $password], 'ss');
 
-    if (!empty($result)) {
+    $username = strtolower($_POST['username']);
+    $result = $query->select('users', '*', "username = ?", [$username], 's');
+
+    if (!empty($result) && password_verify($_POST['password'], $result[0]['password'])) {
         $user = $result[0];
+
+        $sessionToken = bin2hex(random_bytes(32));
 
         $_SESSION = [
             'loggedin' => true,
@@ -66,8 +59,10 @@ if (isset($_POST['submit'])) {
             'role' => $user['role']
         ];
 
-        setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
-        setcookie('session_token', session_id(), time() + (86400 * 30), "/", "", true, true);
+        setcookie('username', $username, time() + (86400 * 30), "/", "", true, true, ['samesite' => 'Strict']);
+        setcookie('session_token', $sessionToken, time() + (86400 * 30), "/", "", true, true, ['samesite' => 'Strict']);
+
+        $query->update('users', ['session_token' => $sessionToken], "id = ?", [$user['id']], 'i');
 
         $redirectPath = $roles[$user['role']];
         ?>
