@@ -1,6 +1,8 @@
 <?php
 session_start();
+
 include '../config.php';
+$query = new Database();
 
 $roles = [
     'admin' => '../admin/',
@@ -16,7 +18,7 @@ function redirectUser($role)
     }
 }
 
-$query = new Database();
+
 
 function createSession($user, $query)
 {
