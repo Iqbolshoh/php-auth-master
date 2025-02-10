@@ -33,6 +33,18 @@ if (isset($_COOKIE['username']) && isset($_COOKIE['session_token'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['role'] = $user['role'];
 
+        // login/index.php (after successful login)
+        $device_name = $_SERVER['HTTP_USER_AGENT'];
+        $ip_address = $_SERVER['REMOTE_ADDR'];
+        $session_token = session_id();
+
+        $query->insert('active_sessions', [
+            'user_id' => $user['id'],
+            'device_name' => $device_name,
+            'ip_address' => $ip_address,
+            'session_token' => $session_token
+        ]);
+
         if ($user['role'] == 'admin') {
             header("Location: ../admin/");
             exit;
@@ -55,6 +67,18 @@ if (isset($_POST['submit'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['role'] = $user['role'];
+
+        // login/index.php (after successful login)
+        $device_name = $_SERVER['HTTP_USER_AGENT'];
+        $ip_address = $_SERVER['REMOTE_ADDR'];
+        $session_token = session_id();
+
+        $query->insert('active_sessions', [
+            'user_id' => $user['id'],
+            'device_name' => $device_name,
+            'ip_address' => $ip_address,
+            'session_token' => $session_token
+        ]);
 
         setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
         setcookie('session_token', session_id(), time() + (86400 * 30), "/", "", true, true);
