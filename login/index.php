@@ -77,6 +77,7 @@ if (isset($_POST['submit'])) {
                 });
             };
         </script>
+        
         <?php
     } else {
         ?>
