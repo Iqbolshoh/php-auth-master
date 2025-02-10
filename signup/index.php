@@ -4,6 +4,11 @@ session_start();
 include '../config.php';
 $query = new Database();
 
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
+
 $roles = [
     'admin' => '../admin/',
     'user' => '../'
@@ -45,6 +50,9 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
 }
 
 if (isset($_POST['submit'])) {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $csrf_token) {
+        die('CSRF verification failed!');
+    }
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
     $email = $query->validate(strtolower($_POST['email']));
