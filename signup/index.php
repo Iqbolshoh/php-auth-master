@@ -177,9 +177,7 @@ if (isset($_POST['submit'])) {
         </div>
     </div>
 
-
-    <script src="../src/js/sweetalert2.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         let isEmailAvailable = false;
         let isUsernameAvailable = false;
