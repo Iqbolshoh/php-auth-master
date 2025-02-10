@@ -1,22 +1,46 @@
 <?php
 session_start();
 
-if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true && isset($_SESSION['role'])) {
+if (isset($_SESSION['loggedin']) && isset($_SESSION['role'])) {
+    $roles = [
+        ['role' => 'admin', 'redirect_path' => '../admin/'],
+        ['role' => 'user', 'redirect_path' => '../user/'],
+    ];
 
-    if ($_SESSION['role'] == 'admin') {
-        header("Location: ../admin/");
-        exit;
-    } else {
-        header("Location: ../");
-        exit;
+    foreach ($roles as $role) {
+        if ($_SESSION['role'] == $role['role']) {
+            header("Location: {$role['redirect_path']}");
+            exit;
+        }
     }
 }
 
 include '../config.php';
 $query = new Database();
 
-if (isset($_COOKIE['username']) && isset($_COOKIE['session_token'])) {
+function createSession($user, $query)
+{
+    $_SESSION['loggedin'] = true;
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['username'] = $user['username'];
+    $_SESSION['role'] = $user['role'];
 
+    $device_name = $_SERVER['HTTP_USER_AGENT'];
+    $ip_address = $_SERVER['REMOTE_ADDR'];
+    $session_token = session_id();
+
+    $query->insert('active_sessions', [
+        'user_id' => $user['id'],
+        'device_name' => $device_name,
+        'ip_address' => $ip_address,
+        'session_token' => $session_token
+    ]);
+
+    setcookie('username', $user['username'], time() + (86400 * 30), "/", "", true, true);
+    setcookie('session_token', $session_token, time() + (86400 * 30), "/", "", true, true);
+}
+
+if (isset($_COOKIE['username']) && isset($_COOKIE['session_token'])) {
     if (session_id() !== $_COOKIE['session_token']) {
         session_write_close();
         session_id($_COOKIE['session_token']);
@@ -24,33 +48,13 @@ if (isset($_COOKIE['username']) && isset($_COOKIE['session_token'])) {
     }
 
     $result = $query->select('users', 'id, role', "username = ?", [$_COOKIE['username']], 's');
-
     if (!empty($result)) {
-        $user = $result[0];
-
-        $_SESSION['loggedin'] = true;
-        $_SESSION['username'] = $_COOKIE['username'];
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['role'] = $user['role'];
-
-        // login/index.php (after successful login)
-        $device_name = $_SERVER['HTTP_USER_AGENT'];
-        $ip_address = $_SERVER['REMOTE_ADDR'];
-        $session_token = session_id();
-
-        $query->insert('active_sessions', [
-            'user_id' => $user['id'],
-            'device_name' => $device_name,
-            'ip_address' => $ip_address,
-            'session_token' => $session_token
-        ]);
-
-        if ($user['role'] == 'admin') {
-            header("Location: ../admin/");
-            exit;
-        } else {
-            header("Location: ../");
-            exit;
+        createSession($result[0], $query);
+        foreach ($roles as $role) {
+            if ($result[0]['role'] == $role['role']) {
+                header("Location: {$role['redirect_path']}");
+                exit;
+            }
         }
     }
 }
@@ -61,51 +65,27 @@ if (isset($_POST['submit'])) {
     $result = $query->select('users', '*', "username = ? AND password = ?", [$username, $password], 'ss');
 
     if (!empty($result)) {
-        $user = $result[0];
-
-        $_SESSION['loggedin'] = true;
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = $user['role'];
-
-        // login/index.php (after successful login)
-        $device_name = $_SERVER['HTTP_USER_AGENT'];
-        $ip_address = $_SERVER['REMOTE_ADDR'];
-        $session_token = session_id();
-
-        $query->insert('active_sessions', [
-            'user_id' => $user['id'],
-            'device_name' => $device_name,
-            'ip_address' => $ip_address,
-            'session_token' => $session_token
-        ]);
-
-        setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
-        setcookie('session_token', session_id(), time() + (86400 * 30), "/", "", true, true);
-
-        $redirectPath = '../';
-        if ($user['role'] == 'admin') {
-            $redirectPath = '../admin/';
+        createSession($result[0], $query);
+        foreach ($roles as $role) {
+            if ($result[0]['role'] == $role['role']) {
+                echo "<script>
+                    window.onload = function () {
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Login successful',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            window.location.href = '{$role['redirect_path']}';
+                        });
+                    };
+                </script>";
+                break;
+            }
         }
-        ?>
-
-        <script>
-            window.onload = function () {
-                Swal.fire({
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'Login successful',
-                    showConfirmButton: false,
-                    timer: 1500
-                }).then(() => {
-                    window.location.href = '<?= $redirectPath; ?>';
-                });
-            };
-        </script>
-        <?php
     } else {
-        ?>
-        <script>
+        echo "<script>
             window.onload = function () {
                 Swal.fire({
                     position: 'top-end',
@@ -115,8 +95,7 @@ if (isset($_POST['submit'])) {
                     showConfirmButton: true
                 });
             };
-        </script>
-        <?php
+        </script>";
     }
 }
 ?>
@@ -134,11 +113,8 @@ if (isset($_POST['submit'])) {
 </head>
 
 <body>
-
     <div class="form-container">
-
         <h1>Login</h1>
-
         <form method="post" action="">
             <div class="form-group">
                 <label for="username">Username</label>
@@ -157,13 +133,10 @@ if (isset($_POST['submit'])) {
                 <button type="submit" name="submit" id="submit" disabled>Login</button>
             </div>
         </form>
-
         <div class="text-center">
             <p>Don't have an account? <a href="../signup/">Sign Up</a></p>
         </div>
-
     </div>
-
     <script src="../src/js/sweetalert2.js"></script>
     <script>
         const usernameField = document.getElementById('username');
@@ -199,7 +172,6 @@ if (isset($_POST['submit'])) {
             }
         });
     </script>
-
 </body>
 
 </html>
