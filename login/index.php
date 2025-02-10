@@ -77,7 +77,7 @@ if (isset($_POST['submit'])) {
                 });
             };
         </script>
-        
+
         <?php
     } else {
         ?>
@@ -96,7 +96,6 @@ if (isset($_POST['submit'])) {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -110,11 +109,8 @@ if (isset($_POST['submit'])) {
 </head>
 
 <body>
-
     <div class="form-container">
-
         <h1>Login</h1>
-
         <form method="post" action="">
             <div class="form-group">
                 <label for="username">Username</label>
@@ -133,13 +129,10 @@ if (isset($_POST['submit'])) {
                 <button type="submit" name="submit" id="submit" disabled>Login</button>
             </div>
         </form>
-
         <div class="text-center">
             <p>Don't have an account? <a href="../signup/">Sign Up</a></p>
         </div>
-
     </div>
-
     <script src="../src/js/sweetalert2.js"></script>
     <script>
         const usernameField = document.getElementById('username');
@@ -175,7 +168,6 @@ if (isset($_POST['submit'])) {
             }
         });
     </script>
-
 </body>
 
 </html>
