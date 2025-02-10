@@ -34,12 +34,10 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
     if (!empty($result)) {
         $user = $result[0];
 
-        $_SESSION = [
-            'loggedin' => true,
-            'user_id' => $user['id'],
-            'username' => $_COOKIE['username'],
-            'role' => $user['role']
-        ];
+        $_SESSION['loggedin'] = true;
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $_COOKIE['username'];
+        $_SESSION['role'] = $user['role'];
 
         $role = $user['role'];
         if (isset($roles[$role])) {
@@ -50,8 +48,23 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
 }
 
 if (isset($_POST['submit'])) {
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $csrf_token) {
-        die('CSRF verification failed!');
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $csrf_token . "a") {
+        echo "<style>
+        .error-message {
+            background-color: red;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 5px;
+            width: 50%;
+            margin: 20px auto;
+        }
+      </style>";
+
+        echo "<p class='error-message'>CSRF error! Please reload the page and try again.</p>";
+        exit;
     }
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
