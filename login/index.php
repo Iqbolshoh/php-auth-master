@@ -1,19 +1,53 @@
 <?php
 session_start();
 
+include '../config.php';
+$query = new Database();
+
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 $csrf_token = $_SESSION['csrf_token'];
-
-include '../config.php';
-$query = new Database();
 
 $roles = [
     'admin' => '../admin/',
     'user' => '../'
 ];
 
+if (!empty($_SESSION['loggedin']) && !empty($_SESSION['role'])) {
+    $role = $_SESSION['role'];
+    if (isset($roles[$role])) {
+        header("Location: {$roles[$role]}");
+        exit;
+    }
+}
+
+if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
+    if (session_id() !== $_COOKIE['session_token']) {
+        session_write_close();
+        session_id($_COOKIE['session_token']);
+        session_start();
+    }
+
+    $result = $query->select('users', 'id, role', "username = ?", [$_COOKIE['username']], 's');
+
+    if (!empty($result)) {
+        $user = $result[0];
+
+        $_SESSION = [
+            'loggedin' => true,
+            'user_id' => $user['id'],
+            'username' => $_COOKIE['username'],
+            'role' => $user['role']
+        ];
+
+        $role = $user['role'];
+        if (isset($roles[$role])) {
+            header("Location: {$roles[$role]}");
+            exit;
+        }
+    }
+}
 
 if (isset($_POST['submit'])) {
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $csrf_token) {
