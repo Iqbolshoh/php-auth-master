@@ -36,8 +36,8 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
 
         $_SESSION = [
             'loggedin' => true,
-            'username' => $_COOKIE['username'],
             'user_id' => $user['id'],
+            'username' => $_COOKIE['username'],
             'role' => $user['role']
         ];
 
@@ -53,10 +53,12 @@ if (isset($_POST['submit'])) {
     if (!empty($result)) {
         $user = $result[0];
 
-        $_SESSION['loggedin'] = true;
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = $user['role'];
+        $_SESSION = [
+            'loggedin' => true,
+            'user_id' => $user['id'],
+            'username' => $user['username'],
+            'role' => $user['role']
+        ];
 
         setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
         setcookie('session_token', session_id(), time() + (86400 * 30), "/", "", true, true);
