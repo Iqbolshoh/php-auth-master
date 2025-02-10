@@ -60,11 +60,6 @@ if (isset($_POST['submit'])) {
 
         setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
         setcookie('session_token', session_id(), time() + (86400 * 30), "/", "", true, true);
-
-        $redirectPath = '../';
-        if ($user['role'] == 'admin') {
-            $redirectPath = '../admin/';
-        }
         ?>
 
         <script>
@@ -76,7 +71,7 @@ if (isset($_POST['submit'])) {
                     showConfirmButton: false,
                     timer: 1500
                 }).then(() => {
-                    window.location.href = '<?= $redirectPath; ?>';
+                    window.location.href = '<?= redirect($user['role']) ?>';
                 });
             };
         </script>
