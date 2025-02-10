@@ -18,30 +18,31 @@ function redirect($role)
     }
 }
 
-if (
-    (!empty($_SESSION['loggedin']) && !empty($_SESSION['role'])) ||
-    (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token']) && session_id() !== $_COOKIE['session_token'])
-) {
-    if (empty($_SESSION['loggedin']) || empty($_SESSION['role'])) {
+if (!empty($_SESSION['loggedin']) && !empty($_SESSION['role'])) {
+    redirect($_SESSION['role']);
+}
+
+if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
+    if (session_id() !== $_COOKIE['session_token']) {
         session_write_close();
         session_id($_COOKIE['session_token']);
         session_start();
-
-        $result = $query->select('users', 'id, role', "username = ?", [$_COOKIE['username']], 's');
-
-        if (!empty($result)) {
-            $user = $result[0];
-
-            $_SESSION = [
-                'loggedin' => true,
-                'username' => $_COOKIE['username'],
-                'user_id' => $user['id'],
-                'role' => $user['role']
-            ];
-        }
     }
 
-    redirect($_SESSION['role']);
+    $result = $query->select('users', 'id, role', "username = ?", [$_COOKIE['username']], 's');
+
+    if (!empty($result)) {
+        $user = $result[0];
+
+        $_SESSION = [
+            'loggedin' => true,
+            'username' => $_COOKIE['username'],
+            'user_id' => $user['id'],
+            'role' => $user['role']
+        ];
+
+        redirect($user['role']);
+    }
 }
 
 if (isset($_POST['submit'])) {
