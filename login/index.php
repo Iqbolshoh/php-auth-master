@@ -9,17 +9,11 @@ $roles = [
     'user' => '../'
 ];
 
-function redirectRole($role)
-{
-    global $roles;
+if (!empty($_SESSION['loggedin']) && !empty($_SESSION['role'])) {
     if (isset($roles[$role])) {
         header("Location: {$roles[$role]}");
         exit;
     }
-}
-
-if (!empty($_SESSION['loggedin']) && !empty($_SESSION['role'])) {
-    redirectRole($_SESSION['role']);
 }
 
 if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
@@ -41,7 +35,10 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
             'role' => $user['role']
         ];
 
-        redirectRole($user['role']);
+        if (isset($roles[$role])) {
+            header("Location: {$roles[$role]}");
+            exit;
+        }
     }
 }
 
