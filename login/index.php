@@ -51,7 +51,15 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
 
 if (isset($_POST['submit'])) {
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $csrf_token) {
-        die('CSRF verification failed!');
+        echo "<script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Security Error',
+                text: 'CSRF verification failed! Please reload the page and try again.',
+                confirmButtonText: 'OK'
+            });
+        </script>";
+        exit;
     }
     $username = strtolower($_POST['username']);
     $password = $query->hashPassword($_POST['password']);
@@ -131,8 +139,9 @@ if (isset($_POST['submit'])) {
                 <label for="password">Password</label>
                 <div class="password-container">
                     <input type="password" id="password" name="password" required maxlength="255">
-                    <button type="button" id="toggle-password" class="password-toggle"><i
-                            class="fas fa-eye"></i></button>
+                    <button type="button" id="toggle-password" class="password-toggle">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
             </div>
             <div class="form-group">
