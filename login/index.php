@@ -3,7 +3,7 @@ session_start();
 
 $roles = [
     'admin' => '../admin/',
-    'user' => '../user/'
+    'user' => '../'
 ];
 
 function redirectUser($role)
