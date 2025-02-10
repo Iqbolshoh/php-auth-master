@@ -1,11 +1,12 @@
 <?php
 session_start();
 
+$roles = [
+    ['role' => 'admin', 'redirect_path' => '../admin/'],
+    ['role' => 'user', 'redirect_path' => '../user/'],
+];
+
 if (isset($_SESSION['loggedin']) && isset($_SESSION['role'])) {
-    $roles = [
-        ['role' => 'admin', 'redirect_path' => '../admin/'],
-        ['role' => 'user', 'redirect_path' => '../user/'],
-    ];
 
     foreach ($roles as $role) {
         if ($_SESSION['role'] == $role['role']) {
