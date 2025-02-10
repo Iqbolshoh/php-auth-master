@@ -90,6 +90,7 @@ if (isset($_POST['submit']) && validateToken($_POST['csrf_token'])) {
         setcookie('session_token', session_id(), time() + (86400 * 30), "/", "", true, true);
 
         $redirectPath = $roles[$role];
+
         ?>
 
         <script>
@@ -172,7 +173,7 @@ if (isset($_POST['submit']) && validateToken($_POST['csrf_token'])) {
                 </div>
             </div>
             <div class="form-group">
-                <button type="submit" id="submit">Sign Up</button>
+                <button type="submit" name="submit" id="submit">Sign Up</button>
             </div>
         </form>
         <div class="text-center">
