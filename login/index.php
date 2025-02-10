@@ -1,6 +1,14 @@
 <?php
 session_start();
 
+include '../config.php';
+$query = new Database();
+
+$roles = [
+    'admin' => '../admin/',
+    'user' => '../'
+];
+
 if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true && isset($_SESSION['role'])) {
 
     if ($_SESSION['role'] == 'admin') {
@@ -11,9 +19,6 @@ if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true && isset($_SE
         exit;
     }
 }
-
-include '../config.php';
-$query = new Database();
 
 if (isset($_COOKIE['username']) && isset($_COOKIE['session_token'])) {
 
