@@ -50,7 +50,7 @@ if (isset($_POST['submit'])) {
     $email = $query->validate(strtolower($_POST['email']));
     $username = $query->validate(strtolower($_POST['username']));
     $password = $query->hashPassword($_POST['password']);
-    $role = 'user'; // default
+    $role = 'user'; // default role
 
     $data = [
         'first_name' => $first_name,
@@ -60,7 +60,6 @@ if (isset($_POST['submit'])) {
         'password' => $password,
         'role' => $role
     ];
-
     $result = $query->insert('users', $data);
 
     if (!empty($result)) {
