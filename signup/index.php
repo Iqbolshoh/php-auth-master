@@ -73,11 +73,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['user_id'] = $user_id;
         $_SESSION['role'] = $role;
 
-        $redirectPath = $roles[$role];
-
         setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
         setcookie('session_token', session_id(), time() + (86400 * 30), "/", "", true, true);
+
+        $redirectPath = $roles[$role];
         ?>
+
         <script>
             window.onload = function () {
                 Swal.fire({
