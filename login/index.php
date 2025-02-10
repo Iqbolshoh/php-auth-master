@@ -1,7 +1,10 @@
 <?php
 session_start();
 
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
 
 include '../config.php';
 $query = new Database();
@@ -11,46 +14,18 @@ $roles = [
     'user' => '../'
 ];
 
-if (!empty($_SESSION['loggedin']) && !empty($_SESSION['role'])) {
-    $role = $_SESSION['role'];
-    if (isset($roles[$role])) {
-        header("Location: {$roles[$role]}");
-        exit;
-    }
-}
 
-if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
-    $result = $query->select('users', 'id, role, session_token', "username = ?", [$_COOKIE['username']], 's');
+if (isset($_POST['submit'])) {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $csrf_token) {
+        echo $_POST['csrf_token'] . " " . $csrf_token;
+        die('CSRF verification failed!');
+    }
+    $username = strtolower($_POST['username']);
+    $password = $query->hashPassword($_POST['password']);
+    $result = $query->select('users', '*', "username = ? AND password = ?", [$username, $password], 'ss');
 
     if (!empty($result)) {
         $user = $result[0];
-
-        if (hash_equals($user['session_token'], $_COOKIE['session_token'])) {
-            $_SESSION = [
-                'loggedin' => true,
-                'user_id' => $user['id'],
-                'username' => $_COOKIE['username'],
-                'role' => $user['role']
-            ];
-
-            header("Location: {$roles[$user['role']]}");
-            exit;
-        }
-    }
-}
-
-if (isset($_POST['submit'])) {
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        die('CSRF verification failed!');
-    }
-
-    $username = strtolower($_POST['username']);
-    $result = $query->select('users', '*', "username = ?", [$username], 's');
-
-    if (!empty($result) && password_verify($_POST['password'], $result[0]['password'])) {
-        $user = $result[0];
-
-        $sessionToken = bin2hex(random_bytes(32));
 
         $_SESSION = [
             'loggedin' => true,
@@ -59,10 +34,8 @@ if (isset($_POST['submit'])) {
             'role' => $user['role']
         ];
 
-        setcookie('username', $username, time() + (86400 * 30), "/", "", true, true, ['samesite' => 'Strict']);
-        setcookie('session_token', $sessionToken, time() + (86400 * 30), "/", "", true, true, ['samesite' => 'Strict']);
-
-        $query->update('users', ['session_token' => $sessionToken], "id = ?", [$user['id']], 'i');
+        setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
+        setcookie('session_token', session_id(), time() + (86400 * 30), "/", "", true, true);
 
         $redirectPath = $roles[$user['role']];
         ?>
@@ -116,7 +89,7 @@ if (isset($_POST['submit'])) {
     <div class="form-container">
         <h1>Login</h1>
         <form method="post" action="">
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
+            <input type="hidden" name="csrf_token" value="<?= $csrf_token; ?>">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required maxlength="30">
