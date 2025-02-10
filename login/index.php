@@ -17,7 +17,6 @@ $roles = [
 
 if (isset($_POST['submit'])) {
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $csrf_token) {
-        echo $_POST['csrf_token'] . " " . $csrf_token;
         die('CSRF verification failed!');
     }
     $username = strtolower($_POST['username']);
