@@ -9,7 +9,7 @@ $roles = [
     'user' => '../'
 ];
 
-function redirect($role)
+function redirectRole($role)
 {
     global $roles;
     if (isset($roles[$role])) {
@@ -19,7 +19,7 @@ function redirect($role)
 }
 
 if (!empty($_SESSION['loggedin']) && !empty($_SESSION['role'])) {
-    redirect($_SESSION['role']);
+    redirectRole($_SESSION['role']);
 }
 
 if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
@@ -41,7 +41,7 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
             'role' => $user['role']
         ];
 
-        redirect($user['role']);
+        redirectRole($user['role']);
     }
 }
 
@@ -60,6 +60,8 @@ if (isset($_POST['submit'])) {
 
         setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
         setcookie('session_token', session_id(), time() + (86400 * 30), "/", "", true, true);
+
+        $redirectPath = $roles[$user['role']];
         ?>
 
         <script>
@@ -71,7 +73,7 @@ if (isset($_POST['submit'])) {
                     showConfirmButton: false,
                     timer: 1500
                 }).then(() => {
-                    window.location.href = '<?= redirect($user['role']) ?>';
+                    window.location.href = '<?= $redirectPath; ?>';
                 });
             };
         </script>
