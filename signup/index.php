@@ -88,7 +88,7 @@ if (isset($_POST['submit'])) {
 
         $_SESSION['loggedin'] = true;
         $_SESSION['user_id'] = $user_id;
-        $_SESSION['username'] =  $username;
+        $_SESSION['username'] = $username;
         $_SESSION['role'] = $role;
 
         setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
@@ -172,8 +172,9 @@ if (isset($_POST['submit'])) {
                 <label for="password">Password</label>
                 <div class="password-container">
                     <input type="password" id="password" name="password" required maxlength="255">
-                    <button type="button" id="toggle-password" class="password-toggle"><i
-                            class="fas fa-eye"></i></button>
+                    <button type="button" id="toggle-password" class="password-toggle">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
             </div>
             <div class="form-group">
