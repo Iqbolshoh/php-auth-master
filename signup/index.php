@@ -1,13 +1,47 @@
 <?php
 session_start();
 
-if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
-    header("Location: ../");
-    exit;
+if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true && isset($_SESSION['role'])) {
+
+    if ($_SESSION['role'] == 'admin') {
+        header("Location: ../admin/");
+        exit;
+    } else {
+        header("Location: ../");
+        exit;
+    }
 }
 
 include '../config.php';
 $query = new Database();
+
+if (isset($_COOKIE['username']) && isset($_COOKIE['session_token'])) {
+
+    if (session_id() !== $_COOKIE['session_token']) {
+        session_write_close();
+        session_id($_COOKIE['session_token']);
+        session_start();
+    }
+
+    $result = $query->select('users', 'id, role', "username = ?", [$_COOKIE['username']], 's');
+
+    if (!empty($result)) {
+        $user = $result[0];
+
+        $_SESSION['loggedin'] = true;
+        $_SESSION['username'] = $_COOKIE['username'];
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['role'] = $user['role'];
+
+        if ($user['role'] == 'admin') {
+            header("Location: ../admin/");
+            exit;
+        } else {
+            header("Location: ../");
+            exit;
+        }
+    }
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -16,13 +50,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $query->validate(strtolower($_POST['email']));
     $username = $query->validate(strtolower($_POST['username']));
     $password = $query->hashPassword($_POST['password']);
+    $role = 'user'; // default
 
     $data = [
         'first_name' => $first_name,
         'last_name' => $last_name,
         'email' => $email,
         'username' => $username,
-        'password' => $password
+        'password' => $password,
+        'role' => $role
     ];
 
     $result = $query->insert('users', $data);
@@ -33,6 +69,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['loggedin'] = true;
         $_SESSION['username'] = $username;
         $_SESSION['user_id'] = $user_id;
+        $_SESSION['role'] = $role;
+
+        $redirectPath = '../';
+        if ($role == 'admin') {
+            $redirectPath = '../admin/';
+        }
 
         setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
         setcookie('session_token', session_id(), time() + (86400 * 30), "/", "", true, true);
@@ -46,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     showConfirmButton: false,
                     timer: 1500
                 }).then(() => {
-                    window.location.href = '../';
+                    window.location.href = '<?= $redirectPath; ?>';
                 });
             };
         </script>
@@ -59,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         title: 'Oops...',
                         text: 'Registration failed. Please try again later.',
                     });
-                </script>";
+            </script>";
     }
 }
 
@@ -115,6 +157,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <p>Already have an account? <a href="../login/">Login</a></p>
         </div>
     </div>
+
 
     <script src="../src/js/sweetalert2.js"></script>
 
@@ -233,7 +276,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         });
     </script>
-
 </body>
 
 </html>

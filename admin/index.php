@@ -3,16 +3,16 @@
 session_start();
 
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header("Location: ./login/");
+    header("Location: ../login/");
     exit;
 }
 
-if (isset($_SESSION['role']) && $_SESSION['role'] != 'user') {
-    header("Location: ./login/");
+if (isset($_SESSION['role']) && $_SESSION['role'] != 'admin') {
+    header("Location: ../login/");
     exit;
 }
 
-include './config.php';
+include '../config.php';
 $query = new Database();
 
 ?>
@@ -24,7 +24,7 @@ $query = new Database();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="../favicon.ico">
-    <title>Welcome user</title>
+    <title>Welcome admin</title>
     <style>
         body {
             display: flex;
@@ -70,7 +70,7 @@ $query = new Database();
 
     <div class="container">
         <?php echo "<h1>Hello, {$_SESSION['role']}!</h1>"; ?>
-        <a href="./logout/" class="logout">Logout</a>
+        <a href="../logout/" class="logout">Logout</a>
     </div>
 
 </body>

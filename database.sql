@@ -1,6 +1,6 @@
-CREATE DATABASE IF NOT EXISTS auth_master;
+CREATE DATABASE IF NOT EXISTS roles;
 
-USE auth_master;
+USE roles;
 
 CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -9,22 +9,13 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(100) NOT NULL UNIQUE,
     username VARCHAR(30) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'user') NOT NULL DEFAULT 'user',
     profile_picture VARCHAR(255) DEFAULT 'default.png',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE active_sessions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    device_name VARCHAR(255) NOT NULL,
-    ip_address VARCHAR(45) NOT NULL,
-    last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    session_token VARCHAR(255) UNIQUE NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
--- Login: Iqbolshoh
+-- Login: iqbolshoh
 -- Password: 1
 INSERT INTO
     users (
@@ -32,7 +23,8 @@ INSERT INTO
         last_name,
         email,
         username,
-        password
+        password,
+        role
     )
 VALUES
     (
@@ -40,12 +32,14 @@ VALUES
         'Ilhomjonov',
         'iilhomjonov777@gmail.com',
         'iqbolshoh',
-        '65c2a32982abe41b1e6ff888d351ee6b7ade33affd4a595667ea7db910aecaa8'
+        '65c2a32982abe41b1e6ff888d351ee6b7ade33affd4a595667ea7db910aecaa8',
+        'admin'
     ),
     (
         'user',
         'user',
         'user@gmail.com',
         'user',
-        '65c2a32982abe41b1e6ff888d351ee6b7ade33affd4a595667ea7db910aecaa8'
+        '65c2a32982abe41b1e6ff888d351ee6b7ade33affd4a595667ea7db910aecaa8',
+        'user'
     )
