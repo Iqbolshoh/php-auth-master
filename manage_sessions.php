@@ -1,4 +1,15 @@
-<!-- manage_sessions.php -->
+<?php
+session_start();
+
+if (($_SESSION['loggedin'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'user') {
+    header("Location: ./login/");
+    exit;
+}
+
+include './config.php';
+$query = new Database();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
