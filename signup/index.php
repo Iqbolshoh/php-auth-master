@@ -102,7 +102,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
                 'httponly' => true,
                 'samesite' => 'Strict'
             ]);
-        }        
+        }
+
+        $query->insert('active_sessions', [
+            'user_id' => $user['id'],
+            'device_name' => $_SERVER['HTTP_USER_AGENT'],
+            'ip_address' => $_SERVER['REMOTE_ADDR'],
+            'session_token' => session_id()
+        ]);
 
         $redirectPath = $roles[$role];
 
