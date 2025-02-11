@@ -4,11 +4,6 @@ session_start();
 include '../config.php';
 $query = new Database();
 
-if (!isset($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-$csrf_token = $_SESSION['csrf_token'];
-
 $roles = [
     'admin' => '../admin/',
     'user' => '../'
@@ -46,6 +41,11 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
         }
     }
 }
+
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csrf_token'])) {
     if (empty($_POST['csrf_token']) || !hash_equals($csrf_token, $_POST['csrf_token'])) {
