@@ -8,6 +8,19 @@ if (($_SESSION['loggedin'] ?? false) !== true || ($_SESSION['role'] ?? '') !== '
 
 include './config.php';
 $query = new Database();
+
+if (isset($_GET['token'])) {
+    $query->delete('active_sessions', 'session_token = ?', [$_GET['token']], 's');
+    header('Location: active_sessions.php');
+    exit;
+}
+
+$result = $query->select('active_sessions', '*', 'session_token = ?', [session_id()], 's');
+
+if (empty($result)) {
+    header("Location: ../login/");
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -20,6 +33,7 @@ $query = new Database();
     <link rel="stylesheet" href="./src/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -48,7 +62,7 @@ $query = new Database();
                                 echo "<td><span class='badge bg-info'>{$session['ip_address']}</span></td>";
                                 echo "<td><span class='badge bg-success'>{$session['last_activity']}</span></td>";
                                 echo "<td>
-                    <button class='btn btn-danger btn-sm' data-bs-toggle='modal' data-bs-target='#removeSessionModal' data-token='{$session['session_token']}'>
+                    <button class='btn btn-danger btn-sm' onclick='confirmRemoval(\"{$session['session_token']}\")'>
                         <i class='fas fa-trash-alt'></i> Remove
                     </button>
                   </td>";
@@ -57,30 +71,6 @@ $query = new Database();
                             ?>
                         </tbody>
                     </table>
-
-                    <!-- Modal for Confirm Delete -->
-                    <div class="modal fade" id="removeSessionModal" tabindex="-1" aria-labelledby="removeSessionLabel"
-                        aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header bg-danger text-white">
-                                    <h5 class="modal-title" id="removeSessionLabel"><i
-                                            class="fas fa-exclamation-triangle"></i> Confirm Removal</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    Are you sure you want to remove this session?
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Cancel</button>
-                                    <a id="confirmDelete" href="#" class="btn btn-danger">Remove</a>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
 
                 </div>
             </section>
@@ -91,6 +81,23 @@ $query = new Database();
     <script src="./src/js/jquery.min.js"></script>
     <script src="./src/js/bootstrap.bundle.min.js"></script>
     <script src="./src/js/adminlte.min.js"></script>
+    <script>
+        function confirmRemoval(token) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You won\'t be able to revert this!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, remove it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'active_sessions.php?token=' + token;
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>
