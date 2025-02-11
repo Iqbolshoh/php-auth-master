@@ -98,8 +98,8 @@ $query = new Database();
                     </div>
 
                 </div>
-
             </section>
+
         </div>
 
         <?php include './footer.php'; ?>
