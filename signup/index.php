@@ -48,9 +48,9 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
 }
 
 
-if (isset($_POST['submit']) && isset($_POST['csrf_token'])) {
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csrf_token'])) {
     if (empty($_POST['csrf_token']) || !hash_equals($csrf_token, $_POST['csrf_token'])) {
-        echo "<style>
+        echo '<style>
             .error-message {
                 background-color: red;
                 color: white;
@@ -62,8 +62,8 @@ if (isset($_POST['submit']) && isset($_POST['csrf_token'])) {
                 width: 50%;
                 margin: 20px auto;
             }
-        </style>";
-        echo "<p class='error-message'>CSRF error! Please reload the page and try again.</p>";
+        </style>';
+        echo '<p class="error-message">CSRF error! Please reload the page and try again.</p>';
         exit;
     }
 
