@@ -47,25 +47,26 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
     }
 }
 
-if (isset($_POST['submit'])) {
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $csrf_token) {
-        echo "<style>
-        .error-message {
-            background-color: red;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 5px;
-            width: 50%;
-            margin: 20px auto;
-        }
-      </style>";
 
+if (isset($_POST['submit']) && isset($_POST['csrf_token'])) {
+    if (empty($_POST['csrf_token']) || !hash_equals($csrf_token, $_POST['csrf_token'])) {
+        echo "<style>
+            .error-message {
+                background-color: red;
+                color: white;
+                padding: 15px;
+                text-align: center;
+                font-size: 18px;
+                font-weight: bold;
+                border-radius: 5px;
+                width: 50%;
+                margin: 20px auto;
+            }
+        </style>";
         echo "<p class='error-message'>CSRF error! Please reload the page and try again.</p>";
         exit;
     }
+
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
     $email = $query->validate(strtolower($_POST['email']));
