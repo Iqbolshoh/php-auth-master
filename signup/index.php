@@ -42,9 +42,7 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
     }
 }
 
-if (!isset($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+$_SESSION['csrf_token'] ??= bin2hex(random_bytes(32));
 $csrf_token = $_SESSION['csrf_token'];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csrf_token'])) {
