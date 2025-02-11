@@ -93,23 +93,22 @@ $query = new Database();
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
 
+
                         </div>
                     </div>
 
                 </div>
-
             </section>
-        </div>
 
+        </div>
         <?php include './footer.php'; ?>
     </div>
 
     <!-- jQuery -->
-    <script src="../src/js/jquery.min.js"></script>
-
+    <script src="./src/js/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
-    <script src="../src/js/bootstrap.bundle.min.js"></script>
-    <script src="../src/js/adminlte.min.js"></script>
+    <script src="./src/js/bootstrap.bundle.min.js"></script>
+    <script src="./src/js/adminlte.min.js"></script>
 </body>
 
 </html>
