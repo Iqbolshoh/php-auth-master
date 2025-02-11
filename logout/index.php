@@ -7,6 +7,7 @@ $session_token = session_id();
 
 $query->delete('active_sessions', 'session_token = ?', [$session_token], 's');
 
+session_unset();
 $_SESSION = [];
 session_destroy();
 session_write_close();
