@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-if (empty($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || empty($_SESSION['role']) || $_SESSION['role'] !== 'user') {
+if (($_SESSION['loggedin'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'user') {
     header("Location: ./login/");
     exit;
 }
