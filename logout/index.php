@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once '../config.php';
+include '../config.php';
 $query = new Database();
 $session_token = session_id();
 
