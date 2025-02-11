@@ -101,13 +101,11 @@ $query = new Database();
             </section>
 
         </div>
-
         <?php include './footer.php'; ?>
     </div>
 
     <!-- jQuery -->
     <script src="./src/js/jquery.min.js"></script>
-
     <!-- Bootstrap 4 -->
     <script src="./src/js/bootstrap.bundle.min.js"></script>
     <script src="./src/js/adminlte.min.js"></script>
