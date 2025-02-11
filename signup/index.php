@@ -89,8 +89,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
         $_SESSION['username'] = $username;
         $_SESSION['role'] = $role;
 
-        setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
-        setcookie('session_token', session_id(), time() + (86400 * 30), "/", "", true, true);
+        $cookies = [
+            'username' => $username,
+            'session_token' => session_id()
+        ];
+
+        foreach ($cookies as $name => $value) {
+            setcookie($name, $value, [
+                'expires' => time() + (86400 * 30),
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+        }        
 
         $redirectPath = $roles[$role];
 
