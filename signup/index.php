@@ -159,7 +159,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
 <body>
     <div class="form-container">
         <h1>Sign Up</h1>
-        <form id="signupForm" method="post" action="">
+        <form id="signupForm" method="POST" action="">
             <div class="form-group">
                 <label for="first_name">First Name</label>
                 <input type="text" id="first_name" name="first_name" required maxlength="30">
