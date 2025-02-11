@@ -1,12 +1,12 @@
 <?php
 session_start();
 
-if (($_SESSION['loggedin'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'user') {
-    header("Location: ./login/");
+if (($_SESSION['loggedin'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'admin') {
+    header("Location: ../login/");
     exit;
 }
 
-include './config.php';
+include '../config.php';
 $query = new Database();
 ?>
 
