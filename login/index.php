@@ -47,7 +47,6 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
     }
 }
 
-
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csrf_token'])) {
     if (empty($_POST['csrf_token']) || !hash_equals($csrf_token, $_POST['csrf_token'])) {
         echo '<style>
