@@ -18,7 +18,7 @@ if (isset($_GET['token'])) {
 $result = $query->select('active_sessions', '*', 'session_token = ?', [session_id()], 's');
 
 if (empty($result)) {
-    header("Location: ../login/");
+    header("Location: ../logout/");
     exit;
 }
 ?>
