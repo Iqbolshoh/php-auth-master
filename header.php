@@ -6,16 +6,10 @@ $menuItems = [
         "menuTitle" => "Menu",
         "icon" => "fas fa-home",
         "pages" => [
-            ["title" => "Home", "url" => "index.php"]
+            ["title" => "Home", "url" => "index.php"],
+            ["title" => "Manage Sessions", "url" => "manage_sessions.php"]
         ],
-    ],
-    // [
-    //     "menuTitle" => "Settings",
-    //     "icon" => "fas fa-cogs",
-    //     "pages" => [
-    //         ["title" => "Profile", "url" => "profile.php"],
-    //     ]
-    // ]
+    ]
 ];
 
 $activePageInfo = array_reduce($menuItems, function ($carry, $menuItem) use ($currentPage) {
