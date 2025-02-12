@@ -45,8 +45,8 @@ if (isset($_GET['token'])) {
                         </thead>
                         <tbody>
                             <?php foreach ($sessions as $session): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($session['device_name']); ?></td>
+                                <tr id="session-<?php echo $session['session_token']; ?>">
+                                    <td class="device-name"> <?php echo htmlspecialchars($session['device_name']); ?></td>
                                     <td><?php echo htmlspecialchars($session['ip_address']); ?></td>
                                     <td><?php echo htmlspecialchars($session['last_activity']); ?></td>
                                     <td class="text-center">
@@ -76,8 +76,8 @@ if (isset($_GET['token'])) {
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <form id="editForm" method="POST" action="update_session.php">
-                                        <input type="hidden" name="session_token" id="editSessionToken" maxleth="255">
+                                    <form id="editForm">
+                                        <input type="hidden" name="session_token" id="editSessionToken">
                                         <div class="form-group">
                                             <label for="deviceName">Device Name</label>
                                             <input type="text" class="form-control" name="device_name" id="deviceName"
@@ -90,20 +90,35 @@ if (isset($_GET['token'])) {
                         </div>
                     </div>
 
-                    <script>
-                        function openEditModal(token, deviceName) {
-                            document.getElementById('editSessionToken').value = token;
-                            document.getElementById('deviceName').value = deviceName;
-                            $('#editModal').modal('show');
-                        }
-                    </script>
-
                 </div>
             </section>
 
         </div>
         <?php include './footer.php'; ?>
     </div>
+    <script>
+        function openEditModal(token, deviceName) {
+            document.getElementById('editSessionToken').value = token;
+            document.getElementById('deviceName').value = deviceName;
+            $('#editModal').modal('show');
+        }
+
+        document.getElementById('editForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token = document.getElementById('editSessionToken').value;
+            let deviceName = document.getElementById('deviceName').value;
+
+            $.ajax({
+                url: 'update_session.php',
+                type: 'POST',
+                data: { session_token: token, device_name: deviceName },
+                success: function (response) {
+                    $('#editModal').modal('hide');
+                    document.querySelector(`#session-${token} .device-name`).textContent = deviceName;
+                }
+            });
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="./src/js/jquery.min.js"></script>
     <script src="./src/js/bootstrap.bundle.min.js"></script>
