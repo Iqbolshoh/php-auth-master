@@ -30,52 +30,33 @@ if (!empty($_COOKIE['username']) && ($user = $query->select('users', 'id, role',
 $_SESSION['csrf_token'] ??= bin2hex(random_bytes(32));
 $csrf_token = $_SESSION['csrf_token'];
 
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csrf_token'])) {
-    if (empty($_POST['csrf_token']) || !hash_equals($csrf_token, $_POST['csrf_token'])) {
-        echo '<style>
-            .error-message {
-                background-color: red;
-                color: white;
-                padding: 15px;
-                text-align: center;
-                font-size: 18px;
-                font-weight: bold;
-                border-radius: 5px;
-                width: 50%;
-                margin: 20px auto;
-            }
-        </style>';
-        echo '<p class="error-message">CSRF error! Please reload the page and try again.</p>';
+    // CSRF tekshiruvi
+    if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+        echo '<div class="error-message">CSRF error! Please reload the page and try again.</div>';
         exit;
     }
 
-    $username = strtolower($_POST['username']);
-    $password = $query->hashPassword($_POST['password']);
-    $result = $query->select('users', '*', "username = ? AND password = ?", [$username, $password], 'ss');
+    // Ma'lumotlarni olish va tekshirish
+    $username = strtolower(trim($_POST['username']));
+    $password = $_POST['password'];
+    $user = $query->select('users', 'id, username, role, password', "username = ?", [$username], 's')[0] ?? null;
 
-    if (!empty($result)) {
-        $user = $result[0];
-
-        $_SESSION['loggedin'] = true;
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = $user['role'];
-
-        $cookies = [
-            'username' => $username,
-            'session_token' => session_id()
+    if ($user && password_verify($password, $user['password'])) {
+        $_SESSION += [
+            'loggedin' => true,
+            'user_id' => $user['id'],
+            'username' => $user['username'],
+            'role' => $user['role']
         ];
 
-        foreach ($cookies as $name => $value) {
-            setcookie($name, $value, [
-                'expires' => time() + (86400 * 30),
-                'path' => '/',
-                'secure' => true,
-                'httponly' => true,
-                'samesite' => 'Strict'
-            ]);
+        // Cookie sozlash
+        foreach (['username' => $username, 'session_token' => session_id()] as $name => $value) {
+            setcookie($name, $value, time() + 86400 * 30, '/', '', true, true);
         }
 
+        // Faol sessiyani bazaga yozish
         $query->insert('active_sessions', [
             'user_id' => $user['id'],
             'device_name' => $_SERVER['HTTP_USER_AGENT'],
@@ -83,38 +64,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
             'session_token' => session_id()
         ]);
 
-        $redirectPath = ROLES[$user['role']];
-        ?>
-
-        <script>
-            window.onload = function () {
-                Swal.fire({
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'Login successful',
-                    showConfirmButton: false,
-                    timer: 1500
-                }).then(() => {
-                    window.location.href = '<?= $redirectPath; ?>';
-                });
-            };
-        </script>
-
-        <?php
+        // JS orqali sahifaga yo‘naltirish
+        echo "<script>
+            Swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: 'Login successful',
+                showConfirmButton: false,
+                timer: 1500
+            }).then(() => window.location.href = '" . ROLES[$user['role']] . "');
+        </script>";
     } else {
-        ?>
-        <script>
-            window.onload = function () {
-                Swal.fire({
-                    position: 'top-end',
-                    icon: 'error',
-                    title: 'Incorrect information',
-                    text: 'Login or password is incorrect',
-                    showConfirmButton: true
-                });
-            };
-        </script>
-        <?php
+        echo "<script>
+            Swal.fire({
+                position: 'top-end',
+                icon: 'error',
+                title: 'Incorrect information',
+                text: 'Login or password is incorrect',
+                showConfirmButton: true
+            });
+        </script>";
     }
 }
 ?>
