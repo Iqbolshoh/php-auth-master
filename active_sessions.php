@@ -34,8 +34,8 @@ if (isset($_GET['token'])) {
             <section class="content">
                 <div class="container-fluid">
 
-                    <table class="">
-                        <thead class="">
+                    <table class="table table-striped table-hover table-bordered">
+                        <thead class="thead-dark">
                             <tr>
                                 <th><i class="fas fa-desktop"></i> Device Name</th>
                                 <th><i class="fas fa-network-wired"></i> IP Address</th>
@@ -44,20 +44,19 @@ if (isset($_GET['token'])) {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php
-                            foreach ($sessions as $session) {
-                                echo "<tr>";
-                                echo "<td>{$session['device_name']}</td>";
-                                echo "<td>{$session['ip_address']}</td>";
-                                echo "<td>{$session['last_activity']}</td>";
-                                echo "<td>
-                    <button class='btn btn-danger btn-sm' onclick='confirmRemoval(\"{$session['session_token']}\")'>
-                        <i class='fas fa-trash-alt'></i> Remove
-                    </button>
-                  </td>";
-                                echo "</tr>";
-                            }
-                            ?>
+                            <?php foreach ($sessions as $session): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($session['device_name']); ?></td>
+                                    <td><?php echo htmlspecialchars($session['ip_address']); ?></td>
+                                    <td><?php echo htmlspecialchars($session['last_activity']); ?></td>
+                                    <td class="text-center">
+                                        <button class="btn btn-danger btn-sm"
+                                            onclick="confirmRemoval('<?php echo $session['session_token']; ?>')">
+                                            <i class="fas fa-trash-alt"></i> Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
 
