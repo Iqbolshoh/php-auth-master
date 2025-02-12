@@ -78,7 +78,7 @@ if (
     } else {
         ?>
         <script>
-            window.onload = function () { Swal.fire({ position: 'top-end', icon: 'error', title: 'Incorrect information', text: 'Login or password is incorrect', showConfirmButton: true }); };
+            window.onload = function () { Swal.fire({ icon: 'error', title: 'Oops...', text: 'Login or password is incorrect', showConfirmButton: true }); };
         </script>
         <?php
     }
