@@ -120,7 +120,11 @@ if (isset($_POST['update'])) {
                 data: { session_token: token, device_name: deviceName },
                 success: function (response) {
                     $('#editModal').modal('hide');
-                    document.querySelector(`#session-${token} .device-name`).textContent = deviceName;
+                    if (response.status === 'success') {
+                        document.querySelector(`#session-${token} .device-name`).textContent = deviceName;
+                    } else {
+                        alert('Failed to update device name');
+                    }
                 }
             });
         });
