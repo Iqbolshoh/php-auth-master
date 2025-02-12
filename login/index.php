@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
 
     $username = strtolower(trim($_POST['username']));
     $password = $query->hashPassword($_POST['password']);
-    $user = $query->select('users', '*', "username = ?", [$username], 's')[0] ?? null;
+    $user = $query->select('users', '*', "username = ? AND password = ?", [$username, $password], 'ss')[0] ?? null;
 
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION += [
