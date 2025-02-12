@@ -35,13 +35,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
         exit('<div class="error-message">CSRF error! Please reload the page and try again.</div>');
     }
 
+    $role = 'user'; // default role is 'user'
+
     $data = [
         'first_name' => $query->validate($_POST['first_name']),
         'last_name' => $query->validate($_POST['last_name']),
         'email' => $query->validate(strtolower($_POST['email'])),
         'username' => $query->validate(strtolower($_POST['username'])),
         'password' => $query->hashPassword($_POST['password']),
-        'role' => 'user' // default role is 'user'
+        'role' => $role
     ];
     $result = $query->insert('users', $data);
 
