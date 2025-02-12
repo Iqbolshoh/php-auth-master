@@ -27,9 +27,8 @@ if (!empty($_COOKIE['username']) && ($user = $query->select('users', 'id, role',
     }
 }
 
-// CSRF token yaratish
 $_SESSION['csrf_token'] ??= bin2hex(random_bytes(32));
-
+$csrf_token = $_SESSION['csrf_token'];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csrf_token'])) {
     if (empty($_POST['csrf_token']) || !hash_equals($csrf_token, $_POST['csrf_token'])) {
