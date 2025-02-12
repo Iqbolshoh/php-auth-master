@@ -50,15 +50,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
         'password' => $password,
         'role' => $role
     ];
-    $result = $query->insert('users', $data);
 
-    if ($query->insert('users', $data)) {
-        $_SESSION = [
-            'loggedin' => true,
-            'user_id' => $query->select('users', 'id', 'username = ?', [$userData['username']], 's')[0]['id'],
-            'username' => $userData['username'],
-            'role' => $userData['role']
-        ];
+    $user = $query->insert('users', $data);
+
+    if (!empty($user)) {
+        $user_id = $query->select('users', 'id', 'username = ?', [$username], 's')[0]['id'];
+
+        $_SESSION['loggedin'] = true;
+        $_SESSION['user_id'] = $user_id;
+        $_SESSION['username'] = $username;
+        $_SESSION['role'] = $role;
 
         foreach (['username' => $_SESSION['username'], 'session_token' => session_id()] as $name => $value) {
             setcookie($name, $value, time() + 2592000, '/', '', true, true); // 30 kun
