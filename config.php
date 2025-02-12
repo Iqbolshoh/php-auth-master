@@ -4,6 +4,11 @@ define("DB_USERNAME", "root");
 define("DB_PASSWORD", "");
 define("DB_NAME", "auth_master");
 
+$roles = [
+    'admin' => '../admin/',
+    'user' => '../'
+];
+
 class Database
 {
     private $conn;
