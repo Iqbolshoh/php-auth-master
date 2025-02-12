@@ -117,6 +117,11 @@ if (
     <title>Sign Up</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../src/css/login_signup.css">
+    <style>
+        .strength-weak {
+            color: red;
+        }
+    </style>
 </head>
 
 <body>
@@ -134,12 +139,12 @@ if (
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" required maxlength="100">
-                <p id="email-message"></p>
+                <small id="email-message"></small>
             </div>
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required maxlength="30">
-                <p id="username-message"></p>
+                <small id="username-message"></small>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
@@ -149,7 +154,7 @@ if (
                         <i class="fas fa-eye"></i>
                     </button>
                 </div>
-                <p id="password-message"></p>
+                <small id="password-message"></small>
             </div>
             <div class="form-group">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
