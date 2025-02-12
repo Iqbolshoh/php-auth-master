@@ -110,13 +110,13 @@ class Database
 
     public function checkUserSession($role)
     {
-        if (($_SESSION['loggedin'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'user') {
-            header("Location: ./login/");
+        if (($_SESSION['loggedin'] ?? false) !== true || ($_SESSION['role'] ?? '') !== $role) {
+            header("Location: " . $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . "/login/");
             exit;
         }
 
         if (!$this->select('active_sessions', '*', 'session_token = ?', [session_id()], 's')) {
-            header("Location: ../logout/");
+            header("Location: " . $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . "/logout/");
             exit;
         }
     }

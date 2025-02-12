@@ -4,6 +4,8 @@ session_start();
 include './config.php';
 $query = new Database();
 $query->checkUserSession($_SESSION['role']);
+
+echo $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . "/login/"
 ?>
 
 <!DOCTYPE html>
