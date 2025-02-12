@@ -29,11 +29,11 @@ if (!empty($_COOKIE['username']) && ($user = $query->select('users', 'id, role',
 
 $_SESSION['csrf_token'] ??= bin2hex(random_bytes(32));
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csrf_token'])) {
-
-    if (!hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
-        exit('<div class="error-message">CSRF error! Please reload the page and try again.</div>');
-    }
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_POST['submit'], $_POST['csrf_token']) &&
+    !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])
+) {
 
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
@@ -61,20 +61,33 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
         $_SESSION['username'] = $username;
         $_SESSION['role'] = $role;
 
-        foreach (['username' => $_SESSION['username'], 'session_token' => session_id()] as $name => $value) {
-            setcookie($name, $value, time() + 2592000, '/', '', true, true); // 30 kun
+        $cookies = [
+            'username' => $username,
+            'session_token' => session_id()
+        ];
+
+        foreach ($cookies as $name => $value) {
+            setcookie($name, $value, [
+                'expires' => time() + (86400 * 30),
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
         }
 
         $query->insert('active_sessions', [
-            'user_id' => $_SESSION['user_id'],
+            'user_id' => $user_id,
             'device_name' => $_SERVER['HTTP_USER_AGENT'],
             'ip_address' => $_SERVER['REMOTE_ADDR'],
             'session_token' => session_id()
         ]);
 
+        $redirectPath = ROLES[$role];
+
         echo "<script>
                 Swal.fire({ icon: 'success', title: 'Registration successful', timer: 1500, showConfirmButton: false })
-                    .then(() => window.location.href = '" . ROLES[$_SESSION['role']] . "');
+                    .then(() => window.location.href = '<?= $redirectPath; ?>';
               </script>";
     } else {
         echo "<script>Swal.fire({ icon: 'error', title: 'Oops...', text: 'Registration failed. Please try again later.' });</script>";
