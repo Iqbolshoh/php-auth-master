@@ -88,13 +88,13 @@ if (
         $redirectPath = ROLES[$user['role']];
         ?>
         <script>
-            window.onload = function () { Swal.fire({ icon: 'success', title: 'Login successful', timer: 1500, showConfirmButton: false }).then(() => { window.location.href = '<?= $redirectPath; ?>'; }); };
+            window.onload = function () { Swal.fire({ icon: 'success', title: 'Registration successfu', timer: 1500, showConfirmButton: false }).then(() => { window.location.href = '<?= $redirectPath; ?>'; }); };
         </script>
         <?php
     } else {
         ?>
         <script>
-            window.onload = function () { Swal.fire({ icon: 'error', title: 'Oops...', text: 'Login or password is incorrect', showConfirmButton: true }); };
+            window.onload = function () { Swal.fire({ icon: 'error', title: 'Oops...', text: 'Registration failed. Please try again.', showConfirmButton: true }); };
         </script>
         <?php
     }
