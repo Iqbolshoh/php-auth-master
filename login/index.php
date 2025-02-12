@@ -32,16 +32,15 @@ $csrf_token = $_SESSION['csrf_token'];
 
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csrf_token'])) {
-    // CSRF tekshiruvi
-    if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+
+    if (empty($_POST['csrf_token']) || !hash_equals($csrf_token ?? '', $_POST['csrf_token'])) {
         echo '<div class="error-message">CSRF error! Please reload the page and try again.</div>';
         exit;
     }
 
-    // Ma'lumotlarni olish va tekshirish
     $username = strtolower(trim($_POST['username']));
-    $password = $_POST['password'];
-    $user = $query->select('users', 'id, username, role, password', "username = ?", [$username], 's')[0] ?? null;
+    $password = $query->hashPassword($_POST['password']);
+    $user = $query->select('users', '*', "username = ?", [$username], 's')[0] ?? null;
 
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION += [
@@ -99,6 +98,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../src/css/login_signup.css">
 </head>
+<style>
+    .error-message {
+        background-color: red;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 5px;
+        width: 50%;
+        margin: 20px auto;
+    }
+</style>
 
 <body>
     <div class="form-container">
