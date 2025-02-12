@@ -72,7 +72,7 @@ if (
         $redirectPath = ROLES[$user['role']];
         ?>
         <script>
-            window.onload = function () { Swal.fire({ position: 'top-end', icon: 'success', title: 'Login successful', showConfirmButton: false, timer: 1500 }).then(() => { window.location.href = '<?= $redirectPath; ?>'; }); };
+            window.onload = function () { Swal.fire({ icon: 'success', title: 'Login successful', timer: 1500, showConfirmButton: false }).then(() => { window.location.href = '<?= $redirectPath; ?>'; }); };
         </script>
         <?php
     } else {

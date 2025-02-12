@@ -85,12 +85,12 @@ if (
             'session_token' => session_id()
         ]);
 
-        $redirectPath = ROLES[$role];
-
-        echo "<script>
-                Swal.fire({ icon: 'success', title: 'Registration successful', timer: 1500, showConfirmButton: false })
-                    .then(() => window.location.href = '<?= $redirectPath; ?>';
-              </script>";
+        $redirectPath = ROLES[$user['role']];
+        ?>
+        <script>
+            window.onload = function () { Swal.fire({ icon: 'success', title: 'Registration successful', timer: 1500, showConfirmButton: false }).then(() => { window.location.href = '<?= $redirectPath; ?>'; }); };
+        </script>
+        <?php
     } else {
         echo "<script>Swal.fire({ icon: 'error', title: 'Oops...', text: 'Registration failed. Please try again later.' });</script>";
     }
