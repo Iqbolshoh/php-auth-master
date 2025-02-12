@@ -150,7 +150,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
                 </div>
             </div>
             <div class="form-group">
-                <input type="hidden" name="csrf_token" value="<?= $csrf_token; ?>">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
             </div>
             <div class="form-group">
                 <button type="submit" name="submit" id="submit">Login</button>
