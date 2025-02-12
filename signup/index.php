@@ -5,7 +5,7 @@ include '../config.php';
 $query = new Database();
 
 if (!empty($_SESSION['loggedin']) && isset(ROLES[$_SESSION['role']])) {
-    header("Location: " . ROLES[$_SESSION['role']]);
+    header("Location: " . SITE_PATH . ROLES[$_SESSION['role']]);
     exit;
 }
 
@@ -22,7 +22,7 @@ if (!empty($_COOKIE['username']) && ($user = $query->select('users', 'id, role',
     $_SESSION['role'] = $user['role'];
 
     if (isset(ROLES[$user['role']])) {
-        header("Location: " . ROLES[$user['role']]);
+        header("Location: " . SITE_PATH . ROLES[$_SESSION['role']]);
         exit;
     }
 }
@@ -110,7 +110,7 @@ if (
             'session_token' => session_id()
         ]);
 
-        $redirectPath = ROLES[$role];
+        $redirectPath = SITE_PATH . ROLES[$_SESSION['role']];
         ?>
         <script>
             window.onload = function () { Swal.fire({ icon: 'success', title: 'Registration successfu', timer: 1500, showConfirmButton: false }).then(() => { window.location.href = '<?= $redirectPath; ?>'; }); };
