@@ -29,12 +29,12 @@ if (!empty($_COOKIE['username']) && ($user = $query->select('users', 'id, role',
 
 $_SESSION['csrf_token'] ??= bin2hex(random_bytes(32));
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csrf_token'])) {
-
-    if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
-        echo '<div class="error-message">CSRF error! Please reload the page and try again.</div>';
-        exit;
-    }
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_POST['submit']) &&
+    $_POST['csrf_token'] &&
+    hash_equals($_SESSION['csrf_token']."a" ?? '', $_POST['csrf_token'])
+) {
 
     $username = strtolower(trim($_POST['username']));
     $password = $query->hashPassword($_POST['password']);
@@ -82,7 +82,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
         <?php
     }
 } elseif (isset($_POST['submit'])) {
-    echo "<script>Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.' });</script>";
+    ?>
+    <script>
+        Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.' });
+    </script>
+    <?php
 }
 ?>
 
