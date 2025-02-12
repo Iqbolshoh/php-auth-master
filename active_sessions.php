@@ -1,24 +1,22 @@
 <?php
 session_start();
 
+include './config.php';
+$query = new Database();
+
 if (($_SESSION['loggedin'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'user') {
     header("Location: ./login/");
     exit;
 }
 
-include './config.php';
-$query = new Database();
+if (!$query->select('active_sessions', '*', 'session_token = ?', [session_id()], 's')) {
+    header("Location: ../logout/");
+    exit;
+}
 
 if (isset($_GET['token'])) {
     $query->delete('active_sessions', 'session_token = ?', [$_GET['token']], 's');
     header('Location: active_sessions.php');
-    exit;
-}
-
-$result = $query->select('active_sessions', '*', 'session_token = ?', [session_id()], 's');
-
-if (empty($result)) {
-    header("Location: ../logout/");
     exit;
 }
 ?>
