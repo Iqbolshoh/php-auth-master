@@ -3,7 +3,7 @@ session_start();
 
 include './config.php';
 $query = new Database();
-$query->checkUserSession($_SESSION['role']);
+$query->checkUserSession('user');
 
 if (isset($_GET['token'])) {
     $query->delete('active_sessions', 'session_token = ?', [$_GET['token']], 's');
