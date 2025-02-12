@@ -117,12 +117,12 @@ class Database
     public function checkUserSession($role)
     {
         if (($_SESSION['loggedin'] ?? false) !== true || ($_SESSION['role'] ?? '') !== $role) {
-            header("Location: " . $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . "/login/");
+            header("Location: " . SITE_PATH . "/login/");
             exit;
         }
 
         if (!$this->select('active_sessions', '*', 'session_token = ?', [session_id()], 's')) {
-            header("Location: " . $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . "/logout/");
+            header("Location: " . SITE_PATH . "/logout/");
             exit;
         }
     }
