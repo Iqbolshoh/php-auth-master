@@ -41,7 +41,7 @@ if (
     $password = $query->hashPassword($_POST['password']);
     $user = $query->select('users', '*', "username = ? AND password = ?", [$username, $password], 'ss')[0] ?? null;
 
-    if ($user) {
+    if (!empty($user)) {
         $_SESSION['loggedin'] = true;
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];

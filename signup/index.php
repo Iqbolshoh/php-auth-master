@@ -85,7 +85,7 @@ if (
             'session_token' => session_id()
         ]);
 
-        $redirectPath = ROLES[$user['role']];
+        $redirectPath = ROLES[$user[$role]];
         ?>
         <script>
             window.onload = function () { Swal.fire({ icon: 'success', title: 'Registration successfu', timer: 1500, showConfirmButton: false }).then(() => { window.location.href = '<?= $redirectPath; ?>'; }); };
