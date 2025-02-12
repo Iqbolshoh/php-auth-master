@@ -117,19 +117,6 @@ if (
     <title>Sign Up</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../src/css/login_signup.css">
-    <style>
-        .strength-weak {
-            color: red;
-        }
-
-        .strength-okay {
-            color: yellow;
-        }
-
-        .strength-strong {
-            color: green;
-        }
-    </style>
 </head>
 
 <body>
@@ -224,12 +211,6 @@ if (
             return strength;
         }
 
-        function calculatePasswordStrengthPercentage(password) {
-            const maxStrength = 5;
-            const strength = calculatePasswordStrength(password);
-            return (strength / maxStrength) * 100;
-        }
-
         document.getElementById('email').addEventListener('input', function () {
             const email = this.value;
             const emailMessageElement = document.getElementById('email-message');
@@ -259,24 +240,12 @@ if (
         document.getElementById('password').addEventListener('input', function () {
             const password = this.value;
             const passwordMessageElement = document.getElementById('password-message');
-            const strengthPercentage = calculatePasswordStrengthPercentage(password);
             let message = '';
 
             if (password.length < 8) {
                 passwordMessageElement.textContent = 'Password must be at least 8 characters long!';
                 passwordMessageElement.className = 'strength-weak';
                 return;
-            }
-
-            if (strengthPercentage < 40) {
-                message = `Password strength is ${strengthPercentage.toFixed(2)}%!`;
-                passwordMessageElement.className = 'strength-weak';
-            } else if (strengthPercentage < 70) {
-                message = `Password strength is ${strengthPercentage.toFixed(2)}%!`;
-                passwordMessageElement.className = 'strength-okay';
-            } else {
-                message = `Password strength is ${strengthPercentage.toFixed(2)}%!`;
-                passwordMessageElement.className = 'strength-strong';
             }
 
             passwordMessageElement.textContent = message;
@@ -312,12 +281,6 @@ if (
 
             if (password.length < 8) {
                 passwordMessageElement.textContent = 'Password must be at least 8 characters long!';
-                event.preventDefault();
-            }
-
-            if (calculatePasswordStrengthPercentage(password) < 40) {
-                passwordMessageElement.textContent = 'Password is too weak!';
-                passwordMessageElement.className = 'strength-weak';
                 event.preventDefault();
             }
         });
