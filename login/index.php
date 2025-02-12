@@ -32,8 +32,9 @@ $_SESSION['csrf_token'] ??= bin2hex(random_bytes(32));
 if (
     $_SERVER["REQUEST_METHOD"] === "POST" &&
     isset($_POST['submit']) &&
-    $_POST['csrf_token'] &&
-    hash_equals($_SESSION['csrf_token'] . "a" ?? '', $_POST['csrf_token'])
+    isset($_POST['csrf_token']) &&
+    isset($_SESSION['csrf_token']) &&
+    hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
 ) {
 
     $username = strtolower(trim($_POST['username']));
