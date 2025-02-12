@@ -42,20 +42,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
     $password = $query->hashPassword($_POST['password']);
     $user = $query->select('users', '*', "username = ? AND password = ?", [$username, $password], 'ss')[0] ?? null;
 
-    if ($user && password_verify($password, $user['password'])) {
-        $_SESSION += [
-            'loggedin' => true,
-            'user_id' => $user['id'],
-            'username' => $user['username'],
-            'role' => $user['role']
+    if ($user) {
+        $_SESSION['loggedin'] = true;
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['role'] = $user['role'];
+
+        $cookies = [
+            'username' => $username,
+            'session_token' => session_id()
         ];
 
-        // Cookie sozlash
-        foreach (['username' => $username, 'session_token' => session_id()] as $name => $value) {
-            setcookie($name, $value, time() + 86400 * 30, '/', '', true, true);
+        foreach ($cookies as $name => $value) {
+            setcookie($name, $value, [
+                'expires' => time() + (86400 * 30),
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
         }
 
-        // Faol sessiyani bazaga yozish
         $query->insert('active_sessions', [
             'user_id' => $user['id'],
             'device_name' => $_SERVER['HTTP_USER_AGENT'],
@@ -63,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
             'session_token' => session_id()
         ]);
 
-        // JS orqali sahifaga yo‘naltirish
+        $redirectPath = ROLES[$user['role']];
         echo "<script>
             Swal.fire({
                 position: 'top-end',
@@ -71,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
                 title: 'Login successful',
                 showConfirmButton: false,
                 timer: 1500
-            }).then(() => window.location.href = '" . ROLES[$user['role']] . "');
+            }).then(() =>  window.location.href = '<?= $redirectPath;
         </script>";
     } else {
         echo "<script>
