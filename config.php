@@ -4,6 +4,7 @@ define("DB_USERNAME", "root");
 define("DB_PASSWORD", "");
 define("DB_NAME", "auth_master");
 
+define("SITE_PATH", $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST']);
 const ROLES = [
     'admin' => '/admin/',
     'user' => '/'
@@ -124,10 +125,5 @@ class Database
             header("Location: " . $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . "/logout/");
             exit;
         }
-    }
-
-    public function site_path($path)
-    {
-        return $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . $path;
     }
 }

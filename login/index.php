@@ -4,8 +4,12 @@ session_start();
 include '../config.php';
 $query = new Database();
 
+// $role_path = $query->site_path(ROLES[$_SESSION['role']]);
+// echo $role_path;
+// exit;
+
 if (!empty($_SESSION['loggedin']) && isset(ROLES[$_SESSION['role']])) {
-    header("Location: " . ROLES[$_SESSION['role']]);
+    header("Location: " . $role_path);
     exit;
 }
 
