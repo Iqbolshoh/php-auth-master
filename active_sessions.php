@@ -51,7 +51,7 @@ if (isset($_GET['token'])) {
                                     <td><?php echo htmlspecialchars($session['last_activity']); ?></td>
                                     <td class="text-center">
                                         <button class="btn btn-warning btn-sm"
-                                            onclick="editSession('<?php echo $session['session_token']; ?>')">
+                                            onclick="openEditModal('<?php echo $session['session_token']; ?>', '<?php echo htmlspecialchars($session['device_name']); ?>')">
                                             <i class="fas fa-edit"></i> Edit
                                         </button>
                                         <button class="btn btn-danger btn-sm"
@@ -63,6 +63,40 @@ if (isset($_GET['token'])) {
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+
+                    <!-- Edit Modal -->
+                    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editModalLabel">Edit Device Name</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="editForm" method="POST" action="update_session.php">
+                                        <input type="hidden" name="session_token" id="editSessionToken" maxleth="255">
+                                        <div class="form-group">
+                                            <label for="deviceName">Device Name</label>
+                                            <input type="text" class="form-control" name="device_name" id="deviceName"
+                                                required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        function openEditModal(token, deviceName) {
+                            document.getElementById('editSessionToken').value = token;
+                            document.getElementById('deviceName').value = deviceName;
+                            $('#editModal').modal('show');
+                        }
+                    </script>
 
                 </div>
             </section>
