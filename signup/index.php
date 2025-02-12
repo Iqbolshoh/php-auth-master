@@ -106,7 +106,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
             'session_token' => session_id()
         ]);
 
-        $redirectPath = $roles[$role];
+        $redirectPath = ROLES[$role];
 
         ?>
 
