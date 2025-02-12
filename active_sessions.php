@@ -22,7 +22,6 @@ if (isset($_GET['token'])) {
     <link rel="stylesheet" href="./src/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -33,8 +32,8 @@ if (isset($_GET['token'])) {
             <section class="content">
                 <div class="container-fluid">
 
-                    <table class="table table-hover table-bordered text-center align-middle">
-                        <thead class="table-dark">
+                    <table class="">
+                        <thead class="">
                             <tr>
                                 <th><i class="fas fa-desktop"></i> Device Name</th>
                                 <th><i class="fas fa-network-wired"></i> IP Address</th>
@@ -47,9 +46,9 @@ if (isset($_GET['token'])) {
                             $sessions = $query->select('active_sessions', '*', 'user_id = ?', [$_SESSION['user_id']], 'i');
                             foreach ($sessions as $session) {
                                 echo "<tr>";
-                                echo "<td><span class='badge bg-primary'>{$session['device_name']}</span></td>";
-                                echo "<td><span class='badge bg-info'>{$session['ip_address']}</span></td>";
-                                echo "<td><span class='badge bg-success'>{$session['last_activity']}</span></td>";
+                                echo "<td>{$session['device_name']}</td>";
+                                echo "<td>{$session['ip_address']}</td>";
+                                echo "<td>{$session['last_activity']}</td>";
                                 echo "<td>
                     <button class='btn btn-danger btn-sm' onclick='confirmRemoval(\"{$session['session_token']}\")'>
                         <i class='fas fa-trash-alt'></i> Remove
@@ -67,6 +66,7 @@ if (isset($_GET['token'])) {
         </div>
         <?php include './footer.php'; ?>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="./src/js/jquery.min.js"></script>
     <script src="./src/js/bootstrap.bundle.min.js"></script>
     <script src="./src/js/adminlte.min.js"></script>
