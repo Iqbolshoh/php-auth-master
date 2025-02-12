@@ -4,34 +4,28 @@ session_start();
 include '../config.php';
 $query = new Database();
 
-if (!empty($_SESSION['loggedin']) && !empty($_SESSION['role'])) {
-    $role = $_SESSION['role'];
-    if (isset(ROLES[$role])) {
-        header("Location: " . ROLES[$role]);
-        exit;
-    }
+if (!empty($_SESSION['loggedin']) && $_SESSION['role'] && isset(ROLES[$_SESSION['role']])) {
+    header("Location: " . ROLES[$_SESSION['role']]);
+    exit;
 }
 
-if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token'])) {
-    if (session_id() !== $_COOKIE['session_token']) {
-        session_write_close();
-        session_id($_COOKIE['session_token']);
-        session_start();
-    }
+if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token']) && session_id() !== $_COOKIE['session_token']) {
+    session_write_close();
+    session_id($_COOKIE['session_token']);
+    session_start();
+}
 
-    $result = $query->select('users', 'id, role', "username = ?", [$_COOKIE['username']], 's');
+if (!empty($_COOKIE['username'])) {
+    $user = $query->select('users', 'id, role', "username = ?", [$_COOKIE['username']], 's')[0] ?? null;
 
-    if (!empty($result)) {
-        $user = $result[0];
-
+    if ($user) {
         $_SESSION['loggedin'] = true;
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $_COOKIE['username'];
         $_SESSION['role'] = $user['role'];
 
-        $role = $user['role'];
-        if (isset(ROLES[$role])) {
-            header("Location: " . ROLES[$role]);
+        if (isset(ROLES[$user['role']])) {
+            header("Location: " . ROLES[$user['role']]);
             exit;
         }
     }
@@ -93,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
             'session_token' => session_id()
         ]);
 
-        $redirectPath = ROLES[$role];
+        $redirectPath = ROLES[$user['role']];
         ?>
 
         <script>
