@@ -71,25 +71,37 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
         ]);
 
         $redirectPath = ROLES[$user['role']];
-        echo "<script>
-            Swal.fire({
-                position: 'top-end',
-                icon: 'success',
-                title: 'Login successful',
-                showConfirmButton: false,
-                timer: 1500
-            }).then(() =>  window.location.href = '<?= $redirectPath;
-        </script>";
+        ?>
+
+        <script>
+            window.onload = function () {
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Login successful',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.href = '<?= $redirectPath; ?>';
+                });
+            };
+        </script>
+
+        <?php
     } else {
-        echo "<script>
-            Swal.fire({
-                position: 'top-end',
-                icon: 'error',
-                title: 'Incorrect information',
-                text: 'Login or password is incorrect',
-                showConfirmButton: true
-            });
-        </script>";
+        ?>
+        <script>
+            window.onload = function () {
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'error',
+                    title: 'Incorrect information',
+                    text: 'Login or password is incorrect',
+                    showConfirmButton: true
+                });
+            };
+        </script>
+        <?php
     }
 }
 ?>
