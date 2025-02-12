@@ -4,11 +4,6 @@ session_start();
 include '../config.php';
 $query = new Database();
 
-$roles = [
-    'admin' => '../admin/',
-    'user' => '../'
-];
-
 if (!empty($_SESSION['loggedin']) && !empty($_SESSION['role'])) {
     $role = $_SESSION['role'];
     if (isset($roles[$role])) {
