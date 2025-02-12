@@ -5,8 +5,10 @@ include './config.php';
 $query = new Database();
 $query->checkUserSession('user');
 
+$sessions = $query->select('active_sessions', '*', 'user_id = ?', [$_SESSION['user_id']], 'i');
+
 if (isset($_GET['token'])) {
-    $query->delete('active_sessions', 'session_token = ?', [$_GET['token']], 's');
+    $query->delete('active_sessions', 'user_id = ? AND session_token = ?', [$_SESSION['user_id'], $_GET['token']], 'is');
     header('Location: active_sessions.php');
     exit;
 }
@@ -43,7 +45,6 @@ if (isset($_GET['token'])) {
                         </thead>
                         <tbody>
                             <?php
-                            $sessions = $query->select('active_sessions', '*', 'user_id = ?', [$_SESSION['user_id']], 'i');
                             foreach ($sessions as $session) {
                                 echo "<tr>";
                                 echo "<td>{$session['device_name']}</td>";
