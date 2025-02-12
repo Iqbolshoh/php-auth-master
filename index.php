@@ -4,6 +4,10 @@ session_start();
 include './config.php';
 $query = new Database();
 $query->checkUserSession('user');
+
+
+
+echo path_roles(ROLES[$_SESSION['role']]);
 ?>
 
 <!DOCTYPE html>

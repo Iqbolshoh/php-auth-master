@@ -5,8 +5,8 @@ define("DB_PASSWORD", "");
 define("DB_NAME", "auth_master");
 
 const ROLES = [
-    'admin' => '../admin/',
-    'user' => '../'
+    'admin' => '/admin/',
+    'user' => '/'
 ];
 
 class Database
@@ -124,5 +124,10 @@ class Database
             header("Location: " . $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . "/logout/");
             exit;
         }
+    }
+
+    public function path_roles($role)
+    {
+        return $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . $role;
     }
 }
