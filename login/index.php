@@ -106,7 +106,7 @@ if (
 <body>
     <div class="form-container">
         <h1>Login</h1>
-        <form method="POST" action="">
+        <form id="loginForm" method="POST" action="">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required maxlength="30">
@@ -120,6 +120,7 @@ if (
                         <i class="fas fa-eye"></i>
                     </button>
                 </div>
+                <small id="password-message" style="color: red;"></small>
             </div>
             <div class="form-group">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
@@ -136,10 +137,12 @@ if (
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         const usernameField = document.getElementById('username');
+        const passwordField = document.getElementById('password');
         const usernameError = document.getElementById('username-error');
+        const passwordMessage = document.getElementById('password-message');
         const submitButton = document.getElementById('submit');
 
-        function validateForm() {
+        function validateUsername() {
             const username = usernameField.value;
             const usernamePattern = /^[a-zA-Z0-9_]+$/;
             if (!usernamePattern.test(username)) {
@@ -151,7 +154,19 @@ if (
             }
         }
 
-        usernameField.addEventListener('input', validateForm);
+        function validatePassword() {
+            const password = passwordField.value;
+            if (password.length < 8) {
+                passwordMessage.textContent = 'Password must be at least 8 characters long!';
+                submitButton.disabled = true;
+            } else {
+                passwordMessage.textContent = '';
+                submitButton.disabled = false;
+            }
+        }
+
+        usernameField.addEventListener('input', validateUsername);
+        passwordField.addEventListener('input', validatePassword);
 
         document.getElementById('toggle-password').addEventListener('click', function () {
             const passwordField = document.getElementById('password');
@@ -163,6 +178,15 @@ if (
             } else {
                 passwordField.type = 'password';
                 toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            validateUsername();
+            validatePassword();
+
+            if (usernameError.textContent || passwordMessage.textContent) {
+                event.preventDefault();
             }
         });
     </script>
