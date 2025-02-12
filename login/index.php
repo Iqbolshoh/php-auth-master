@@ -33,7 +33,7 @@ if (
     $_SERVER["REQUEST_METHOD"] === "POST" &&
     isset($_POST['submit']) &&
     $_POST['csrf_token'] &&
-    hash_equals($_SESSION['csrf_token']."a" ?? '', $_POST['csrf_token'])
+    hash_equals($_SESSION['csrf_token'] . "a" ?? '', $_POST['csrf_token'])
 ) {
 
     $username = strtolower(trim($_POST['username']));
@@ -84,7 +84,7 @@ if (
 } elseif (isset($_POST['submit'])) {
     ?>
     <script>
-        Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.' });
+        window.onload = function () { Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.', showConfirmButton: true }); };
     </script>
     <?php
 }
