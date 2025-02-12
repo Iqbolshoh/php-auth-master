@@ -35,17 +35,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
         exit('<div class="error-message">CSRF error! Please reload the page and try again.</div>');
     }
 
-    $userData = array_map([$query, 'validate'], [
-        'first_name' => $_POST['first_name'],
-        'last_name' => $_POST['last_name'],
-        'email' => strtolower($_POST['email']),
-        'username' => strtolower($_POST['username'])
-    ]);
+    $data = [
+        'first_name' => $query->validate($_POST['first_name']),
+        'last_name' => $query->validate($_POST['last_name']),
+        'email' => $query->validate(strtolower($_POST['email'])),
+        'username' => $query->validate(strtolower($_POST['username'])),
+        'password' => $query->hashPassword($_POST['password']),
+        'role' => 'user' // default role is 'user'
+    ];
+    $result = $query->insert('users', $data);
 
-    $userData['password'] = $query->hashPassword($_POST['password']);
-    $userData['role'] = 'user';
-
-    if ($query->insert('users', $userData)) {
+    if ($query->insert('users', $data)) {
         $_SESSION = [
             'loggedin' => true,
             'user_id' => $query->select('users', 'id', 'username = ?', [$userData['username']], 's')[0]['id'],
