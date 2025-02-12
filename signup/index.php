@@ -29,6 +29,31 @@ if (!empty($_COOKIE['username']) && ($user = $query->select('users', 'id, role',
 
 $_SESSION['csrf_token'] ??= bin2hex(random_bytes(32));
 
+function get_user_info()
+{
+    $user_agent = $_SERVER['HTTP_USER_AGENT'];
+
+    $devices = [
+        'iPhone' => 'iPhone',
+        'iPad' => 'iPad',
+        'Macintosh|Mac OS X' => 'Mac',
+        'Windows NT 10.0' => 'Windows 10 PC',
+        'Windows NT 6.3' => 'Windows 8.1 PC',
+        'Windows NT 6.2' => 'Windows 8 PC',
+        'Windows NT 6.1' => 'Windows 7 PC',
+        'Android' => 'Android Phone',
+        'Linux' => 'Linux Device',
+    ];
+
+    foreach ($devices as $regex => $device) {
+        if (preg_match("/$regex/i", $user_agent)) {
+            return $device;
+        }
+    }
+
+    return "Unknown Device";
+}
+
 if (
     $_SERVER["REQUEST_METHOD"] === "POST" &&
     isset($_POST['submit']) &&
