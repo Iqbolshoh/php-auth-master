@@ -70,34 +70,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
 
         $redirectPath = ROLES[$user['role']];
         ?>
-
         <script>
-            window.onload = function () {
-                Swal.fire({
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'Login successful',
-                    showConfirmButton: false,
-                    timer: 1500
-                }).then(() => {
-                    window.location.href = '<?= $redirectPath; ?>';
-                });
-            };
+            window.onload = function () { Swal.fire({ position: 'top-end', icon: 'success', title: 'Login successful', showConfirmButton: false, timer: 1500 }).then(() => { window.location.href = '<?= $redirectPath; ?>'; }); };
         </script>
-
         <?php
     } else {
         ?>
         <script>
-            window.onload = function () {
-                Swal.fire({
-                    position: 'top-end',
-                    icon: 'error',
-                    title: 'Incorrect information',
-                    text: 'Login or password is incorrect',
-                    showConfirmButton: true
-                });
-            };
+            window.onload = function () { Swal.fire({ position: 'top-end', icon: 'error', title: 'Incorrect information', text: 'Login or password is incorrect', showConfirmButton: true }); };
         </script>
         <?php
     }
@@ -115,19 +95,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../src/css/login_signup.css">
 </head>
-<style>
-    .error-message {
-        background-color: red;
-        color: white;
-        padding: 15px;
-        text-align: center;
-        font-size: 18px;
-        font-weight: bold;
-        border-radius: 5px;
-        width: 50%;
-        margin: 20px auto;
-    }
-</style>
 
 <body>
     <div class="form-container">
