@@ -15,6 +15,16 @@ class Database
         if ($this->conn->connect_error) {
             die("Database connection error: " . $this->conn->connect_error);
         }
+        
+        if (($_SESSION['loggedin'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'user') {
+            header("Location: ./login/");
+            exit;
+        }
+        
+        if (!$this->select('active_sessions', '*', 'session_token = ?', [session_id()], 's')) {
+            header("Location: ../logout/");
+            exit;
+        }
     }
 
     public function __destruct()
