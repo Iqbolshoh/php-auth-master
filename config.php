@@ -126,7 +126,7 @@ class Database
         }
     }
 
-    public function path_roles($role)
+    public function role_path($role)
     {
         return $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . $role;
     }
