@@ -117,6 +117,19 @@ if (
     <title>Sign Up</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../src/css/login_signup.css">
+    <style>
+        .strength-weak {
+            color: red;
+        }
+
+        .strength-okay {
+            color: yellow;
+        }
+
+        .strength-strong {
+            color: green;
+        }
+    </style>
 </head>
 
 <body>
@@ -149,12 +162,13 @@ if (
                         <i class="fas fa-eye"></i>
                     </button>
                 </div>
+                <p id="password-message"></p>
             </div>
             <div class="form-group">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
             </div>
             <div class="form-group">
-                <button type="submit" name="submit" id="submit">Login</button>
+                <button type="submit" name="submit" id="submit">Sign Up</button>
             </div>
         </form>
         <div class="text-center">
@@ -197,6 +211,25 @@ if (
                 });
         }
 
+        function calculatePasswordStrength(password) {
+            let strength = 0;
+            const lengthBonus = password.length > 7 ? 1 : 0;
+            const numberBonus = /[0-9]/.test(password) ? 1 : 0;
+            const lowercaseBonus = /[a-z]/.test(password) ? 1 : 0;
+            const uppercaseBonus = /[A-Z]/.test(password) ? 1 : 0;
+            const specialCharBonus = /[!@#$%^&*(),.?":{}|<>]/.test(password) ? 1 : 0;
+            const repetitionPenalty = /(.)\1{2,}/.test(password) ? -1 : 0;
+
+            strength = lengthBonus + numberBonus + lowercaseBonus + uppercaseBonus + specialCharBonus + repetitionPenalty;
+            return strength;
+        }
+
+        function calculatePasswordStrengthPercentage(password) {
+            const maxStrength = 5;
+            const strength = calculatePasswordStrength(password);
+            return (strength / maxStrength) * 100;
+        }
+
         document.getElementById('email').addEventListener('input', function () {
             const email = this.value;
             const emailMessageElement = document.getElementById('email-message');
@@ -223,11 +256,39 @@ if (
             checkAvailability('username', username, usernameMessageElement, status => isUsernameAvailable = status);
         });
 
+        document.getElementById('password').addEventListener('input', function () {
+            const password = this.value;
+            const passwordMessageElement = document.getElementById('password-message');
+            const strengthPercentage = calculatePasswordStrengthPercentage(password);
+            let message = '';
+
+            if (password.length < 8) {
+                passwordMessageElement.textContent = 'Password must be at least 8 characters long!';
+                passwordMessageElement.className = 'strength-weak';
+                return;
+            }
+
+            if (strengthPercentage < 40) {
+                message = `Password strength is ${strengthPercentage.toFixed(2)}%!`;
+                passwordMessageElement.className = 'strength-weak';
+            } else if (strengthPercentage < 70) {
+                message = `Password strength is ${strengthPercentage.toFixed(2)}%!`;
+                passwordMessageElement.className = 'strength-okay';
+            } else {
+                message = `Password strength is ${strengthPercentage.toFixed(2)}%!`;
+                passwordMessageElement.className = 'strength-strong';
+            }
+
+            passwordMessageElement.textContent = message;
+        });
+
         document.getElementById('signupForm').addEventListener('submit', function (event) {
             const email = document.getElementById('email').value;
             const emailMessageElement = document.getElementById('email-message');
             const username = document.getElementById('username').value;
             const usernameMessageElement = document.getElementById('username-message');
+            const password = document.getElementById('password').value;
+            const passwordMessageElement = document.getElementById('password-message');
 
             if (!validateEmailFormat(email)) {
                 emailMessageElement.textContent = 'Email format is incorrect!';
@@ -246,6 +307,17 @@ if (
 
             if (!isUsernameAvailable) {
                 usernameMessageElement.textContent = 'This username exists!';
+                event.preventDefault();
+            }
+
+            if (password.length < 8) {
+                passwordMessageElement.textContent = 'Password must be at least 8 characters long!';
+                event.preventDefault();
+            }
+
+            if (calculatePasswordStrengthPercentage(password) < 40) {
+                passwordMessageElement.textContent = 'Password is too weak!';
+                passwordMessageElement.className = 'strength-weak';
                 event.preventDefault();
             }
         });
