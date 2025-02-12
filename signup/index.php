@@ -31,96 +31,49 @@ $_SESSION['csrf_token'] ??= bin2hex(random_bytes(32));
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csrf_token'])) {
 
-    if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
-        echo '<div class="error-message">CSRF error! Please reload the page and try again.</div>';
-        exit;
+    if (!hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+        exit('<div class="error-message">CSRF error! Please reload the page and try again.</div>');
     }
 
-    $first_name = $query->validate($_POST['first_name']);
-    $last_name = $query->validate($_POST['last_name']);
-    $email = $query->validate(strtolower($_POST['email']));
-    $username = $query->validate(strtolower($_POST['username']));
-    $password = $query->hashPassword($_POST['password']);
-    $role = 'user'; // default role is 'user'
+    $userData = array_map([$query, 'validate'], [
+        'first_name' => $_POST['first_name'],
+        'last_name' => $_POST['last_name'],
+        'email' => strtolower($_POST['email']),
+        'username' => strtolower($_POST['username'])
+    ]);
 
-    $data = [
-        'first_name' => $first_name,
-        'last_name' => $last_name,
-        'email' => $email,
-        'username' => $username,
-        'password' => $password,
-        'role' => $role
-    ];
-    $result = $query->insert('users', $data);
+    $userData['password'] = $query->hashPassword($_POST['password']);
+    $userData['role'] = 'user';
 
-    if (!empty($result)) {
-        $user_id = $query->select('users', 'id', 'username = ?', [$username], 's')[0]['id'];
-
-        $_SESSION['loggedin'] = true;
-        $_SESSION['user_id'] = $user_id;
-        $_SESSION['username'] = $username;
-        $_SESSION['role'] = $role;
-
-        $cookies = [
-            'username' => $username,
-            'session_token' => session_id()
+    if ($query->insert('users', $userData)) {
+        $_SESSION = [
+            'loggedin' => true,
+            'user_id' => $query->select('users', 'id', 'username = ?', [$userData['username']], 's')[0]['id'],
+            'username' => $userData['username'],
+            'role' => $userData['role']
         ];
 
-        foreach ($cookies as $name => $value) {
-            setcookie($name, $value, [
-                'expires' => time() + (86400 * 30),
-                'path' => '/',
-                'secure' => true,
-                'httponly' => true,
-                'samesite' => 'Strict'
-            ]);
+        foreach (['username' => $_SESSION['username'], 'session_token' => session_id()] as $name => $value) {
+            setcookie($name, $value, time() + 2592000, '/', '', true, true); // 30 kun
         }
 
         $query->insert('active_sessions', [
-            'user_id' => $user_id,
+            'user_id' => $_SESSION['user_id'],
             'device_name' => $_SERVER['HTTP_USER_AGENT'],
             'ip_address' => $_SERVER['REMOTE_ADDR'],
             'session_token' => session_id()
         ]);
 
-        $redirectPath = ROLES[$role];
-
-        ?>
-
-        <script>
-            window.onload = function () {
-                Swal.fire({
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'Registration successful',
-                    showConfirmButton: false,
-                    timer: 1500
-                }).then(() => {
-                    window.location.href = '<?= $redirectPath; ?>';
-                });
-            };
-        </script>
-
-        <?php
-    } else {
         echo "<script>
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Registration failed. Please try again later.',
-                    });
-            </script>";
+                Swal.fire({ icon: 'success', title: 'Registration successful', timer: 1500, showConfirmButton: false })
+                    .then(() => window.location.href = '" . ROLES[$_SESSION['role']] . "');
+              </script>";
+    } else {
+        echo "<script>Swal.fire({ icon: 'error', title: 'Oops...', text: 'Registration failed. Please try again later.' });</script>";
     }
 } elseif (isset($_POST['submit'])) {
-    echo "<script>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid CSRF Token',
-                    text: 'Please refresh the page and try again.',
-                });
-          </script>";
+    echo "<script>Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.' });</script>";
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -167,7 +120,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
                 </div>
             </div>
             <div class="form-group">
-                <input type="hidden" name="csrf_token" value="<?= $csrf_token; ?>">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
             </div>
             <div class="form-group">
                 <button type="submit" name="submit" id="submit">Login</button>
