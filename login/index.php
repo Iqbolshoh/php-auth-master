@@ -81,8 +81,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['submit'], $_POST['csr
         </script>
         <?php
     }
-}else{
-    
+} elseif (isset($_POST['submit'])) {
+    echo "<script>Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.' });</script>";
 }
 ?>
 
