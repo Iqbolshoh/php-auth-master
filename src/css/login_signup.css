@@ -94,7 +94,8 @@ h1 {
 }
 
 #email-message,
-#username-message #password-message {
+#username-message,
+#password-message {
   color: red;
   font-size: 14px;
   margin-top: 5px;
