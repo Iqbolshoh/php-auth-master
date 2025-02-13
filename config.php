@@ -5,6 +5,8 @@ define("DB_PASSWORD", "");
 define("DB_NAME", "auth_master");
 
 define("SITE_PATH", $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST']);
+date_default_timezone_set('Etc/GMT-5');
+
 const ROLES = [
     'admin' => '/admin/',
     'user' => '/'
