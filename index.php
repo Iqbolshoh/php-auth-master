@@ -16,13 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = [
         'first_name' => $first_name,
         'last_name' => $last_name,
-        'email' => $email,
-        'password' => $password
+        'email' => $email
     ];
 
     if (isset($_POST['password'])) {
-        $password = $query->hashPassword($_POST['password']);
-        $data += $password;
+        $data['password'] = $query->hashPassword($_POST['password']);
     }
 
     $query->update(
