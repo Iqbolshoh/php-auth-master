@@ -13,8 +13,18 @@ if (isset($_GET['token'])) {
     exit;
 }
 
-if (isset($_POST['update'])) {
-    $query->update('users', ['device_name' => $device_name], 'id = ?', [$_SESSION['user_id']], 'i');
+if (isset($_POST['update_session'])) {
+    $session_token = $_POST['session_token'];
+    $device_name = $_POST['device_name'];
+
+    $query->update(
+        'active_sessions',
+        ['device_name' => $device_name],
+        'session_token = ? AND user_id = ?',
+        [$session_token, $_SESSION['user_id']],
+        'si'
+    );
+
     header('Location: active_sessions.php');
     exit;
 }
@@ -82,14 +92,15 @@ if (isset($_POST['update'])) {
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <form id="editForm">
+                                    <form method="POST" action="active_sessions.php">
                                         <input type="hidden" name="session_token" id="editSessionToken">
                                         <div class="form-group">
                                             <label for="deviceName">Device Name</label>
                                             <input type="text" class="form-control" name="device_name" id="deviceName"
                                                 required>
                                         </div>
-                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                        <button type="submit" name="update_session" class="btn btn-primary">Save
+                                            changes</button>
                                     </form>
                                 </div>
                             </div>
@@ -109,31 +120,6 @@ if (isset($_POST['update'])) {
             $('#editModal').modal('show');
         }
 
-        document.getElementById('editForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-            let token = document.getElementById('editSessionToken').value;
-            let deviceName = document.getElementById('deviceName').value;
-
-            $.ajax({
-                url: 'update_session.php',
-                type: 'POST',
-                data: { session_token: token, device_name: deviceName },
-                success: function (response) {
-                    $('#editModal').modal('hide');
-                    if (response.status === 'success') {
-                        document.querySelector(`#session-${token} .device-name`).textContent = deviceName;
-                    } else {
-                        alert('Failed to update device name');
-                    }
-                }
-            });
-        });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="./src/js/jquery.min.js"></script>
-    <script src="./src/js/bootstrap.bundle.min.js"></script>
-    <script src="./src/js/adminlte.min.js"></script>
-    <script>
         function confirmRemoval(token) {
             Swal.fire({
                 title: 'Are you sure?',
@@ -150,6 +136,10 @@ if (isset($_POST['update'])) {
             });
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="./src/js/jquery.min.js"></script>
+    <script src="./src/js/bootstrap.bundle.min.js"></script>
+    <script src="./src/js/adminlte.min.js"></script>
 </body>
 
 </html>
