@@ -13,16 +13,13 @@ if (
     isset($_POST['csrf_token']) &&
     isset($_SESSION['csrf_token']) &&
     hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
-)
-{
+) {
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
-    $email = $query->validate(strtolower($_POST['email']));
 
     $data = [
         'first_name' => $first_name,
-        'last_name' => $last_name,
-        'email' => $email
+        'last_name' => $last_name
     ];
 
     if (!empty($_POST['password'])) {
@@ -99,12 +96,12 @@ if (
                         <div class="form-group">
                             <label>Email</label>
                             <input type="email" name="email" class="form-control"
-                                value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                                value="<?php echo htmlspecialchars($user['email']); ?>" disabled>
                         </div>
                         <div class="form-group">
                             <label>Username</label>
                             <input type="text" name="username" class="form-control"
-                                value="<?php echo htmlspecialchars($user['username']); ?>" required disabled>
+                                value="<?php echo htmlspecialchars($user['username']); ?>" disabled>
                         </div>
                         <div class="form-group">
                             <label for="password">Password</label>
