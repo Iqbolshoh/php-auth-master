@@ -15,27 +15,32 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token']) && session
     session_start();
 }
 
-if (!empty($_COOKIE['username']) && ($user = $query->select('users', 'id, role', "username = ?", [$_COOKIE['username']], 's')[0] ?? null)) {
-    $_SESSION['loggedin'] = true;
-    $_SESSION['user_id'] = $user['id'];
-    $_SESSION['username'] = $_COOKIE['username'];
-    $_SESSION['role'] = $user['role'];
+if (!empty($_COOKIE['username'])) {
+    $username = $_COOKIE['username'];
+    $user = $query->select('users', 'id, role', "username = ?", [$username], 's')[0] ?? null;
 
-    $active_sessions = $query->select("active_sessions", "*", "session_token = ?", [session_id()], "s");
+    if (!empty($user)) {
+        $_SESSION['loggedin'] = true;
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $username;
+        $_SESSION['role'] = $user['role'];
 
-    if (!empty($active_sessions)) {
-        $query->update(
-            "active_sessions",
-            ['last_activity' => date('Y-m-d H:i:s')],
-            "session_token = ?",
-            [$session_token],
-            "s"
-        );
-    }
+        $active_sessions = $query->select("active_sessions", "*", "session_token = ?", [session_id()], "s");
 
-    if (isset(ROLES[$user['role']])) {
-        header("Location: " . SITE_PATH . ROLES[$_SESSION['role']]);
-        exit;
+        if (!empty($active_sessions)) {
+            $query->update(
+                "active_sessions",
+                ['last_activity' => date('Y-m-d H:i:s')],
+                "session_token = ?",
+                [$session_token],
+                "s"
+            );
+        }
+
+        if (isset(ROLES[$user['role']])) {
+            header("Location: " . SITE_PATH . ROLES[$_SESSION['role']]);
+            exit;
+        }
     }
 }
 
