@@ -69,6 +69,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </style>
 
 <body class="hold-transition sidebar-mini">
+    <script>
+        window.onload = function () { Swal.fire({ icon: 'success', title: 'Success!', text: 'Your profile has been updated successfully!', timer: 1500, showConfirmButton: false }).then(() => { window.location.href = 'index.php'; }); };
+    </script>
     <div class="wrapper">
         <?php include './header.php'; ?>
         <div class="content-wrapper">
