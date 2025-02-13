@@ -7,6 +7,8 @@ $query->checkUserSession('user');
 
 $user = $query->select("users", '*', "id = ?", [$_SESSION['user_id']], 'i')[0] ?? null;
 
+$_SESSION['csrf_token'] ??= bin2hex(random_bytes(32));
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST'):
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
@@ -102,6 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'):
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
                         </div>
                         <button type="submit" class="btn btn-primary">Update Profile</button>
                     </form>
