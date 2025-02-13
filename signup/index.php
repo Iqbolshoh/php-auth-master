@@ -107,6 +107,7 @@ if (
             'user_id' => $user_id,
             'device_name' => get_user_info(),
             'ip_address' => $_SERVER['REMOTE_ADDR'],
+            'last_activity' => date('Y-m-d H:i:s'),
             'session_token' => session_id()
         ]);
 
