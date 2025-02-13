@@ -62,7 +62,7 @@ if (isset($_POST['update_session']) && isset($_POST['session_token'])) {
                         <tbody>
                             <?php foreach ($sessions as $index => $session): ?>
                                 <tr id="session-<?php echo htmlspecialchars($session['session_token']); ?>">
-                                    <td><?=$index+1?></td>
+                                    <td><?= $index + 1 ?></td>
                                     <td class="device-name"> <?php echo htmlspecialchars($session['device_name']); ?></td>
                                     <td><?php echo htmlspecialchars($session['ip_address']); ?></td>
                                     <td><?php echo date('H:i:s d-m-Y', strtotime($session['last_activity'])); ?></td>
