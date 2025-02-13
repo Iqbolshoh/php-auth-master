@@ -118,7 +118,9 @@ if (
                         <div class="form-group">
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
                         </div>
-                        <button type="submit" name="submit" class="btn btn-primary">Update Profile</button>
+                        <div class="form-group">
+                            <button type="submit" name="submit" class="btn btn-primary">Update Profile</button>
+                        </div>
                     </form>
 
                 </div>
