@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     );
     ?>
     <script>
-        window.onload = function () { Swal.fire({ icon: 'Success', title: 'Success!', text: 'Your profile has been updated successfully!', icon: 'success' }).then(() => { window.location = 'index.php'; }); };
+        window.onload = function () { Swal.fire({ icon: 'success', title: 'Success!', text: 'Your profile has been updated successfully!', timer: 1500, showConfirmButton: false }).then(() => { window.location.href = 'index.php'; }); };
     </script>
     <?php
     exit;
@@ -47,6 +47,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="./src/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
+<style>
+    .form-group .password-container {
+        display: flex;
+        align-items: center;
+    }
+
+    .form-group .password-container input {
+        flex: 1;
+        padding-right: 40px;
+    }
+
+    .form-group .password-toggle {
+        position: absolute;
+        right: 10px;
+        font-size: 18px;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+    }
+</style>
 
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
@@ -94,17 +114,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <?php include './footer.php'; ?>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></scrip >
-            <script>
-                document.getElementById('toggle-password').addEventListener('click', function () {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.getElementById('toggle-password').addEventListener('click', function () {
             const passwordField = document.getElementById('password');
-                const toggleIcon = this.querySelector('i');
+            const toggleIcon = this.querySelector('i');
 
-                if (passwordField.type === 'password') {
-                    passwordField.type = 'text';
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
                 toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
             } else {
-                    passwordField.type = 'password';
+                passwordField.type = 'password';
                 toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
             }
         });
