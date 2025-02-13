@@ -92,15 +92,16 @@ if (isset($_POST['update_session'])) {
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <form method="POST" action="active_sessions.php">
+                                    <form method="POST">
                                         <input type="hidden" name="session_token" id="editSessionToken">
                                         <div class="form-group">
                                             <label for="deviceName">Device Name</label>
                                             <input type="text" class="form-control" name="device_name" id="deviceName"
                                                 required>
                                         </div>
-                                        <button type="submit" name="update_session" class="btn btn-primary">Save
-                                            changes</button>
+                                        <button type="submit" name="update_session" class="btn btn-primary">
+                                            Save changes
+                                        </button>
                                     </form>
                                 </div>
                             </div>
