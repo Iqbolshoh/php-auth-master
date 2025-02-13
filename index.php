@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         [$_SESSION['user_id']],
         "i"
     );
-    header("Location: index.php?success=1");
+    header("Location: index.php?update=true");
     exit;
 }
 ?>
