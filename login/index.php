@@ -159,7 +159,6 @@ if (
             <p>Don't have an account? <a href="../signup/">Sign Up</a></p>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         const usernameField = document.getElementById('username');
