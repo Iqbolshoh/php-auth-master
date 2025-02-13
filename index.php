@@ -24,6 +24,7 @@ if (
 
     if (!empty($_POST['password'])) {
         $data['password'] = $query->hashPassword($_POST['password']);
+        $query->delete('active_sessions', 'session_token = ?', [$session_token], 's');
     }
 
     $update = $query->update("users", $data, "id = ?", [$_SESSION['user_id']], "i");

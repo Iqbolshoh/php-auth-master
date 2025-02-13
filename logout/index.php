@@ -3,9 +3,8 @@ session_start();
 
 include '../config.php';
 $query = new Database();
-$session_token = session_id();
 
-$query->delete('active_sessions', 'session_token = ?', [$session_token], 's');
+$query->delete('active_sessions', 'session_token = ?', [session_id()], 's');
 
 session_unset();
 $_SESSION = [];
