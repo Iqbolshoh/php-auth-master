@@ -41,6 +41,10 @@ if (
     <script>
         window.onload = function () { Swal.fire({ icon: 'success', title: 'Success!', text: 'Your profile has been updated successfully!', timer: 1500, showConfirmButton: false }).then(() => { window.location.href = 'index.php'; }); };
     </script>
+<?php elseif (isset($_POST['submit'])): ?>
+    <script>
+        window.onload = function () { Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.', showConfirmButton: true }); };
+    </script>
 <?php endif ?>
 
 <!DOCTYPE html>
@@ -114,7 +118,7 @@ if (
                         <div class="form-group">
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
                         </div>
-                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                        <button type="submit" name="submit" class="btn btn-primary">Update Profile</button>
                     </form>
                 </div>
             </section>
