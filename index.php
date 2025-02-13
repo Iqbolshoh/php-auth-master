@@ -26,7 +26,9 @@ if (
         $data['password'] = $query->hashPassword($_POST['password']);
     }
 
-    if ($query->update("users", $data, "id = ?", [$_SESSION['user_id']], "i")) {
+    $update = $query->update("users", $data, "id = ?", [$_SESSION['user_id']], "i");
+    
+    if ($update) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         ?>
         <script>
