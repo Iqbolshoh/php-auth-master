@@ -111,6 +111,8 @@ if (
             'session_token' => session_id()
         ]);
 
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
         $redirectPath = SITE_PATH . ROLES[$_SESSION['role']];
         ?>
         <script>

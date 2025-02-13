@@ -95,6 +95,7 @@ if (
             'session_token' => session_id()
         ]);
 
+        
         $redirectPath = SITE_PATH . ROLES[$_SESSION['role']];
         ?>
         <script>
