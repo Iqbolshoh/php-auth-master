@@ -3,7 +3,7 @@ $currentPage = basename($_SERVER['SCRIPT_NAME']);
 
 $menuItems = [
     [
-        "menuTitle" => "Menu",
+        "menuTitle" => "Settings",
         "icon" => "fas fa-home",
         "pages" => [
             ["title" => "Home", "url" => "index.php"],
