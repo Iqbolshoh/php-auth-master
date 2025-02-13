@@ -118,7 +118,7 @@ if (isset($_POST['update_session'])) {
         <?php include './footer.php'; ?>
     </div>
     <script>
-        function openEditModal(token, deviceName) {
+        function openEditModal(deviceName) {
             document.getElementById('deviceName').value = deviceName;
             $('#editModal').modal('show');
         }
