@@ -21,6 +21,14 @@ if (!empty($_COOKIE['username']) && ($user = $query->select('users', 'id, role',
     $_SESSION['username'] = $_COOKIE['username'];
     $_SESSION['role'] = $user['role'];
 
+    $query->update(
+        "active_sessions",
+        ['last_activity' => date('Y-m-d H:i:s')],
+        "session_token = ?",
+        [$session_token],
+        "s"
+    );
+
     if (isset(ROLES[$user['role']])) {
         header("Location: " . SITE_PATH . ROLES[$_SESSION['role']]);
         exit;
