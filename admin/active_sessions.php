@@ -49,9 +49,10 @@ if (isset($_POST['update_session']) && isset($_POST['session_token'])) {
             <section class="content">
                 <div class="container-fluid">
 
-                    <table class="table table-striped table-hover table-bordered">
+                <table class="table table-striped table-hover table-bordered">
                         <thead class="bg-dark">
                             <tr>
+                                <th> №</th>
                                 <th><i class="fas fa-desktop"></i> Device Name</th>
                                 <th><i class="fas fa-network-wired"></i> IP Address</th>
                                 <th><i class="fas fa-clock"></i> Last Activity</th>
@@ -59,8 +60,9 @@ if (isset($_POST['update_session']) && isset($_POST['session_token'])) {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($sessions as $session): ?>
+                            <?php foreach ($sessions as $index => $session): ?>
                                 <tr id="session-<?php echo htmlspecialchars($session['session_token']); ?>">
+                                    <td><?=$index+1?></td>
                                     <td class="device-name"> <?php echo htmlspecialchars($session['device_name']); ?></td>
                                     <td><?php echo htmlspecialchars($session['ip_address']); ?></td>
                                     <td><?php echo date('H:i:s d-m-Y', strtotime($session['last_activity'])); ?></td>
