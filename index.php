@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
     $email = $_POST['email'];
-    $password = $query->hashPassword($_POST['pass$password']);
+    $password = $query->hashPassword($_POST['password']);
 
     $query->update(
         "users",
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         [$_SESSION['user_id']],
         "i"
     );
-    header("Location: index.php?update=true");
+    echo "<script>Swal.fire({title: 'Success!', text: 'Your profile has been updated successfully!', icon: 'success'}).then(() => {window.location = 'index.php';});</script>";
     exit;
 }
 ?>
@@ -40,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>User Dashboard</title>
     <link rel="stylesheet" href="./src/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -48,10 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="content-wrapper">
             <section class="content">
                 <div class="container-fluid">
-
-                    <?php if (isset($_GET['success'])): ?>
-                        <div class="alert alert-success">Your profile has been updated successfully!</div>
-                    <?php endif; ?>
 
                     <form method="POST">
                         <div class="form-group">
@@ -83,7 +80,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
-                            <small id="password-message" style="color: red;"></small>
                         </div>
                         <button type="submit" class="btn btn-primary">Update Profile</button>
                     </form>
