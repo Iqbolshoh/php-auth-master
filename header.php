@@ -4,7 +4,7 @@ $currentPage = basename($_SERVER['SCRIPT_NAME']);
 $menuItems = [
     [
         "menuTitle" => "Settings",
-        "icon" => "fas fa-home",
+        "icon" => "fas fa-cog",
         "pages" => [
             ["title" => "Home", "url" => "index.php"],
             ["title" => "Active Sessions", "url" => "active_sessions.php"]
