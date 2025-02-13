@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     );
     ?>
     <script>
-        Swal.fire({ title: 'Success!', text: 'Your profile has been updated successfully!', icon: 'success' }).then(() => { window.location = 'index.php'; });
+        window.onload = function () { Swal.fire({ icon: 'Success', title: 'Success!', text: 'Your profile has been updated successfully!', icon: 'success' }).then(() => { window.location = 'index.php'; }); };
     </script>
     <?php exit;
 } ?>
