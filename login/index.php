@@ -31,14 +31,6 @@ if (!empty($_COOKIE['username']) && ($user = $query->select('users', 'id, role',
             [$session_token],
             "s"
         );
-    } else {
-        $query->insert("active_sessions", [
-            'user_id' => $user['id'],
-            'device_name' => get_user_info(),
-            'ip_address' => $_SERVER['REMOTE_ADDR'],
-            'last_activity' => date('Y-m-d H:i:s'),
-            'session_token' => $session_token
-        ]);
     }
 
     if (isset(ROLES[$user['role']])) {

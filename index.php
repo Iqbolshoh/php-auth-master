@@ -112,12 +112,14 @@ if (
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
+                            <small id="password-message" style="color: red;"></small>
                         </div>
                         <div class="form-group">
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
                         </div>
                         <div class="form-group">
-                            <button type="submit" name="submit" class="btn btn-primary">Update Profile</button>
+                            <button type="submit" name="submit" id="submit" class="btn btn-primary">Update
+                                Profile</button>
                         </div>
                     </form>
 
@@ -128,6 +130,23 @@ if (
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        const passwordField = document.getElementById('password');
+        const passwordMessage = document.getElementById('password-message');
+        const submitButton = document.getElementById('submit');
+
+        function validatePassword() {
+            const password = passwordField.value;
+            if (password.length < 8) {
+                passwordMessage.textContent = 'Password must be at least 8 characters long!';
+                submitButton.disabled = true;
+            } else {
+                passwordMessage.textContent = '';
+                submitButton.disabled = false;
+            }
+        }
+
+        passwordField.addEventListener('input', validatePassword);
+
         document.getElementById('toggle-password').addEventListener('click', function () {
             const passwordField = document.getElementById('password');
             const toggleIcon = this.querySelector('i');
