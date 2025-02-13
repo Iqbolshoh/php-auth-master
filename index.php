@@ -29,7 +29,7 @@ if (
 
     $update = $query->update("users", $data, "id = ?", [$_SESSION['user_id']], "i");
 
-    if ($update) {
+    if (!empty($update)) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         ?>
         <script>
