@@ -6,7 +6,7 @@ $menuItems = [
         "menuTitle" => "Settings",
         "icon" => "fas fa-cog",
         "pages" => [
-            ["title" => "User Dashboard", "url" => "index.php"],
+            ["title" => "Update Profile", "url" => "index.php"],
             ["title" => "Active Sessions", "url" => "active_sessions.php"]
         ],
     ]
