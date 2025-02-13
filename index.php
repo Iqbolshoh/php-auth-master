@@ -26,10 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         [$_SESSION['user_id']],
         "i"
     );
-    echo "<script>Swal.fire({title: 'Success!', text: 'Your profile has been updated successfully!', icon: 'success'}).then(() => {window.location = 'index.php';});</script>";
-    exit;
-}
-?>
+    ?>
+    <script>
+        Swal.fire({ title: 'Success!', text: 'Your profile has been updated successfully!', icon: 'success' }).then(() => { window.location = 'index.php'; });
+    </script>
+    <?php exit;
+} ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -37,10 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>User Dashboard</title>
     <link rel="stylesheet" href="./src/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -89,16 +89,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <?php include './footer.php'; ?>
     </div>
-    <script>
-        document.getElementById('toggle-password').addEventListener('click', function () {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></scrip >
+            <script>
+                document.getElementById('toggle-password').addEventListener('click', function () {
             const passwordField = document.getElementById('password');
-            const toggleIcon = this.querySelector('i');
+                const toggleIcon = this.querySelector('i');
 
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
                 toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
             } else {
-                passwordField.type = 'password';
+                    passwordField.type = 'password';
                 toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
             }
         });
