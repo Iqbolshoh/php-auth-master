@@ -51,118 +51,79 @@ if (
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="./src/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
-<style>
-    .form-group .password-container {
-        display: flex;
-        align-items: center;
-    }
 
-    .form-group .password-container input {
-        flex: 1;
-        padding-right: 40px;
-    }
-
-    .form-group .password-toggle {
-        position: absolute;
-        right: 10px;
-        font-size: 18px;
-        cursor: pointer;
-        border: none;
-        background: transparent;
-    }
-</style>
-
-<body class="hold-transition sidebar-mini">
-    <div class="wrapper">
-        <?php include './header.php'; ?>
-        <div class="content-wrapper">
-            <section class="content">
-                <div class="container-fluid">
-
-                    <form method="POST">
-                        <div class="form-group">
-                            <label>First Name</label>
-                            <input type="text" name="first_name" class="form-control"
-                                value="<?php echo htmlspecialchars($user['first_name']); ?>" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Last Name</label>
-                            <input type="text" name="last_name" class="form-control"
-                                value="<?php echo htmlspecialchars($user['last_name']); ?>" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" name="email" class="form-control"
-                                value="<?php echo htmlspecialchars($user['email']); ?>" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label>Username</label>
-                            <input type="text" name="username" class="form-control"
-                                value="<?php echo htmlspecialchars($user['username']); ?>" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <div class="password-container">
-                                <input type="password" id="password" name="password" class="form-control"
-                                    maxlength="255">
-                                <button type="button" id="toggle-password" class="password-toggle">
-                                    <i class="fas fa-eye"></i>
-                                </button>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h4>Update Profile</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            <div class="mb-3">
+                                <label class="form-label">First Name</label>
+                                <input type="text" name="first_name" class="form-control"
+                                    value="<?php echo htmlspecialchars($user['first_name']); ?>" required>
                             </div>
-                            <small id="password-message" style="color: red;"></small>
-                        </div>
-                        <div class="form-group">
+                            <div class="mb-3">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" name="last_name" class="form-control"
+                                    value="<?php echo htmlspecialchars($user['last_name']); ?>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control"
+                                    value="<?php echo htmlspecialchars($user['email']); ?>" disabled>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-control"
+                                    value="<?php echo htmlspecialchars($user['username']); ?>" disabled>
+                            </div>
+                            <div class="mb-3 position-relative">
+                                <label class="form-label">Password</label>
+                                <div class="input-group">
+                                    <input type="password" id="password" name="password" class="form-control"
+                                        maxlength="255">
+                                    <button type="button" id="toggle-password" class="btn btn-outline-secondary">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <small id="password-message" class="text-danger"></small>
+                            </div>
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" name="submit" id="submit" class="btn btn-primary">Update
-                                Profile</button>
-                        </div>
-                    </form>
-
+                            <div class="d-grid">
+                                <button type="submit" name="submit" id="submit" class="btn btn-primary">Update
+                                    Profile</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </section>
+            </div>
         </div>
-        <?php include './footer.php'; ?>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        const passwordField = document.getElementById('password');
-        const passwordMessage = document.getElementById('password-message');
-        const submitButton = document.getElementById('submit');
-
-        function validatePassword() {
-            const password = passwordField.value;
-            if (password.length < 8) {
-                passwordMessage.textContent = 'Password must be at least 8 characters long!';
-                submitButton.disabled = true;
-            } else {
-                passwordMessage.textContent = '';
-                submitButton.disabled = false;
-            }
-        }
-
-        passwordField.addEventListener('input', validatePassword);
-
         document.getElementById('toggle-password').addEventListener('click', function () {
             const passwordField = document.getElementById('password');
             const toggleIcon = this.querySelector('i');
+            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+            toggleIcon.classList.toggle('fa-eye');
+            toggleIcon.classList.toggle('fa-eye-slash');
+        });
 
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
-            } else {
-                passwordField.type = 'password';
-                toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
-            }
+        document.getElementById('password').addEventListener('input', function () {
+            const passwordMessage = document.getElementById('password-message');
+            document.getElementById('submit').disabled = this.value.length < 8;
+            passwordMessage.textContent = this.value.length < 8 ? 'Password must be at least 8 characters long!' : '';
         });
     </script>
-    <script src="./src/js/jquery.min.js"></script>
-    <script src="./src/js/bootstrap.bundle.min.js"></script>
-    <script src="./src/js/adminlte.min.js"></script>
 </body>
 
 </html>
