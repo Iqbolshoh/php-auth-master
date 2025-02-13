@@ -60,57 +60,66 @@ if (
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
         <?php include './header.php'; ?>
-        
-        <div class="container mt-5">
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <div class="card shadow-lg">
-                        <div class="card-header bg-primary text-white text-center">
-                            <h4>Update Profile</h4>
-                        </div>
-                        <div class="card-body">
-                            <form method="POST">
-                                <div class="mb-3">
-                                    <label class="form-label">First Name</label>
-                                    <input type="text" name="first_name" class="form-control"
-                                        value="<?php echo htmlspecialchars($user['first_name']); ?>" required>
+        <div class="content-wrapper">
+
+            <section class="content">
+                <div class="container-fluid">
+
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="card shadow-lg">
+                                <div class="card-header bg-primary text-white text-center">
+                                    <h4>Update Profile</h4>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Last Name</label>
-                                    <input type="text" name="last_name" class="form-control"
-                                        value="<?php echo htmlspecialchars($user['last_name']); ?>" required>
+                                <div class="card-body">
+                                    <form method="POST">
+                                        <div class="mb-3">
+                                            <label class="form-label">First Name</label>
+                                            <input type="text" name="first_name" class="form-control"
+                                                value="<?php echo htmlspecialchars($user['first_name']); ?>" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Last Name</label>
+                                            <input type="text" name="last_name" class="form-control"
+                                                value="<?php echo htmlspecialchars($user['last_name']); ?>" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control"
+                                                value="<?php echo htmlspecialchars($user['email']); ?>" disabled>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Username</label>
+                                            <input type="text" class="form-control"
+                                                value="<?php echo htmlspecialchars($user['username']); ?>" disabled>
+                                        </div>
+                                        <div class="mb-3 position-relative">
+                                            <label class="form-label">Password</label>
+                                            <div class="input-group">
+                                                <input type="password" id="password" name="password"
+                                                    class="form-control" maxlength="255">
+                                                <button type="button" id="toggle-password"
+                                                    class="btn btn-outline-secondary">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                            <small id="password-message" class="text-danger"></small>
+                                        </div>
+                                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
+                                        <div class="d-grid">
+                                            <button type="submit" name="submit" id="submit"
+                                                class="btn btn-primary">Update
+                                                Profile</button>
+                                        </div>
+                                    </form>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" class="form-control"
-                                        value="<?php echo htmlspecialchars($user['email']); ?>" disabled>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Username</label>
-                                    <input type="text" class="form-control"
-                                        value="<?php echo htmlspecialchars($user['username']); ?>" disabled>
-                                </div>
-                                <div class="mb-3 position-relative">
-                                    <label class="form-label">Password</label>
-                                    <div class="input-group">
-                                        <input type="password" id="password" name="password" class="form-control"
-                                            maxlength="255">
-                                        <button type="button" id="toggle-password" class="btn btn-outline-secondary">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                    <small id="password-message" class="text-danger"></small>
-                                </div>
-                                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
-                                <div class="d-grid">
-                                    <button type="submit" name="submit" id="submit" class="btn btn-primary">Update
-                                        Profile</button>
-                                </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
+
                 </div>
-            </div>
+            </section>
+
         </div>
         <?php include './footer.php'; ?>
     </div>
