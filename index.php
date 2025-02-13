@@ -75,6 +75,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <input type="text" name="username" class="form-control"
                                 value="<?php echo htmlspecialchars($user['username']); ?>" required disabled>
                         </div>
+                        <div class="form-group">
+                            <label>Password</label>
+
+                        </div>
                         <button type="submit" class="btn btn-primary">Update Profile</button>
                     </form>
                 </div>
