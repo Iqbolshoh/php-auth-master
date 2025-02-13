@@ -76,8 +76,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 value="<?php echo htmlspecialchars($user['username']); ?>" required disabled>
                         </div>
                         <div class="form-group">
-                            <label>Password</label>
-                            <input type="text" name="username" class="form-control">
+                            <label for="password">Password</label>
+                            <div class="password-container">
+                                <input type="password" id="password" name="password" class="form-control" required
+                                    maxlength="255">
+                                <button type="button" id="toggle-password" class="password-toggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small id="password-message" style="color: red;"></small>
                         </div>
                         <button type="submit" class="btn btn-primary">Update Profile</button>
                     </form>
