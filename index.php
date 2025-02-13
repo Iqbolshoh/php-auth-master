@@ -33,7 +33,7 @@ if (
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         ?>
         <script>
-            window.onload = function () { Swal.fire({ icon: 'success', title: 'Success!', text: 'Your profile has been updated successfully!', timer: 1500, showConfirmButton: false }).then(() => { window.location.href = 'index.php'; }); };
+            window.onload = function () { Swal.fire({ icon: 'success', title: 'Success!', text: 'Your profile has been updated successfully!', timer: 1500, showConfirmButton: false }).then(() => { window.location.replace('index.php'); }); };
         </script>
         <?php
     }
