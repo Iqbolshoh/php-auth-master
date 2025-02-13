@@ -23,7 +23,7 @@ if (!empty($_COOKIE['username']) && ($user = $query->select('users', 'id, role',
 
     $active_sessions = $query->select("active_sessions", "*", "session_token = ?", [session_id()], "s");
 
-    if ($active_sessions) {
+    if (!empty($active_sessions)) {
         $query->update(
             "active_sessions",
             ['last_activity' => date('Y-m-d H:i:s')],
