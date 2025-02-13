@@ -50,7 +50,7 @@ if (isset($_POST['update_session']) && isset($_POST['session_token'])) {
                 <div class="container-fluid">
 
                     <table class="table table-striped table-hover table-bordered">
-                        <thead class="thead-dark">
+                        <thead class="bg-dark">
                             <tr>
                                 <th><i class="fas fa-desktop"></i> Device Name</th>
                                 <th><i class="fas fa-network-wired"></i> IP Address</th>
