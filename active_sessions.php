@@ -13,14 +13,14 @@ if (isset($_GET['token'])) {
     exit;
 }
 
-if (isset($_POST['update_session']) && isset($_POST['session_token'])) {
+if (isset($_POST['update_session'])) {
     $device_name = $_POST['device_name'];
 
     $query->update(
         'active_sessions',
         ['device_name' => $device_name],
         'session_token = ? AND user_id = ?',
-        [$_POST['session_token'], $_SESSION['user_id']],
+        [session_id(), $_SESSION['user_id']],
         'si'
     );
 
@@ -69,7 +69,7 @@ if (isset($_POST['update_session']) && isset($_POST['session_token'])) {
                                     <td class="text-center">
                                         <?php if (session_id() == $session['session_token']): ?>
                                             <button class="btn btn-warning btn-sm"
-                                                onclick="openEditModal('<?php echo htmlspecialchars($session['session_token']); ?>', '<?php echo htmlspecialchars($session['device_name']); ?>')">
+                                                onclick="openEditModal('<?php echo htmlspecialchars($session['device_name']); ?>')">
                                                 <i class="fas fa-edit"></i> Edit
                                             </button>
                                         <?php endif ?>
@@ -119,7 +119,6 @@ if (isset($_POST['update_session']) && isset($_POST['session_token'])) {
     </div>
     <script>
         function openEditModal(token, deviceName) {
-            document.getElementById('editSessionToken').value = token;
             document.getElementById('deviceName').value = deviceName;
             $('#editModal').modal('show');
         }
