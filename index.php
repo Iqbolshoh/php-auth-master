@@ -7,8 +7,6 @@ $query->checkUserSession('user');
 
 $user = $query->select("users", '*', "id = ?", [$_SESSION['user_id']], 'i')[0] ?? null;
 
-$_SESSION['csrf_token'] ??= bin2hex(random_bytes(32));
-
 if (
     $_SERVER["REQUEST_METHOD"] === "POST" &&
     isset($_POST['submit']) &&
@@ -16,6 +14,8 @@ if (
     isset($_SESSION['csrf_token']) &&
     hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
 ):
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
     $email = $query->validate(strtolower($_POST['email']));
@@ -120,7 +120,7 @@ if (
                         </div>
                         <button type="submit" name="submit" class="btn btn-primary">Update Profile</button>
                     </form>
-                    
+
                 </div>
             </section>
         </div>
