@@ -9,7 +9,11 @@ if (!empty($_SESSION['loggedin']) && isset(ROLES[$_SESSION['role']])) {
     exit;
 }
 
-if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token']) && session_id() !== $_COOKIE['session_token']) {
+if (
+    !empty($_COOKIE['username']) &&
+    !empty($_COOKIE['session_token']) &&
+    session_id() !== $_COOKIE['session_token']
+) {
     session_write_close();
     session_id($_COOKIE['session_token']);
     session_start();
