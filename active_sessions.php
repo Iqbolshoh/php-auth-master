@@ -13,15 +13,14 @@ if (isset($_GET['token'])) {
     exit;
 }
 
-if (isset($_POST['update_session'])) {
-    $session_token = $_POST['session_token'];
+if (isset($_POST['update_session']) && isset($_POST['session_token'])) {
     $device_name = $_POST['device_name'];
 
     $query->update(
         'active_sessions',
         ['device_name' => $device_name],
         'session_token = ? AND user_id = ?',
-        [$session_token, $_SESSION['user_id']],
+        [$_POST['session_token'], $_SESSION['user_id']],
         'si'
     );
 
