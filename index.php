@@ -68,7 +68,7 @@ if (
                     <div class="row justify-content-center">
                         <div class="col-md-6">
                             <div class="card shadow-lg">
-                                <div class="card-header bg-primary text-white text-center">
+                                <div class="card-header bg-dark text-white text-center">
                                     <h4>Update Profile</h4>
                                 </div>
                                 <div class="card-body">
@@ -108,7 +108,7 @@ if (
                                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
                                         <div class="d-grid">
                                             <button type="submit" name="submit" id="submit"
-                                                class="btn btn-primary">Update
+                                                class="btn btn-primary w-100">Update
                                                 Profile</button>
                                         </div>
                                     </form>
