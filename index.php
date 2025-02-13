@@ -9,9 +9,9 @@ $user = $query->select("users", '*', "id = ?", [$_SESSION['user_id']], 'i');
 $user = $user ? $user[0] : null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $first_name = $_POST['first_name'];
-    $last_name = $_POST['last_name'];
-    $email = $_POST['email'];
+    $first_name = $query->validate($_POST['first_name']);
+    $last_name = $query->validate($_POST['last_name']);
+    $email = $query->validate(strtolower($_POST['email']));
     $password = $query->hashPassword($_POST['password']);
 
     $query->update(
