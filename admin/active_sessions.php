@@ -49,7 +49,7 @@ if (isset($_POST['update_session']) && isset($_POST['session_token'])) {
             <section class="content">
                 <div class="container-fluid">
 
-                <table class="table table-striped table-hover table-bordered">
+                    <table class="table table-striped table-hover table-bordered">
                         <thead class="bg-dark">
                             <tr>
                                 <th> №</th>
@@ -62,15 +62,17 @@ if (isset($_POST['update_session']) && isset($_POST['session_token'])) {
                         <tbody>
                             <?php foreach ($sessions as $index => $session): ?>
                                 <tr id="session-<?php echo htmlspecialchars($session['session_token']); ?>">
-                                    <td><?=$index+1?></td>
+                                    <td><?= $index + 1 ?></td>
                                     <td class="device-name"> <?php echo htmlspecialchars($session['device_name']); ?></td>
                                     <td><?php echo htmlspecialchars($session['ip_address']); ?></td>
                                     <td><?php echo date('H:i:s d-m-Y', strtotime($session['last_activity'])); ?></td>
                                     <td class="text-center">
-                                        <button class="btn btn-warning btn-sm"
-                                            onclick="openEditModal('<?php echo htmlspecialchars($session['session_token']); ?>', '<?php echo htmlspecialchars($session['device_name']); ?>')">
-                                            <i class="fas fa-edit"></i> Edit
-                                        </button>
+                                        <?php if (session_id() == $session['session_token']): ?>
+                                            <button class="btn btn-warning btn-sm"
+                                                onclick="openEditModal('<?php echo htmlspecialchars($session['session_token']); ?>', '<?php echo htmlspecialchars($session['device_name']); ?>')">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                        <?php endif ?>
                                         <button class="btn btn-danger btn-sm"
                                             onclick="confirmRemoval('<?php echo htmlspecialchars($session['session_token']); ?>')">
                                             <i class="fas fa-trash-alt"></i> Remove
