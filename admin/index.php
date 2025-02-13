@@ -1,9 +1,9 @@
 <?php
 session_start();
-include '../config.php';
 
+include '../config.php';
 $query = new Database();
-$query->checkUserSession('admin');
+$query->checkUserSession('user');
 
 $user = $query->select("users", '*', "id = ?", [$_SESSION['user_id']], 'i')[0] ?? null;
 
