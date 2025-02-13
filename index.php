@@ -1,14 +1,13 @@
 <?php
 session_start();
 include './config.php';
+
 $query = new Database();
 $query->checkUserSession('user');
 
-// Foydalanuvchi ma'lumotlarini olish
 $user = $query->select("users", '*', "id = ?", [$_SESSION['user_id']], 'i');
 $user = $user ? $user[0] : null;
 
-// Ma'lumotlarni yangilash
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
