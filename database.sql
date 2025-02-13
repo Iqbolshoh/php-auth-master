@@ -41,7 +41,7 @@ VALUES
         'Ilhomjonov',
         'iilhomjonov777@gmail.com',
         'iqbolshoh',
-        '65c2a32982abe41b1e6ff888d351ee6b7ade33affd4a595667ea7db910aecaa8',
+        '1f254bb82e64bde20137a2922989f6f57529c98e34d146b523a47898702b7231',
         'admin'
     ),
     (
@@ -49,6 +49,6 @@ VALUES
         'User',
         'user@gmail.com',
         'user',
-        '65c2a32982abe41b1e6ff888d351ee6b7ade33affd4a595667ea7db910aecaa8',
+        '1f254bb82e64bde20137a2922989f6f57529c98e34d146b523a47898702b7231',
         'user'
     );
