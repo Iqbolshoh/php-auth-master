@@ -12,16 +12,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
     $email = $query->validate(strtolower($_POST['email']));
-    $password = $query->hashPassword($_POST['password']);
+
+    $data = [
+        'first_name' => $first_name,
+        'last_name' => $last_name,
+        'email' => $email,
+        'password' => $password
+    ];
+
+    if (isset($_POST['password'])) {
+        $password = $query->hashPassword($_POST['password']);
+        $data += $password;
+    }
 
     $query->update(
         "users",
-        [
-            'first_name' => $first_name,
-            'last_name' => $last_name,
-            'email' => $email,
-            'password' => $password
-        ],
+        $data,
         "id = ?",
         [$_SESSION['user_id']],
         "i"
@@ -74,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="form-group">
                             <label for="password">Password</label>
                             <div class="password-container">
-                                <input type="password" id="password" name="password" class="form-control" required
+                                <input type="password" id="password" name="password" class="form-control"
                                     maxlength="255">
                                 <button type="button" id="toggle-password" class="password-toggle">
                                     <i class="fas fa-eye"></i>
