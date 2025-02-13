@@ -8,7 +8,7 @@ $query->checkUserSession('user');
 $user = $query->select("users", '*', "id = ?", [$_SESSION['user_id']], 'i');
 $user = $user ? $user[0] : null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST'):
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
     $email = $query->validate(strtolower($_POST['email']));
@@ -34,9 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script>
         window.onload = function () { Swal.fire({ icon: 'success', title: 'Success!', text: 'Your profile has been updated successfully!', timer: 1500, showConfirmButton: false }).then(() => { window.location.href = 'index.php'; }); };
     </script>
-    <?php
-    exit;
-} ?>
+<?php endif ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -69,9 +67,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </style>
 
 <body class="hold-transition sidebar-mini">
-    <script>
-        window.onload = function () { Swal.fire({ icon: 'success', title: 'Success!', text: 'Your profile has been updated successfully!', timer: 1500, showConfirmButton: false }).then(() => { window.location.href = 'index.php'; }); };
-    </script>
     <div class="wrapper">
         <?php include './header.php'; ?>
         <div class="content-wrapper">
