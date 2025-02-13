@@ -64,7 +64,7 @@ if (isset($_POST['update_session'])) {
                                 <tr id="session-<?php echo htmlspecialchars($session['session_token']); ?>">
                                     <td class="device-name"> <?php echo htmlspecialchars($session['device_name']); ?></td>
                                     <td><?php echo htmlspecialchars($session['ip_address']); ?></td>
-                                    <td><?php echo htmlspecialchars($session['last_activity']); ?></td>
+                                    <td><?php echo date('H:i:s d-m-Y', strtotime($session['last_activity'])); ?></td>
                                     <td class="text-center">
                                         <button class="btn btn-warning btn-sm"
                                             onclick="openEditModal('<?php echo htmlspecialchars($session['session_token']); ?>', '<?php echo htmlspecialchars($session['device_name']); ?>')">
