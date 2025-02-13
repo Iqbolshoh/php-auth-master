@@ -9,13 +9,9 @@ $user = $query->select("users", '*', "id = ?", [$_SESSION['user_id']], 'i')[0] ?
 
 if (
     $_SERVER["REQUEST_METHOD"] === "POST" &&
-    isset($_POST['submit']) &&
-    isset($_POST['csrf_token']) &&
-    isset($_SESSION['csrf_token']) &&
+    isset($_POST['submit'], $_POST['csrf_token'], $_SESSION['csrf_token']) &&
     hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
-):
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-
+) {
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
     $email = $query->validate(strtolower($_POST['email']));
@@ -26,26 +22,43 @@ if (
         'email' => $email
     ];
 
-    if (isset($_POST['password'])) {
+    if (!empty($_POST['password'])) {
         $data['password'] = $query->hashPassword($_POST['password']);
     }
 
-    $query->update(
-        "users",
-        $data,
-        "id = ?",
-        [$_SESSION['user_id']],
-        "i"
-    );
+    if ($query->update("users", $data, "id = ?", [$_SESSION['user_id']], "i")) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        ?>
+        <script>
+            window.onload = function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Your profile has been updated successfully!',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = 'index.php';
+                });
+            };
+        </script>
+        <?php
+    }
+} elseif (isset($_POST['submit'])) {
     ?>
     <script>
-        window.onload = function () { Swal.fire({ icon: 'success', title: 'Success!', text: 'Your profile has been updated successfully!', timer: 1500, showConfirmButton: false }).then(() => { window.location.href = 'index.php'; }); };
+        window.onload = function () {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid CSRF Token',
+                text: 'Please refresh the page and try again.',
+                showConfirmButton: true
+            });
+        };
     </script>
-<?php elseif (isset($_POST['submit'])): ?>
-    <script>
-        window.onload = function () { Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.', showConfirmButton: true }); };
-    </script>
-<?php endif ?>
+    <?php
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
