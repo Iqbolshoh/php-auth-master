@@ -120,9 +120,9 @@ if (
                         </div>
                         <button type="submit" name="submit" class="btn btn-primary">Update Profile</button>
                     </form>
+                    
                 </div>
             </section>
-
         </div>
         <?php include './footer.php'; ?>
     </div>
