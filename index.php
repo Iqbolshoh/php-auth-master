@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
     $email = $_POST['email'];
-    $username = $_POST['username'];
+    $password = $query->hashPassword($_POST['pass$password']);
 
     $query->update(
         "users",
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'first_name' => $first_name,
             'last_name' => $last_name,
             'email' => $email,
-            'username' => $username
+            'password' => $password
         ],
         "id = ?",
         [$_SESSION['user_id']],
