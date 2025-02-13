@@ -5,8 +5,7 @@ include './config.php';
 $query = new Database();
 $query->checkUserSession('user');
 
-$user = $query->select("users", '*', "id = ?", [$_SESSION['user_id']], 'i');
-$user = $user ? $user[0] : null;
+$user = $query->select("users", '*', "id = ?", [$_SESSION['user_id']], 'i')[0] ?? null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST'):
     $first_name = $query->validate($_POST['first_name']);
