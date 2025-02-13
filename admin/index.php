@@ -106,7 +106,9 @@ if (
                                             </div>
                                             <small id="password-message" class="text-danger"></small>
                                         </div>
-                                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
+                                        <div class="mb-3">
+                                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
+                                        </div>
                                         <div class="d-grid">
                                             <button type="submit" name="submit" id="submit"
                                                 class="btn btn-primary w-100">Update
