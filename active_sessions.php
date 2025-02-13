@@ -9,7 +9,7 @@ $sessions = $query->select('active_sessions', '*', 'user_id = ?', [$_SESSION['us
 
 if (isset($_GET['token'])) {
     $query->delete('active_sessions', 'user_id = ? AND session_token = ?', [$_SESSION['user_id'], $_GET['token']], 'is');
-    header('Location: active_sessions.php');
+    header('Location: ' . $_SERVER['PHP_SELF']);
     exit;
 }
 
@@ -24,7 +24,7 @@ if (isset($_POST['update_session'])) {
         'si'
     );
 
-    header('Location: active_sessions.php');
+    header('Location: ' . $_SERVER['PHP_SELF']);
     exit;
 }
 ?>
