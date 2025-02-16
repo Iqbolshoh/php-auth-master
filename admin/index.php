@@ -31,7 +31,7 @@ if (
 
     if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
         $encrypted_name = md5(bin2hex(random_bytes(32)) . '_' . bin2hex(random_bytes(16)) . '_' . uniqid('', true)) . '.' . pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
-        $targetFile = "../src/images/profile_picture/" . $encrypted_name;
+        $targetFile = "../src/images/profile_picture/";
 
         $filePath = $targetFile . '/' . $user['profile_picture'];
         if (file_exists($filePath) && $user['profile_picture'] != 'default.png') {
