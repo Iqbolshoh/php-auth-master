@@ -2,8 +2,7 @@
 
 This repository is a user authentication and role management system built with PHP. It provides an easy-to-use admin panel and allows the creation and management of multiple user roles. Security is the top priority in **PHP Auth Master**, ensuring user data is well-protected.  
 
-![Active Sessions](src/images/active_session.png)  
-![Login](src/images/login.png)  
+![Active Sessions](src/images/active_sessions.png)
 
 ## Features  
 
@@ -38,7 +37,7 @@ When users navigate to **Active Sessions**, they will see something like this:
 | Device Name | IP Address | Login Time | Last Activity | Action |
 |-------------|-----------|------------|--------------|--------|
 | Windows PC | 192.168.1.100 | 2025-02-16 10:15:00 | 2025-02-16 10:45:00 | 🔴 Logout |
-| iPhone 12  | 203.45.67.89  | 2025-02-16 09:00:00 | 2025-02-16 09:30:00 | 🔴 Logout |
+| iPhone 15 Pro Max  | 203.45.67.89  | 2025-02-16 09:00:00 | 2025-02-16 09:30:00 | 🔴 Logout |
 
 Users can log out of any session with just one click.  
 
@@ -64,6 +63,9 @@ $menuItems = [
 ---
 
 ## Preview Pages  
+
+### Login 
+![Login](src/images/login.png) 
 
 ### Admin Dashboard  
 ![Admin](src/images/admin_panel.png)  
