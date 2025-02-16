@@ -92,7 +92,9 @@ if (
         'email' => $email,
         'username' => $username,
         'password' => $password,
-        'role' => $role
+        'role' => $role,
+        'created_at' => date('Y-m-d H:i:s'),
+        'updated_at' => date('Y-m-d H:i:s')
     ];
 
     $user = $query->insert('users', $data);
