@@ -1,8 +1,8 @@
-
 # PHP Auth Master  
 
-This repository is a user authentication and role management system built with PHP. It provides an easy-to-use admin panel and allows the creation and management of multiple user roles.  
+This repository is a user authentication and role management system built with PHP. It provides an easy-to-use admin panel and allows the creation and management of multiple user roles. Security is the top priority in **PHP Auth Master**, ensuring user data is well-protected.  
 
+![Active Sessions](src/images/active_session.png)  
 ![Login](src/images/login.png)  
 
 ## Features  
@@ -12,8 +12,39 @@ This repository is a user authentication and role management system built with P
 - **User Authentication**: Secure registration and login with password hashing.  
 - **Role-Based Access Control**: Different functionalities and pages are accessible based on user roles.  
 - **Automatic Menu Generation**: The admin panel menu is dynamically generated based on user roles.  
+- **Advanced Security Measures**: Session tracking, active session management, and automatic logout after a password change.  
 
-## Admin Panel  
+---
+
+## 🔐 Security & Active Sessions  
+
+One of the most powerful security features in **PHP Auth Master** is the **Active Session Management System**, which ensures that users can track and control their active sessions.  
+
+### Active Session Features  
+
+- **Session Monitoring**: Users can see a list of all logged-in devices, including:  
+  - Device Name  
+  - IP Address  
+  - Login Time  
+  - Last Activity Time  
+- **Remove Unauthorized Devices**: Users can manually log out of unwanted or suspicious devices.  
+- **Automatic Logout on Password Change**: If a user changes their password, **all active sessions** on other devices will be logged out immediately.  
+- **Strong Security**: The system prevents unauthorized access and provides **real-time session tracking**.  
+
+### Example: Active Session Table  
+
+When users navigate to **Active Sessions**, they will see something like this:  
+
+| Device Name | IP Address | Login Time | Last Activity | Action |
+|-------------|-----------|------------|--------------|--------|
+| Windows PC | 192.168.1.100 | 2025-02-16 10:15:00 | 2025-02-16 10:45:00 | 🔴 Logout |
+| iPhone 12  | 203.45.67.89  | 2025-02-16 09:00:00 | 2025-02-16 09:30:00 | 🔴 Logout |
+
+Users can log out of any session with just one click.  
+
+---
+
+## 🛠 Admin Panel  
 
 To use the admin panel, simply define the menu structure. The system will automatically generate the necessary navigation and pages:  
 
@@ -30,17 +61,19 @@ $menuItems = [
 ];
 ```
 
+---
+
 ## Preview Pages  
 
 ### Admin Dashboard  
-![Admin](src/images/admin.png)  
+![Admin](src/images/admin_panel.png)  
 
 ### User Dashboard  
 ![User](src/images/user.png)  
 
 ---
 
-## Setting Up the Project  
+## 🚀 Setting Up the Project  
 
 Follow these steps to set up the project on your local machine:  
 
@@ -63,7 +96,7 @@ Replace `yourusername` and `yourpassword` with your MySQL credentials.
 
 ---
 
-## Database Connection and Role Configuration  
+## 🔧 Database Connection and Role Configuration  
 
 To ensure proper database connectivity, update the `config.php` file with the following settings:  
 
@@ -86,7 +119,18 @@ const ROLES = [
 - **`DB_NAME`**: Defines the name of the authentication database (`auth_master`).  
 - **`ROLES`**: An array mapping user roles to their corresponding default redirection paths.  
 
-These configurations allow seamless database connectivity and ensure proper user role management.
+These configurations allow seamless database connectivity and ensure proper user role management.  
+
+---
+
+## 🛡 Why Choose PHP Auth Master?  
+
+✅ **Strong Security** – Active session tracking, password-based session logout, and role-based access.  
+✅ **User-Friendly** – Built-in admin panel for easy management.  
+✅ **Flexible & Scalable** – Easily add new roles, pages, and users.  
+✅ **Real-Time Monitoring** – See who is logged in and remove unauthorized sessions.  
+
+💡 **Ready to secure your PHP application? Start using PHP Auth Master today!** 🚀
 
 ---
 
