@@ -34,11 +34,11 @@ if (
         $targetFile = "../src/images/profile_picture/" . $encrypted_name;
 
         $filePath = $targetFile . '/' . $user['profile_picture'];
-        if (file_exists($filePath)) {
+        if (file_exists($filePath) && $user['profile_picture'] != 'default.png') {
             unlink($filePath);
         }
 
-        if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $targetFile)) {
+        if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $targetFile . $encrypted_name)) {
             $data['profile_picture'] = $encrypted_name;
         }
     }
