@@ -1,39 +1,73 @@
-# PHP User Role Manager
 
-This repository is a user management system built using PHP. It includes functionalities for user registration, login, role management.
+# PHP Auth Master  
 
-![Login](src/images/login.png)
+This repository is a user authentication and role management system built with PHP. It provides an easy-to-use admin panel and allows the creation and management of multiple user roles.  
 
-## Features
+![Login](src/images/login.png)  
 
-- **User Roles**: Admin, and User roles with specific access controls.
-- **User Authentication**: Secure login and registration with password hashing.
-- **File Uploads**: Users can upload profile images. All images, except `default.png`, are securely encrypted before storage.
-- **Role-Based Access**: Different pages and functionalities accessible based on user roles.
+## Features  
 
-## Preview pages
+- **Multiple User Roles**: Easily create and manage different roles such as Admin, User, and more.  
+- **Admin Panel**: A built-in admin dashboard where user roles and permissions can be managed.  
+- **User Authentication**: Secure registration and login with password hashing.  
+- **Role-Based Access Control**: Different functionalities and pages are accessible based on user roles.  
+- **Automatic Menu Generation**: The admin panel menu is dynamically generated based on user roles.  
 
-### Admin Dashboard
-![Admin](src/images/admin.png)
+## Admin Panel  
 
-### User Dashboard
-![User](src/images/user.png)
+To use the admin panel, simply define the menu structure. The system will automatically generate the necessary navigation and pages:  
 
-## Setting Up the Project
+```php
+$menuItems = [
+    [
+        "menuTitle" => "Settings",
+        "icon" => "fas fa-cog",
+        "pages" => [
+            ["title" => "Update Profile", "url" => "index.php"],
+            ["title" => "Active Sessions", "url" => "active_sessions.php"]
+        ],
+    ]
+];
+```
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Iqbolshoh/php-user-role-manager.git
-   cd php-user-role-manager
-   ```
+## Preview Pages  
 
-2. Import the database:
-   ```bash
-   mysql -u yourusername -p yourpassword < database.sql
-   ```
+### Admin Dashboard  
+![Admin](src/images/admin.png)  
 
-3. Configure the database connection in `config.php`:
-   ```php
+### User Dashboard  
+![User](src/images/user.png)  
+
+---
+
+## Setting Up the Project  
+
+Follow these steps to set up the project on your local machine:  
+
+### 1. Clone the Repository  
+Run the following command to clone the repository and navigate into the project directory:  
+
+```bash
+git clone https://github.com/Iqbolshoh/php-auth-master.git
+cd php-auth-master
+```
+
+### 2. Import the Database  
+Execute the following command to import the database schema into MySQL:  
+
+```bash
+mysql -u yourusername -p yourpassword < database.sql
+```
+
+Replace `yourusername` and `yourpassword` with your MySQL credentials.  
+
+---
+
+## Database Connection and Role Configuration  
+
+To ensure proper database connectivity, update the `config.php` file with the following settings:  
+
+```php
 define("DB_SERVER", "localhost");
 define("DB_USERNAME", "root");
 define("DB_PASSWORD", "");
@@ -43,8 +77,18 @@ const ROLES = [
     'admin' => '/admin/',
     'user' => '/'
 ];
+```
 
-   ```
+### Explanation:  
+- **`DB_SERVER`**: Specifies the database host (default is `localhost`).  
+- **`DB_USERNAME`**: Defines the MySQL username (`root` for local setups).  
+- **`DB_PASSWORD`**: Specifies the database password (leave empty if using the default local MySQL setup).  
+- **`DB_NAME`**: Defines the name of the authentication database (`auth_master`).  
+- **`ROLES`**: An array mapping user roles to their corresponding default redirection paths.  
+
+These configurations allow seamless database connectivity and ensure proper user role management.
+
+---
 
 ## Technologies Used
 
