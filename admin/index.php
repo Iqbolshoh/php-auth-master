@@ -19,12 +19,28 @@ if (
 
     $data = [
         'first_name' => $first_name,
-        'last_name' => $last_name
+        'last_name' => $last_name,
+        'profile_picture' => 'default.png',
+        'updated_at' => date('Y-m-d H:i:s')
     ];
 
     if (!empty($_POST['password'])) {
         $data['password'] = $query->hashPassword($_POST['password']);
         $query->delete('active_sessions', 'user_id = ? AND session_token <> ?', [$_SESSION['user_id'], session_id()], 'is');
+    }
+
+    if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+        $encrypted_name = md5(bin2hex(random_bytes(32)) . '_' . bin2hex(random_bytes(16)) . '_' . uniqid('', true)) . '.' . pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
+        $targetFile = "../src/images/profile_picture/" . $encrypted_name;
+
+        $filePath = $targetFile . '/' . $user['profile_picture'];
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+
+        if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $targetFile)) {
+            $data['profile_picture'] = $encrypted_name;
+        }
     }
 
     $update = $query->update("users", $data, "id = ?", [$_SESSION['user_id']], "i");
@@ -73,7 +89,7 @@ if (
                                     <h4>Update Profile</h4>
                                 </div>
                                 <div class="card-body">
-                                    <form method="POST">
+                                    <form method="POST" enctype="multipart/form-data">
                                         <div class="mb-3">
                                             <label class="form-label">First Name</label>
                                             <input type="text" name="first_name" class="form-control"
@@ -105,6 +121,26 @@ if (
                                                 </button>
                                             </div>
                                             <small id="password-message" class="text-danger"></small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label fw-bold">Upload Image</label>
+                                            <div class="input-group">
+                                                <input type="file" name="profile_picture" id="profile_picture"
+                                                    accept="image/*" required style="display: none;">
+                                                <label for="profile_picture" style="background-color: white;
+                                                    color: #007bff; 
+                                                    border: 2px solid #007bff; 
+                                                    border-radius: 5px; 
+                                                    padding: 7px; 
+                                                    cursor: pointer; 
+                                                    transition: 0.3s; 
+                                                    width: 100%; 
+                                                    text-align: center; 
+                                                    font-weight: bold; 
+                                                    display: inline-block;">
+                                                    📂 Upload Image
+                                                </label>
+                                            </div>
                                         </div>
                                         <div class="mb-3">
                                             <input type="hidden" name="csrf_token"
