@@ -29,16 +29,17 @@ This repository is a user authentication and role management system built with P
 
 ## 🔐 Security & Active Sessions  
 
-**PHP Auth Master** ensures top-level security with an **Active Session Management System**, allowing users to track and control logged-in devices.  
+**PHP Auth Master** ensures **strong security** with an **Active Session Management System**, allowing users to track and manage logged-in devices in real time.  
 
 ### 🔹 Key Security Features  
 
-- 🖥 **Session Monitoring** – View active devices with:  
-  - 📌 Device Name  
-  - 🌍 IP Address  
-- ❌ **Logout Unwanted Devices** – Manually remove suspicious sessions.  
-- 🔄 **Auto Logout on Password Change** – All active sessions are terminated instantly after a password update.  
-- 🛡 **Real-Time Protection** – Prevents unauthorized access with **session tracking & control**.  
+- 🖥 **Session Monitoring** – View all active sessions with:  
+  - 📌 **Device Name**  
+  - 🌍 **IP Address**  
+  - ⏳ **Last Activity Time**  
+- ❌ **Logout Unwanted Devices** – Remove unauthorized or inactive sessions.  
+- 🔄 **Auto Logout on Password Change** – When a password is updated, **all active sessions** are automatically logged out.  
+- 🛡 **Real-Time Protection** – Prevents unauthorized access with **session tracking & manual control**.  
 
 ### Example: Active Session Table  
 
@@ -82,9 +83,9 @@ $menuItems = [
 
 ---
 
-## 🚀 Setting Up the Project  
+## 🚀 Quick Setup  
 
-Follow these simple steps to get **PHP Auth Master** running on your local machine.  
+Get **PHP Auth Master** running in just two steps!  
 
 ### 1️⃣ Clone the Repository  
 ```bash
@@ -102,7 +103,7 @@ mysql -u yourusername -p yourpassword < database.sql
 
 ## 🔧 Database & Role Configuration  
 
-Update `config.php` to connect the database:  
+Edit `config.php` to set up the database:  
 
 ```php
 define("DB_SERVER", "localhost");
@@ -116,14 +117,11 @@ const ROLES = [
 ];
 ```
 
-### 🔹 Quick Overview  
-✅ **`DB_SERVER`** – Database host (`localhost` by default).  
-✅ **`DB_USERNAME`** – MySQL username (`root` for local).  
-✅ **`DB_PASSWORD`** – Leave empty for default local setup.  
-✅ **`DB_NAME`** – Database name (`auth_master`).  
-✅ **`ROLES`** – Defines user roles & redirections.  
+### 🔹 Key Settings  
+✅ **DB Connection** – Default `localhost`, user `root`.  
+✅ **Role Management** – Admin & User with auto redirection.  
 
-🚀 **You’re all set! Run your project & start managing users securely.**
+🚀 **You're ready to go!** Start the project & manage users easily.
 
 ---
 
