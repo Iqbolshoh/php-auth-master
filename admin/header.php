@@ -54,10 +54,16 @@ $activePage = $activePageInfo['activePage'] ?? null;
         </div>
     </form>
     <ul class="navbar-nav ml-auto">
-        <li class="nav-item dropdown"><a class="nav-link" href="#messages"><i class="far fa-comments"></i><span
-                    class="badge badge-danger navbar-badge">2</span></a></li>
-        <li class="nav-item dropdown"><a class="nav-link" href="#notifications"><i class="far fa-bell"></i><span
-                    class="badge badge-warning navbar-badge">5</span></a></li>
+        <li class="nav-item dropdown"><a class="nav-link" href="#messages">
+                <i class="far fa-comments"></i>
+                <span class="badge badge-danger navbar-badge">2</span>
+            </a>
+        </li>
+        <li class="nav-item dropdown"><a class="nav-link" href="#notifications">
+                <i class="far fa-bell"></i>
+                <span class="badge badge-warning navbar-badge">5</span>
+            </a>
+        </li>
     </ul>
 </nav>
 
