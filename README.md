@@ -4,40 +4,51 @@ This repository is a user authentication and role management system built with P
 
 ![Active Sessions](src/images/active_sessions.png)
 
-## Features  
+## ✨ Features  
 
-- **Multiple User Roles**: Easily create and manage different roles such as Admin, User, and more.  
-- **Admin Panel**: A built-in admin dashboard where user roles and permissions can be managed.  
-- **User Authentication**: Secure registration and login with password hashing.  
-- **Role-Based Access Control**: Different functionalities and pages are accessible based on user roles.  
-- **Automatic Menu Generation**: The admin panel menu is dynamically generated based on user roles.  
-- **Advanced Security Measures**: Session tracking, active session management, and automatic logout after a password change.  
+- 🔹 **Multiple User Roles** – Easily manage Admin, User, and more.  
+- 🔹 **Admin Panel** – Built-in dashboard for role & permission control.  
+- 🔹 **Secure Authentication** – Password hashing & session protection.  
+- 🔹 **Role-Based Access** – Restrict pages based on user roles.  
+- 🔹 **Auto Menu Generation** – Dynamic navigation for admin panel.  
+- 🔹 **Advanced Security** – Active session tracking & auto logout on password change.  
+
+## 🛡 Why PHP Auth Master?  
+
+✅ **Secure** – Tracks active sessions & prevents unauthorized access.  
+✅ **Easy to Use** – Simple admin panel for quick management.  
+✅ **Scalable** – Add new roles & users effortlessly.  
+✅ **Real-Time Control** – Monitor & remove active sessions anytime.  
+
+🚀 **Get started with PHP Auth Master today!**
 
 ---
 
+### Login 
+![Login](src/images/login.png) 
+
 ## 🔐 Security & Active Sessions  
 
-One of the most powerful security features in **PHP Auth Master** is the **Active Session Management System**, which ensures that users can track and control their active sessions.  
+**PHP Auth Master** ensures **strong security** with an **Active Session Management System**, allowing users to track and manage logged-in devices in real time.  
 
-### Active Session Features  
+### 🔹 Key Security Features  
 
-- **Session Monitoring**: Users can see a list of all logged-in devices, including:  
-  - Device Name  
-  - IP Address  
-  - Login Time  
-  - Last Activity Time  
-- **Remove Unauthorized Devices**: Users can manually log out of unwanted or suspicious devices.  
-- **Automatic Logout on Password Change**: If a user changes their password, **all active sessions** on other devices will be logged out immediately.  
-- **Strong Security**: The system prevents unauthorized access and provides **real-time session tracking**.  
+- 🖥 **Session Monitoring** – View all active sessions with:  
+  - 📌 **Device Name**  
+  - 🌍 **IP Address**  
+  - ⏳ **Last Activity Time**  
+- ❌ **Logout Unwanted Devices** – Remove unauthorized or inactive sessions.  
+- 🔄 **Auto Logout on Password Change** – When a password is updated, **all active sessions** are automatically logged out.  
+- 🛡 **Real-Time Protection** – Prevents unauthorized access with **session tracking & manual control**.  
 
 ### Example: Active Session Table  
 
 When users navigate to **Active Sessions**, they will see something like this:  
 
-| Device Name | IP Address | Login Time | Last Activity | Action |
-|-------------|-----------|------------|--------------|--------|
-| Windows PC | 192.168.1.100 | 2025-02-16 10:15:00 | 2025-02-16 10:45:00 | 🔴 Logout |
-| iPhone 15 Pro Max  | 203.45.67.89  | 2025-02-16 09:00:00 | 2025-02-16 09:30:00 | 🔴 Logout |
+| №  | Device Name         | IP Address  | Last Activity        | Action  |
+|----|---------------------|------------|----------------------|---------|
+| 1  | Windows 11 PC      | 192.168.1.100  | 10:28:42 16-02-2025  | 🔴 Logout |
+| 2  | iPhone 15 Pro Max  | 203.45.67.89  | 10:27:34 16-02-2025  | 🔴 Logout |
 
 Users can log out of any session with just one click.  
 
@@ -64,9 +75,6 @@ $menuItems = [
 
 ## Preview Pages  
 
-### Login 
-![Login](src/images/login.png) 
-
 ### Admin Dashboard  
 ![Admin](src/images/admin_panel.png)  
 
@@ -75,32 +83,27 @@ $menuItems = [
 
 ---
 
-## 🚀 Setting Up the Project  
+## 🚀 Quick Setup  
 
-Follow these steps to set up the project on your local machine:  
+Get **PHP Auth Master** running in just two steps!  
 
-### 1. Clone the Repository  
-Run the following command to clone the repository and navigate into the project directory:  
-
+### 1️⃣ Clone the Repository  
 ```bash
 git clone https://github.com/Iqbolshoh/php-auth-master.git
 cd php-auth-master
 ```
 
-### 2. Import the Database  
-Execute the following command to import the database schema into MySQL:  
-
+### 2️⃣ Import the Database  
 ```bash
 mysql -u yourusername -p yourpassword < database.sql
 ```
-
-Replace `yourusername` and `yourpassword` with your MySQL credentials.  
+🔹 Replace `yourusername` & `yourpassword` with your MySQL credentials.  
 
 ---
 
-## 🔧 Database Connection and Role Configuration  
+## 🔧 Database & Role Configuration  
 
-To ensure proper database connectivity, update the `config.php` file with the following settings:  
+Edit `config.php` to set up the database:  
 
 ```php
 define("DB_SERVER", "localhost");
@@ -114,41 +117,21 @@ const ROLES = [
 ];
 ```
 
-### Explanation:  
-- **`DB_SERVER`**: Specifies the database host (default is `localhost`).  
-- **`DB_USERNAME`**: Defines the MySQL username (`root` for local setups).  
-- **`DB_PASSWORD`**: Specifies the database password (leave empty if using the default local MySQL setup).  
-- **`DB_NAME`**: Defines the name of the authentication database (`auth_master`).  
-- **`ROLES`**: An array mapping user roles to their corresponding default redirection paths.  
+### 🔹 Key Settings  
+✅ **DB Connection** – Default `localhost`, user `root`.  
+✅ **Role Management** – Admin & User with auto redirection.  
 
-These configurations allow seamless database connectivity and ensure proper user role management.  
-
----
-
-## 🛡 Why Choose PHP Auth Master?  
-
-✅ **Strong Security** – Active session tracking, password-based session logout, and role-based access.  
-✅ **User-Friendly** – Built-in admin panel for easy management.  
-✅ **Flexible & Scalable** – Easily add new roles, pages, and users.  
-✅ **Real-Time Monitoring** – See who is logged in and remove unauthorized sessions.  
-
-💡 **Ready to secure your PHP application? Start using PHP Auth Master today!** 🚀
+🚀 **You're ready to go!** Start the project & manage users easily.
 
 ---
 
 ## Technologies Used
 
 <div style="display: flex; flex-wrap: wrap; gap: 5px;">
-    <img src="https://img.shields.io/badge/HTML-%23F06529.svg?style=for-the-badge&logo=html5&logoColor=white"
-        alt="HTML">
-    <img src="https://img.shields.io/badge/CSS-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white" alt="CSS">
-    <img src="https://img.shields.io/badge/JavaScript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E"
-        alt="JavaScript">
-     <img src="https://img.shields.io/badge/PHP-%23777BB4.svg?style=for-the-badge&logo=php&logoColor=white" alt="PHP">
-   <img src="https://img.shields.io/badge/MySQL-%234479A1.svg?style=for-the-badge&logo=mysql&logoColor=white"
-        alt="MySQL">
+    <img src="https://img.shields.io/badge/Java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java">
+    <img src="https://img.shields.io/badge/Swing-%23007396.svg?style=for-the-badge&logo=java&logoColor=white" alt="Swing">
+    <img src="https://img.shields.io/badge/AWT-%23E34F26.svg?style=for-the-badge&logo=java&logoColor=white" alt="AWT">
 </div>
-
 
 ## Contributing
 
