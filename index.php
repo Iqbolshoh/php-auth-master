@@ -5,7 +5,9 @@ include './config.php';
 $query = new Database();
 $query->checkUserSession('user');
 
-$user = $query->select("users", '*', "id = ?", [$_SESSION['user_id']], 'i')[0] ?? null;
+$user = $query->select("users", '*', "id = ?", [$_SESSION['user_id']], 'i')[0];
+
+$_SESSION['csrf_token'] ??= bin2hex(random_bytes(32));
 
 if (
     $_SERVER["REQUEST_METHOD"] === "POST" &&
