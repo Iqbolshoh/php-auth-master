@@ -46,12 +46,6 @@ if (!empty($_COOKIE['username'])) {
 
 $_SESSION['csrf_token'] ??= bin2hex(random_bytes(32));
 
-// $response = [
-//     'status' => '',
-//     'message' => '',
-//     $data
-// ];
-
 function get_user_info()
 {
     $user_agent = $_SERVER['HTTP_USER_AGENT'];
