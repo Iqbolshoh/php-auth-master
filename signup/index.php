@@ -169,7 +169,7 @@ if (
 <body>
     <div class="form-container">
         <h1>Sign Up</h1>
-        <form id="signupForm" method="POST" action="">
+        <form id="signupForm" method="POST">
             <div class="form-group">
                 <label for="first_name">First Name</label>
                 <input type="text" id="first_name" name="first_name" required maxlength="30">
@@ -221,12 +221,24 @@ if (
             const submitButton = document.getElementById('submit');
             const togglePassword = document.getElementById('toggle-password');
 
+            let emailAvailable = false;
+            let usernameAvailable = false;
+
             function validateEmailFormat(email) {
                 return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(email);
             }
 
             function validateUsernameFormat(username) {
                 return /^[a-zA-Z0-9_]{3,30}$/.test(username);
+            }
+
+            function validatePassword() {
+                if (passwordField.value.length < 8) {
+                    passwordMessage.textContent = 'Password must be at least 8 characters long!';
+                    return false;
+                }
+                passwordMessage.textContent = '';
+                return true;
             }
 
             function checkAvailability(type, value, messageElement, callback) {
@@ -241,45 +253,47 @@ if (
                     .then(data => {
                         if (data.exists) {
                             messageElement.textContent = `This ${type} is already taken!`;
-                            submitButton.disabled = true;
                             callback(false);
                         } else {
                             messageElement.textContent = '';
                             callback(true);
                         }
+                        updateSubmitButtonState();
                     });
             }
 
-            function validatePassword() {
-                if (passwordField.value.length < 8) {
-                    passwordMessage.textContent = 'Password must be at least 8 characters long!';
-                    submitButton.disabled = true;
-                    return false;
-                }
-                passwordMessage.textContent = '';
-                submitButton.disabled = false;
-                return true;
+            function updateSubmitButtonState() {
+                submitButton.disabled = !(emailAvailable && usernameAvailable && validatePassword());
             }
 
             emailField.addEventListener('input', function () {
                 if (!validateEmailFormat(this.value)) {
                     emailMessage.textContent = 'Invalid email format!';
-                    submitButton.disabled = true;
+                    emailAvailable = false;
+                    updateSubmitButtonState();
                     return;
                 }
-                checkAvailability('email', this.value, emailMessage, status => submitButton.disabled = !status);
+                checkAvailability('email', this.value, emailMessage, status => {
+                    emailAvailable = status;
+                });
             });
 
             usernameField.addEventListener('input', function () {
                 if (!validateUsernameFormat(this.value)) {
                     usernameMessage.textContent = 'Username must be 3-30 characters long and contain only letters, numbers, and underscores!';
-                    submitButton.disabled = true;
+                    usernameAvailable = false;
+                    updateSubmitButtonState();
                     return;
                 }
-                checkAvailability('username', this.value, usernameMessage, status => submitButton.disabled = !status);
+                checkAvailability('username', this.value, usernameMessage, status => {
+                    usernameAvailable = status;
+                });
             });
 
-            passwordField.addEventListener('input', validatePassword);
+            passwordField.addEventListener('input', function () {
+                validatePassword();
+                updateSubmitButtonState();
+            });
 
             togglePassword.addEventListener('click', function () {
                 passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
