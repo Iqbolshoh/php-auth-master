@@ -37,24 +37,34 @@ $activePage = $activePageInfo['activePage'] ?? null;
 
 <title><?= $pageTitle ?></title>
 <link rel="icon" type="image/x-icon" href="./favicon.ico">
+<link rel="stylesheet" href="./src/css/adminlte.min.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
     <ul class="navbar-nav">
-        <li class="nav-item"><a class="nav-link" data-widget="pushmenu" role="button"><i class="fas fa-bars"></i></a>
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" role="button">
+                <i class="fas fa-bars"></i>
+            </a>
         </li>
-        <li class="nav-item d-none d-sm-inline-block"><a href="./" class="nav-link">Home</a></li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="./" class="nav-link">Home</a>
+        </li>
     </ul>
     <form class="form-inline ml-3">
         <div class="input-group input-group-sm">
             <input class="form-control form-control-navbar" type="search" placeholder="Search" name="search">
             <div class="input-group-append">
-                <button class="btn btn-navbar" type="submit"><i class="fas fa-search"></i></button>
+                <button class="btn btn-navbar" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
             </div>
         </div>
     </form>
     <ul class="navbar-nav ml-auto">
-        <li class="nav-item dropdown"><a class="nav-link" href="#messages">
+        <li class="nav-item dropdown">
+            <a class="nav-link" href="#messages">
                 <i class="far fa-comments"></i>
                 <span class="badge badge-danger navbar-badge">2</span>
             </a>
@@ -110,7 +120,8 @@ $activePage = $activePageInfo['activePage'] ?? null;
                     <li class="nav-item has-treeview <?= $menuItem === $activeMenu ? 'menu-open' : '' ?>">
                         <a class="nav-link <?= $menuItem === $activeMenu ? 'active' : '' ?>" href="#">
                             <i class="nav-icon <?= $menuItem['icon'] ?>"></i>
-                            <p><?= $menuItem['menuTitle'] ?>
+                            <p>
+                                <?= $menuItem['menuTitle'] ?>
                                 <?= !empty($menuItem['pages']) ? '<i class="right fas fa-angle-left"></i>' : '' ?>
                             </p>
                         </a>

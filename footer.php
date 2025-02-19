@@ -6,6 +6,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="./src/js/jquery.min.js"></script>
+<script src="./src/js/bootstrap.bundle.min.js"></script>
+<script src="./src/js/adminlte.min.js"></script>
 <script>
     function logout() {
         Swal.fire({
