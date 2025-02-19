@@ -29,7 +29,6 @@ if (isset($_POST['update_session'])) {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 
