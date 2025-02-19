@@ -151,7 +151,7 @@ if (
 <body>
     <div class="form-container">
         <h1>Login</h1>
-        <form id="loginForm" method="POST" action="">
+        <form id="loginForm" method="POST">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required maxlength="30">
