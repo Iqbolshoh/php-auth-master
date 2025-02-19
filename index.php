@@ -167,6 +167,10 @@ if (
         </div>
         <?php include './footer.php'; ?>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./src/js/jquery.min.js"></script>
+    <script src="./src/js/bootstrap.bundle.min.js"></script>
+    <script src="./src/js/adminlte.min.js"></script>
     <script>
         document.getElementById('toggle-password').addEventListener('click', function () {
             const passwordField = document.getElementById('password');
@@ -182,12 +186,6 @@ if (
             passwordMessage.textContent = this.value.length < 8 ? 'Password must be at least 8 characters long!' : '';
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="./src/js/jquery.min.js"></script>
-    <script src="./src/js/bootstrap.bundle.min.js"></script>
-    <script src="./src/js/adminlte.min.js"></script>
-
 </body>
 
 </html>

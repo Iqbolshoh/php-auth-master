@@ -116,6 +116,9 @@ if (isset($_POST['update_session'])) {
         </div>
         <?php include './footer.php'; ?>
     </div>
+    <script src="../src/js/jquery.min.js"></script>
+    <script src="../src/js/bootstrap.bundle.min.js"></script>
+    <script src="../src/js/adminlte.min.js"></script>
     <script>
         function openEditModal(deviceName) {
             document.getElementById('deviceName').value = deviceName;
@@ -138,10 +141,6 @@ if (isset($_POST['update_session'])) {
             });
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="./src/js/jquery.min.js"></script>
-    <script src="./src/js/bootstrap.bundle.min.js"></script>
-    <script src="./src/js/adminlte.min.js"></script>
 </body>
 
 </html>
