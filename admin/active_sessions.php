@@ -30,6 +30,7 @@ if (isset($_POST['update_session'])) {
 ?>
 
 <?php include './header.php'; ?>
+
 <div class="content-wrapper">
     <section class="content">
         <div class="container-fluid">

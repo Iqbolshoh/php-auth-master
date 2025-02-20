@@ -7,7 +7,8 @@ $menuItems = [
         "icon" => "fas fa-cog",
         "pages" => [
             ["title" => "Update Profile", "url" => "index.php"],
-            ["title" => "Active Sessions", "url" => "active_sessions.php"]
+            ["title" => "Active Sessions", "url" => "active_sessions.php"],
+            ["title" => "Main", "url" => "main.php"]
         ],
     ]
 ];
@@ -137,7 +138,8 @@ $active_page = $active_pageInfo['active_page'] ?? null;
                         ?>
                         <img src="<?= $filePath ?>" class="img-circle elevation-2" alt="User Image">
                     </div>
-                    <div class="info"><a href="<?= SITE_PATH ?>" class="d-block">Iqbolshoh Ilhomjonov</a></div>
+                    <div class="info"><a href="<?= SITE_PATH ?>" class="d-block">Iqbolshoh Ilhomjonov</a>
+                    </div>
                 </div>
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
@@ -175,3 +177,10 @@ $active_page = $active_pageInfo['active_page'] ?? null;
                 </nav>
             </div>
         </aside>
+
+        <div class="content-wrapper">
+            <!-- Content-wrapper started -->
+            <section class="content">
+                <!-- Content section started -->
+                <div class="container-fluid">
+                    <!-- Container-fluid started -->

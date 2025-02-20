@@ -64,6 +64,7 @@ if (
 ?>
 
 <?php include './header.php'; ?>
+
 <div class="content-wrapper">
     <section class="content">
         <div class="container-fluid">
