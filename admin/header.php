@@ -43,7 +43,7 @@ $active_page = $active_pageInfo['active_page'] ?? null;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Powerful admin panel by Iqbolshoh Ilhomjonov">
-    <meta name="keywords" content="iqbolshoh, iqbolshoh_777, iqbolshoh_dev, <?= htmlspecialchars($page_title) ?>">
+    <meta name="keywords" content="iqbolshoh, iqbolshoh_777, iqbolshoh_dev, <?= $page_title . ", " . SITE_PATH ?>">
     <meta name="author" content="iqbolshoh.uz">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#ffffff">
