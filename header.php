@@ -7,8 +7,7 @@ $menuItems = [
         "icon" => "fas fa-cog",
         "pages" => [
             ["title" => "Update Profile", "url" => "index.php"],
-            ["title" => "Active Sessions", "url" => "active_sessions.php"],
-            ["title" => "Main", "url" => "main.php"]
+            ["title" => "Active Sessions", "url" => "active_sessions.php"]
         ],
     ]
 ];
