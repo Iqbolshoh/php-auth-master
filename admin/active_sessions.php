@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-include './config.php';
+include '../config.php';
 $query = new Database();
 $query->checkUserSession('admin');
 
