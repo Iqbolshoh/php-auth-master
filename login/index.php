@@ -63,7 +63,7 @@ function get_user_info()
     ];
 
     foreach ($devices as $regex => $device) {
-        if (preg_match("/$regex/i", $user_agent)) {
+        if (stripos($user_agent, $regex) !== false) {
             return $device;
         }
     }
@@ -142,10 +142,10 @@ if (
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <link rel="icon" type="image/x-icon" href="<?= SITE_PATH ?>/favicon.ico">
     <title>Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="../src/css/login_signup.css">
+    <link rel="stylesheet" href="<?= SITE_PATH ?>/src/css/login_signup.css">
 </head>
 
 <body>
@@ -175,7 +175,7 @@ if (
             </div>
         </form>
         <div class="text-center">
-            <p>Don't have an account? <a href="../signup/">Sign Up</a></p>
+            <p>Don't have an account? <a href="<?= SITE_PATH ?>/signup/">Sign Up</a></p>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
