@@ -63,7 +63,7 @@ if (
 }
 ?>
 
-<?php include '../header.php'; ?>
+<?php include './header.php'; ?>
 
 <div class="row justify-content-center">
     <div class="col-md-6">
@@ -152,4 +152,4 @@ if (
     });
 </script>
 
-<?php include '../footer.php'; ?>
+<?php include './footer.php'; ?>
