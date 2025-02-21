@@ -1,5 +1,3 @@
-
-                    
                     <!-- Container-fluid closed -->
                     </div>
                 <!-- Content section closed -->
@@ -9,15 +7,13 @@
 
         <footer class="main-footer">
             <div class="float-right d-none d-sm-inline">
-                Admin Panel
+                Admin Panel <strong><a href="https://iqbolshoh.uz/">Iqbolshoh.uz</a></strong>
             </div>
-            <strong>Iqbolshoh &copy;<?php echo date('Y'); ?> <a href="https://Iqbolshoh.uz">Iqbolshoh.uz</a>.</strong> All rights reserved.
+            <strong> &copy;<?php echo date('Y'); ?>
+                <a href="<?= SITE_PATH ?>"><?= $_SERVER['HTTP_HOST'] ?></a>.
+            </strong> All rights reserved.
         </footer>
 
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script src="<?= SITE_PATH ?>/src/js/jquery.min.js"></script>
-        <script src="<?= SITE_PATH ?>/src/js/bootstrap.bundle.min.js"></script>
-        <script src="<?= SITE_PATH ?>/src/js/adminlte.min.js"></script>
         <script>
             function logout() {
                 Swal.fire({

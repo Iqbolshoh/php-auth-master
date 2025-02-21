@@ -43,11 +43,13 @@ $active_page = $active_pageInfo['active_page'] ?? null;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Powerful admin panel by Iqbolshoh Ilhomjonov">
-    <meta name="keywords" content="iqbolshoh, iqbolshoh_777, iqbolshoh_dev, <?= $page_title . ", " . SITE_PATH ?>">
+    <meta name="keywords"
+        content="iqbolshoh, iqbolshoh_777, iqbolshoh_dev, iqbolshoh.uz, <?= htmlspecialchars($page_title) . ', ' . htmlspecialchars(SITE_PATH) ?>">
     <meta name="author" content="iqbolshoh.uz">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#ffffff">
 
+    <!-- Open Graph (OG) tags -->
     <meta property="og:title" content="<?= htmlspecialchars($page_title) ?>">
     <meta property="og:description" content="Powerful admin panel by Iqbolshoh Ilhomjonov">
     <meta property="og:image" content="<?= SITE_PATH ?>/src/images/logo.png">
@@ -56,9 +58,18 @@ $active_page = $active_pageInfo['active_page'] ?? null;
     <meta property="og:site_name" content="Iqbolshoh Admin Panel">
 
     <title><?= htmlspecialchars($page_title) ?></title>
+    <link rel="icon" href="<?= SITE_PATH . "/favicon.ico" ?>" type="image/x-icon">
+
+    <!-- CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <link rel="stylesheet" href="<?= SITE_PATH ?>/src/css/adminlte.min.css">
+
+    <!-- JS -->
+    <script src="<?= SITE_PATH ?>/src/js/jquery.min.js"></script>
+    <script src="<?= SITE_PATH ?>/src/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+    <script src="<?= SITE_PATH ?>/src/js/adminlte.min.js" defer></script>
 </head>
 
 <body class="hold-transition sidebar-mini">
