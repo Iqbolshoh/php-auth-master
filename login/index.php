@@ -194,12 +194,14 @@ if (
                 const usernamePattern = /^[a-zA-Z0-9_]{3,30}$/;
 
                 if (!usernamePattern.test(username)) {
-                    usernameError.textContent = "Username must be 3-30 characters long and contain only letters, numbers, and underscores!";
+                    usernameError.textContent = "Username must be 3-30 characters: A-Z, a-z, 0-9, or _.";
                     submitButton.disabled = true;
+                    submitButton.style.cssText = 'background-color: #b8daff; cursor: not-allowed;';
                     return false;
                 } else {
                     usernameError.textContent = "";
                     submitButton.disabled = false;
+                    submitButton.style.cssText = 'background-color: #007bff; cursor: pointer;';
                     return true;
                 }
             }
@@ -207,12 +209,14 @@ if (
             function validatePassword() {
                 const password = passwordField.value;
                 if (password.length < 8) {
-                    passwordMessage.textContent = 'Password must be at least 8 characters long!';
+                    passwordMessage.textContent = 'Invalid email format!';
                     submitButton.disabled = true;
+                    submitButton.style.cssText = 'background-color: #b8daff; cursor: not-allowed;';
                     return false;
                 }
                 passwordMessage.textContent = '';
                 submitButton.disabled = false;
+                submitButton.style.cssText = 'background-color: #007bff; cursor: pointer;';
                 return true;
             }
 
@@ -226,6 +230,8 @@ if (
             });
 
             loginForm.addEventListener('submit', function (event) {
+                submitButton.style.backgroundColor = '#b8daff';
+                submitButton.style.cursor = 'not-allowed';
                 if (!validateUsername() || !validatePassword()) {
                     event.preventDefault();
                 }
