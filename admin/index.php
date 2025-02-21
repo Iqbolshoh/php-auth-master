@@ -3,7 +3,7 @@ session_start();
 
 include '../config.php';
 $query = new Database();
-$query->checkUserSession('admin');
+$query->checkUserSession('user');
 
 $user = $query->select("users", '*', "id = ?", [$_SESSION['user_id']], 'i')[0];
 
@@ -63,7 +63,7 @@ if (
 }
 ?>
 
-<?php include './header.php'; ?>
+<?php include '../header.php'; ?>
 
 <div class="row justify-content-center">
     <div class="col-md-6">
@@ -109,16 +109,16 @@ if (
                             <input type="file" name="profile_picture" id="profile_picture" accept="image/*"
                                 style="display: none;">
                             <label for="profile_picture" style="background-color: white;
-                                                    color: #007bff; 
-                                                    border: 2px solid #007bff; 
-                                                    border-radius: 5px; 
-                                                    padding: 7px; 
-                                                    cursor: pointer; 
-                                                    transition: 0.3s; 
-                                                    width: 100%; 
-                                                    text-align: center; 
-                                                    font-weight: bold; 
-                                                    display: inline-block;">
+                                color: #007bff; 
+                                border: 2px solid #007bff; 
+                                border-radius: 5px; 
+                                padding: 7px; 
+                                cursor: pointer; 
+                                transition: 0.3s; 
+                                width: 100%; 
+                                text-align: center; 
+                                font-weight: bold; 
+                                display: inline-block;">
                                 📂 Upload Image
                             </label>
                         </div>
@@ -152,4 +152,4 @@ if (
     });
 </script>
 
-<?php include './footer.php'; ?>
+<?php include '../footer.php'; ?>

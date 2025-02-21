@@ -109,16 +109,16 @@ if (
                             <input type="file" name="profile_picture" id="profile_picture" accept="image/*"
                                 style="display: none;">
                             <label for="profile_picture" style="background-color: white;
-                                                    color: #007bff; 
-                                                    border: 2px solid #007bff; 
-                                                    border-radius: 5px; 
-                                                    padding: 7px; 
-                                                    cursor: pointer; 
-                                                    transition: 0.3s; 
-                                                    width: 100%; 
-                                                    text-align: center; 
-                                                    font-weight: bold; 
-                                                    display: inline-block;">
+                                color: #007bff; 
+                                border: 2px solid #007bff; 
+                                border-radius: 5px; 
+                                padding: 7px; 
+                                cursor: pointer; 
+                                transition: 0.3s; 
+                                width: 100%; 
+                                text-align: center; 
+                                font-weight: bold; 
+                                display: inline-block;">
                                 📂 Upload Image
                             </label>
                         </div>
