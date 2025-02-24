@@ -89,8 +89,11 @@ if (
     if (!empty($user)) {
         $_SESSION['loggedin'] = true;
         $_SESSION['user_id'] = $user['id'];
+        $_SESSION['first_name'] = $user['first_name'];
+        $_SESSION['last_name'] = $user['last_name'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['role'] = $user['role'];
+        $_SESSION['profile_picture'] = $user['profile_picture'];
 
         $cookies = [
             'username' => $username,
