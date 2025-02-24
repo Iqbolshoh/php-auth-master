@@ -147,7 +147,7 @@ $active_page = $active_pageInfo['active_page'] ?? null;
             <div class="sidebar">
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <?php $filePath = SITE_PATH . "/src/images/profile_picture/" . $query->select("users", '*', "id = ?", [$_SESSION['user_id']], 'i')[0]['profile_picture']; ?>
+                        <?php $filePath = SITE_PATH . "/src/images/profile_picture/" . $_SESSION['profile_picture'] ?>
                         <img src="<?= $filePath ?>" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info"><a href="<?= SITE_PATH ?>" class="d-block">Iqbolshoh Ilhomjonov</a>
