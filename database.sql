@@ -1,8 +1,12 @@
-CREATE DATABASE IF NOT EXISTS auth_master;
+-- DROP DATABASE IF EXISTS
+DROP DATABASE IF EXISTS auth_master;
 
+-- CREATE DATABASE
+CREATE DATABASE auth_master;
 USE auth_master;
 
-CREATE TABLE IF NOT EXISTS users (
+-- 1. USERS TABLE
+CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL,
@@ -15,8 +19,9 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS active_sessions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+-- 2. ACTIVE SESSIONS TABLE
+CREATE TABLE active_sessions (
+    id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
     device_name VARCHAR(255) NOT NULL,
     ip_address VARCHAR(45) NOT NULL,
@@ -25,30 +30,16 @@ CREATE TABLE IF NOT EXISTS active_sessions (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- admin and user (password: 'Iqbolsoh$7')
-INSERT INTO
-    users (
-        first_name,
-        last_name,
-        email,
-        username,
-        password,
-        role
-    )
-VALUES
-    (
-        'Iqbolshoh',
-        'Ilhomjonov',
-        'iilhomjonov777@gmail.com',
-        'iqbolshoh',
-        '1f254bb82e64bde20137a2922989f6f57529c98e34d146b523a47898702b7231',
-        'admin'
-    ),
-    (
-        'User',
-        'User',
-        'user@gmail.com',
-        'user',
-        '1f254bb82e64bde20137a2922989f6f57529c98e34d146b523a47898702b7231',
-        'user'
-    );
+-- =============================
+-- 📥 DATA INSERTION (Complate)
+-- =============================
+
+-- USERS
+INSERT INTO users (first_name, last_name, email, username, password, role, profile_picture) VALUES
+('Iqbolshoh', 'Ilhomjonov', 'iilhomjonov777@gmail.com', 'iqbolshoh', '1f254bb82e64bde20137a2922989f6f57529c98e34d146b523a47898702b7231', 'admin', '8145fa2f20bfe50ad65815655ad8d59a.jpeg'),
+('User', 'user', 'user@iqbolshoh.uz', 'user', '1f254bb82e64bde20137a2922989f6f57529c98e34d146b523a47898702b7231', 'user', 'default.png');
+
+-- ACTIVE SESSION INSERT
+INSERT INTO active_sessions (user_id, device_name, ip_address, session_token) VALUES
+(1, 'iPhone 15 Pro Max', '192.168.1.10', 'session_token_123'),
+(1, 'Windows 11 PC', '192.168.1.15', 'session_token_456');

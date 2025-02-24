@@ -34,7 +34,7 @@ if (
         $encrypted_name = md5(bin2hex(random_bytes(32)) . '_' . bin2hex(random_bytes(16)) . '_' . uniqid('', true)) . '.' . pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
         $targetFile = SITE_PATH . "/src/images/profile_picture/";
 
-        $filePath = $targetFile . '/' . $user['profile_picture'];
+        $filePath = $targetFile . $user['profile_picture'];
         if (file_exists($filePath) && $user['profile_picture'] != 'default.png') {
             unlink($filePath);
         }
