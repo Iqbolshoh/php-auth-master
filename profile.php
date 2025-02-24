@@ -32,7 +32,7 @@ if (
 
     if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
         $encrypted_name = md5(bin2hex(random_bytes(32)) . '_' . bin2hex(random_bytes(16)) . '_' . uniqid('', true)) . '.' . pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
-        $targetFile = SITE_PATH . "/src/images/profile_picture/";
+        $targetFile = "./src/images/profile_picture/";
 
         $filePath = $targetFile . $user['profile_picture'];
         if (file_exists($filePath) && $user['profile_picture'] != 'default.png') {
@@ -53,7 +53,7 @@ if (
         $_SESSION['last_name'] = $last_name;
         ?>
         <script>
-            window.onload = function () { Swal.fire({ icon: 'success', title: 'Success!', text: 'Your profile has been updated successfully!', timer: 1500, showConfirmButton: false }).then(() => { window.location.replace('index.php'); }); };
+            window.onload = function () { Swal.fire({ icon: 'success', title: 'Success!', text: 'Your profile has been updated successfully!', timer: 1500, showConfirmButton: false }).then(() => { window.location.replace('profile.php'); }); };
         </script>
         <?php
     }

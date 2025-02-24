@@ -36,7 +36,7 @@ CREATE TABLE active_sessions (
 
 -- USERS
 INSERT INTO users (first_name, last_name, email, username, password, role, profile_picture) VALUES
-('Iqbolshoh', 'Ilhomjonov', 'iilhomjonov777@gmail.com', 'iqbolshoh', '1f254bb82e64bde20137a2922989f6f57529c98e34d146b523a47898702b7231', 'admin', '8145fa2f20bfe50ad65815655ad8d59a.jpeg'),
+('Iqbolshoh', 'Ilhomjonov', 'iilhomjonov777@gmail.com', 'iqbolshoh', '1f254bb82e64bde20137a2922989f6f57529c98e34d146b523a47898702b7231', 'admin', '11703422cd9e03a57c355b6f24bcef40.jpeg'),
 ('User', 'user', 'user@iqbolshoh.uz', 'user', '1f254bb82e64bde20137a2922989f6f57529c98e34d146b523a47898702b7231', 'user', 'default.png');
 
 -- ACTIVE SESSION INSERT
