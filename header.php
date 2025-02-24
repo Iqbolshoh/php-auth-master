@@ -150,7 +150,10 @@ $active_page = $active_pageInfo['active_page'] ?? null;
                         <?php $image_path = SITE_PATH . "/src/images/profile_picture/" . $_SESSION['profile_picture'] ?>
                         <img src="<?= $image_path ?>" class="img-circle elevation-2" alt="User Image">
                     </div>
-                    <div class="info"><a href="<?= SITE_PATH ?>" class="d-block">Iqbolshoh Ilhomjonov</a>
+                    <div class="info">
+                        <a href="<?= SITE_PATH ?>" class="d-block">
+                            <?= $_SESSION['full_name'] ?>
+                        </a>
                     </div>
                 </div>
                 <nav class="mt-2">
