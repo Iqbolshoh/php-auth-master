@@ -41,6 +41,7 @@ if (
 
         if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $targetFile . $encrypted_name)) {
             $data['profile_picture'] = $encrypted_name;
+            $_SESSION['profile_picture'] = $encrypted_name;
         }
     }
 
@@ -50,7 +51,6 @@ if (
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         $_SESSION['first_name'] = $first_name;
         $_SESSION['last_name'] = $last_name;
-        $_SESSION['profile_picture'] = $encrypted_name;
         ?>
         <script>
             window.onload = function () { Swal.fire({ icon: 'success', title: 'Success!', text: 'Your profile has been updated successfully!', timer: 1500, showConfirmButton: false }).then(() => { window.location.replace('index.php'); }); };
