@@ -152,7 +152,7 @@ $active_page = $active_pageInfo['active_page'] ?? null;
                     </div>
                     <div class="info">
                         <a href="<?= SITE_PATH ?>" class="d-block">
-                            <?= $_SESSION['full_name'] ?>
+                            <?= $_SESSION['first_name'] . " " . $_SESSION['last_name'] ?>
                         </a>
                     </div>
                 </div>
