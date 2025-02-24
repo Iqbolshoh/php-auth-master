@@ -22,8 +22,11 @@ if (!empty($_COOKIE['username'])) {
     if (!empty($user)) {
         $_SESSION['loggedin'] = true;
         $_SESSION['user_id'] = $user['id'];
+        $_SESSION['first_name'] = $user['first_name'];
+        $_SESSION['last_name'] = $user['last_name'];
         $_SESSION['username'] = $username;
         $_SESSION['role'] = $user['role'];
+        $_SESSION['profile_picture'] = $user['profile_picture'];
 
         $active_sessions = $query->select("active_sessions", "*", "session_token = ?", [session_id()], "s");
 
@@ -78,7 +81,7 @@ if (
     isset($_SESSION['csrf_token']) &&
     hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
 ) {
-
+    
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
     $email = $query->validate(strtolower($_POST['email']));
@@ -104,8 +107,11 @@ if (
 
         $_SESSION['loggedin'] = true;
         $_SESSION['user_id'] = $user_id;
+        $_SESSION['first_name'] = $user['first_name'];
+        $_SESSION['last_name'] = $user['last_name'];
         $_SESSION['username'] = $username;
         $_SESSION['role'] = $role;
+        $_SESSION['profile_picture'] = $user['profile_picture'];
 
         $cookies = [
             'username' => $username,
