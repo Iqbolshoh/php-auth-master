@@ -28,9 +28,9 @@ if (!empty($_COOKIE['username'])) {
         $_SESSION['role'] = $user['role'];
         $_SESSION['profile_picture'] = $user['profile_picture'];
 
-        $active_sessions = $query->select("active_sessions", "*", "session_token = ?", [session_id()], "s");
+        $active_session = $query->select("active_sessions", "*", "session_token = ?", [session_id()], "s");
 
-        if (!empty($active_sessions)) {
+        if (!empty($active_session)) {
             $query->update(
                 "active_sessions",
                 ['last_activity' => date('Y-m-d H:i:s')],
@@ -38,6 +38,7 @@ if (!empty($_COOKIE['username'])) {
                 [session_id()],
                 "s"
             );
+
         }
 
         if (isset(ROLES[$user['role']])) {
@@ -81,13 +82,15 @@ if (
     isset($_SESSION['csrf_token']) &&
     hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
 ) {
-    
+
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
     $email = $query->validate(strtolower($_POST['email']));
     $username = $query->validate(strtolower($_POST['username']));
     $password = $query->hashPassword($_POST['password']);
-    $role = 'user'; // default role is 'user'
+    // DEFAULT ROLE
+    // -----------------------------------------------
+    $role = 'user';
 
     $data = [
         'first_name' => $first_name,

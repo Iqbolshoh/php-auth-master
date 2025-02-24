@@ -28,9 +28,9 @@ if (!empty($_COOKIE['username'])) {
         $_SESSION['role'] = $user['role'];
         $_SESSION['profile_picture'] = $user['profile_picture'];
 
-        $active_sessions = $query->select("active_sessions", "*", "session_token = ?", [session_id()], "s");
+        $active_session = $query->select("active_sessions", "*", "session_token = ?", [session_id()], "s");
 
-        if (!empty($active_sessions)) {
+        if (!empty($active_session)) {
             $query->update(
                 "active_sessions",
                 ['last_activity' => date('Y-m-d H:i:s')],
