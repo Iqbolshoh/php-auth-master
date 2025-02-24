@@ -88,6 +88,7 @@ if (
     $email = $query->validate(strtolower($_POST['email']));
     $username = $query->validate(strtolower($_POST['username']));
     $password = $query->hashPassword($_POST['password']);
+    
     // DEFAULT ROLE
     // -----------------------------------------------
     $role = 'user';

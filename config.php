@@ -116,16 +116,19 @@ class Database
         return hash_hmac('sha256', $password, 'iqbolshoh');
     }
 
-    public function checkUserSession($role)
+    public function checkSession($role)
     {
         if (($_SESSION['loggedin'] ?? false) !== true || ($_SESSION['role'] ?? '') !== $role) {
             header("Location: " . SITE_PATH . "/login/");
             exit;
         }
+        
+        // $_SESSION['has_active_session'];
 
         if (!$this->select('active_sessions', '*', 'session_token = ?', [session_id()], 's')) {
             header("Location: " . SITE_PATH . "/logout/");
             exit;
         }
+
     }
 }
