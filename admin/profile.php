@@ -5,7 +5,7 @@ include '../config.php';
 $query = new Database();
 $query->checkSession('admin');
 
-$user = $query->select("users", '*', "id = ?", [$_SESSION['user_id']], 'i')[0];
+$user = $query->select("users", '*', "id = ?", [$_SESSION['user']['id']], 'i')[0];
 
 $query->generate_csrf_token();
 
@@ -27,7 +27,7 @@ if (
 
     if (!empty($_POST['password'])) {
         $data['password'] = $query->hashPassword($_POST['password']);
-        $query->delete('active_sessions', 'user_id = ? AND session_token <> ?', [$_SESSION['user_id'], session_id()], 'is');
+        $query->delete('active_sessions', 'user_id = ? AND session_token <> ?', [$_SESSION['user']['id'], session_id()], 'is');
     }
 
     if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
@@ -41,16 +41,16 @@ if (
 
         if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $targetFile . $encrypted_name)) {
             $data['profile_picture'] = $encrypted_name;
-            $_SESSION['profile_picture'] = $encrypted_name;
+            $_SESSION['user']['profile_picture'] = $encrypted_name;
         }
     }
 
-    $update = $query->update("users", $data, "id = ?", [$_SESSION['user_id']], "i");
+    $update = $query->update("users", $data, "id = ?", [$_SESSION['user']['id']], "i");
 
     if ($update) {
         $query->generate_csrf_token();
-        $_SESSION['first_name'] = $first_name;
-        $_SESSION['last_name'] = $last_name;
+        $_SESSION['user']['first_name'] = $first_name;
+        $_SESSION['user']['last_name'] = $last_name;
         ?>
         <script>
             window.onload = function () { Swal.fire({ icon: 'success', title: 'Success!', text: 'Your profile has been updated successfully!', timer: 1500, showConfirmButton: false }).then(() => { window.location.replace('profile.php'); }); };
