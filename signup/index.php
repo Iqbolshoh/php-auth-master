@@ -67,8 +67,6 @@ function get_user_info()
     return "Unknown Device";
 }
 
-$query->generate_csrf_token();
-
 if (
     $_SERVER["REQUEST_METHOD"] === "POST" &&
     isset($_POST['submit']) &&
@@ -129,8 +127,6 @@ if (
             'last_activity' => date('Y-m-d H:i:s'),
             'session_token' => session_id()
         ]);
-
-        $query->generate_csrf_token();
 
         $redirectPath = SITE_PATH . ROLES[$_SESSION['user']['role']];
         ?>
@@ -199,7 +195,7 @@ if (
                 <small id="password-message"></small>
             </div>
             <div class="form-group">
-                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                <input type="hidden" name="csrf_token" value="<?= $query->generate_csrf_token() ?>">
             </div>
             <div class="form-group">
                 <button type="submit" name="submit" id="submit">Sign Up</button>
