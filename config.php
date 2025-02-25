@@ -116,7 +116,7 @@ class Database
         return hash_hmac('sha256', $password, 'iqbolshoh');
     }
 
-    public function checkSession($role)
+    public function session_check($role)
     {
         if (($_SESSION['loggedin'] ?? false) !== true || ($_SESSION['user']['role'] ?? '') !== $role) {
             header("Location: " . SITE_PATH . "/login/");
@@ -127,7 +127,6 @@ class Database
             header("Location: " . SITE_PATH . "/logout/");
             exit;
         }
-
     }
 
     function generate_csrf_token()
