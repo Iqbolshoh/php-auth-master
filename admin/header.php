@@ -150,7 +150,7 @@ $active_page = $active_pageInfo['active_page'] ?? null;
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
                         <?php $image_path = SITE_PATH . "/src/images/profile_picture/" . $_SESSION['user']['profile_picture'] ?>
-                        <img src="<?= $image_path ?>" class="img-circle elevation-2" alt="User Image">
+                        <img src="<?= $image_path ?>" class="img-circle elevation-2 bg-white" alt="User Image">
                     </div>
                     <div class="info">
                         <a href="<?= SITE_PATH ?>" class="d-block">
