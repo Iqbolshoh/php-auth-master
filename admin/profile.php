@@ -14,6 +14,7 @@ if (
     isset($_SESSION['csrf_token']) &&
     hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
 ) {
+    
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
 
@@ -70,7 +71,7 @@ if (
     <div class="col-md-8">
         <div class="card shadow-lg rounded-4 border-0">
             <div class="card-header bg-dark text-white text-center rounded-top-4">
-                <h3 class="mb-0">User Details</h3>
+                <h3 class="mb-0">User Profile</h3>
             </div>
             <div class="card-body">
                 <div class="text-center mb-4">
@@ -117,10 +118,12 @@ if (
                     </tr>
                 </table>
 
-                <div class="d-flex justify-content-evenly mt-4">
-                    <button type="button" class="btn btn-warning flex-grow-1 mx-2" data-bs-toggle="modal"
-                        data-bs-target="#editModal">
-                        <i class="fas fa-edit"></i> Edit
+                <div class="d-flex justify-content-center mt-4">
+                    <button type="button" class="btn btn-warning px-4 py-2 fw-bold shadow-lg rounded-pill"
+                        data-bs-toggle="modal" data-bs-target="#editModal"
+                        style="font-size: 16px; transition: 0.3s ease-in-out;"
+                        onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        <i class="fas fa-edit"></i> Edit Profile
                     </button>
                 </div>
             </div>
@@ -134,7 +137,12 @@ if (
             <div class="modal-content rounded-4 shadow-lg">
                 <div class="modal-header bg-dark text-white text-center rounded-top-4">
                     <h5 class="modal-title" id="editModalLabel">Edit User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
+                    <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close"
+                        style="background: transparent; border: none; font-size: 24px; font-weight: bold; color: white; cursor: pointer; line-height: 1;"
+                        onmouseover="this.style.color='#ff4d4d'; this.style.transform='scale(1.2)'; this.style.transition='0.2s';"
+                        onmouseout="this.style.color='white'; this.style.transform='scale(1)';">
+                        ×
+                    </button>
                 </div>
 
                 <div class="modal-body">
@@ -194,8 +202,7 @@ if (
                 </div>
 
                 <div class="modal-footer">
-                    <button type="submit" name="submit" id="submit" class="btn btn-primary w-100">
-                        Update Profile</button>
+                    <button type="submit" name="submit" id="submit" class="btn btn-primary w-100">Save</button>
                 </div>
             </div>
         </form>

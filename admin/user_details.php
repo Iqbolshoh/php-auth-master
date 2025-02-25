@@ -27,6 +27,7 @@ if (
     isset($_SESSION['csrf_token']) &&
     hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
 ) {
+
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
 
@@ -38,7 +39,7 @@ if (
 
     if (!empty($_POST['password'])) {
         $data['password'] = $query->hashPassword($_POST['password']);
-        $query->delete('active_sessions', 'user_id = ?', [$user_id], 'is');
+        $query->delete('active_sessions', 'user_id = ?', [$user_id], 'i');
     }
 
     if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
@@ -52,16 +53,12 @@ if (
 
         if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $targetFile . $encrypted_name)) {
             $data['profile_picture'] = $encrypted_name;
-            $_SESSION['user']['profile_picture'] = $encrypted_name;
         }
     }
 
     $update = $query->update("users", $data, "id = ?", [$user_id], "i");
 
     if ($update) {
-        $_SESSION['user']['first_name'] = $data['first_name'];
-        $_SESSION['user']['last_name'] = $data['last_name'];
-        $_SESSION['user']['updated_at'] = $data['updated_at'];
         ?>
         <script>
             window.onload = function () { Swal.fire({ icon: 'success', title: 'Success!', text: 'Your profile has been updated successfully!', timer: 1500, showConfirmButton: false }).then(() => { window.location.replace('user_details.php?id=' + <?= $user_id ?>); }); };
@@ -165,7 +162,12 @@ if (
             <div class="modal-content rounded-4 shadow-lg">
                 <div class="modal-header bg-dark text-white text-center rounded-top-4">
                     <h5 class="modal-title" id="editModalLabel">Edit User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
+                    <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close"
+                        style="background: transparent; border: none; font-size: 24px; font-weight: bold; color: white; cursor: pointer; line-height: 1;"
+                        onmouseover="this.style.color='#ff4d4d'; this.style.transform='scale(1.2)'; this.style.transition='0.2s';"
+                        onmouseout="this.style.color='white'; this.style.transform='scale(1)';">
+                        ×
+                    </button>
                 </div>
 
                 <div class="modal-body">
@@ -225,8 +227,7 @@ if (
                 </div>
 
                 <div class="modal-footer">
-                    <button type="submit" name="submit" id="submit" class="btn btn-primary w-100">
-                        Update Profile</button>
+                    <button type="submit" name="submit" id="submit" class="btn btn-primary w-100">Save</button>
                 </div>
             </div>
         </form>
