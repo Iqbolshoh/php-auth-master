@@ -110,8 +110,8 @@ if (
                             <input type="file" name="profile_picture" id="profile_picture" accept="image/*"
                                 style="display: none;">
                             <label for="profile_picture" style="background-color: white;
-                                color: #007bff; 
-                                border: 2px solid #007bff; 
+                                color: #495057; 
+                                border: 2px solid #495057; 
                                 border-radius: 5px; 
                                 padding: 7px; 
                                 cursor: pointer; 
@@ -128,8 +128,8 @@ if (
                         <input type="hidden" name="csrf_token" value="<?= $query->generate_csrf_token() ?>">
                     </div>
                     <div class="d-grid">
-                        <button type="submit" name="submit" id="submit" class="btn btn-primary w-100">Update
-                            Profile</button>
+                        <button type="submit" name="submit" id="submit" class="btn btn-primary w-100">
+                            Update Profile</button>
                     </div>
                 </form>
             </div>
