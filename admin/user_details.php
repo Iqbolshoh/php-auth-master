@@ -19,6 +19,62 @@ if (isset($_POST['delete_id'])) {
     header("Location: ./create_user.php");
     exit;
 }
+
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_POST['submit']) &&
+    isset($_POST['csrf_token']) &&
+    isset($_SESSION['csrf_token']) &&
+    hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+) {
+    $first_name = $query->validate($_POST['first_name']);
+    $last_name = $query->validate($_POST['last_name']);
+
+    $data = [
+        'first_name' => $first_name,
+        'last_name' => $last_name,
+        'updated_at' => date('Y-m-d H:i:s')
+    ];
+
+    if (!empty($_POST['password'])) {
+        $data['password'] = $query->hashPassword($_POST['password']);
+        $query->delete('active_sessions', 'user_id = ?', [$user_id], 'is');
+    }
+
+    if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+        $encrypted_name = md5(bin2hex(random_bytes(32)) . '_' . bin2hex(random_bytes(16)) . '_' . uniqid('', true)) . '.' . pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
+        $targetFile = "../src/images/profile_picture/";
+
+        $filePath = $targetFile . $user['profile_picture'];
+        if (file_exists($filePath) && $user['profile_picture'] != 'default.png') {
+            unlink($filePath);
+        }
+
+        if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $targetFile . $encrypted_name)) {
+            $data['profile_picture'] = $encrypted_name;
+            $_SESSION['user']['profile_picture'] = $encrypted_name;
+        }
+    }
+
+    $update = $query->update("users", $data, "id = ?", [$user_id], "i");
+
+    if ($update) {
+        $_SESSION['user']['first_name'] = $data['first_name'];
+        $_SESSION['user']['last_name'] = $data['last_name'];
+        $_SESSION['user']['updated_at'] = $data['updated_at'];
+        ?>
+        <script>
+            window.onload = function () { Swal.fire({ icon: 'success', title: 'Success!', text: 'Your profile has been updated successfully!', timer: 1500, showConfirmButton: false }).then(() => { window.location.replace('user_details.php?id=' + <?= $user_id ?>); }); };
+        </script>
+        <?php
+    }
+} elseif (isset($_POST['submit'])) {
+    ?>
+    <script>
+        window.onload = function () { Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.', showConfirmButton: true }).then(() => { window.location.replace('user_details.php?id=' + <?= $user_id ?>); });; };
+    </script>
+    <?php
+}
 ?>
 
 <?php include './header.php'; ?>
@@ -105,7 +161,7 @@ if (isset($_POST['delete_id'])) {
 
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             <div class="modal-content rounded-4 shadow-lg">
                 <div class="modal-header bg-dark text-white text-center rounded-top-4">
                     <h5 class="modal-title" id="editModalLabel">Edit User</h5>

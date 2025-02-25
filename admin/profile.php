@@ -67,13 +67,77 @@ if (
 <?php include './header.php'; ?>
 
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow-lg">
-            <div class="card-header bg-dark text-white text-center">
-                <h4>Update Profile</h4>
+    <div class="col-md-8">
+        <div class="card shadow-lg rounded-4 border-0">
+            <div class="card-header bg-dark text-white text-center rounded-top-4">
+                <h3 class="mb-0">User Details</h3>
             </div>
             <div class="card-body">
-                <form method="POST" enctype="multipart/form-data">
+                <div class="text-center mb-4">
+                    <img src="<?= SITE_PATH . "/src/images/profile_picture/" . $user['profile_picture']; ?>"
+                        alt="Profile Picture" class="rounded-circle border border-3 border-dark shadow-sm" width="140"
+                        height="140" style="object-fit: cover; transition: 0.3s;"
+                        onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                    <h4 class="mt-3"><?= htmlspecialchars($user['first_name'] . " " . $user['last_name']); ?></h4>
+                    <p class="text-muted">@<?= htmlspecialchars($user['username']); ?></p>
+                </div>
+
+                <table class="table table-hover table-bordered rounded-3 overflow-hidden">
+                    <tr>
+                        <th class="bg-light">ID</th>
+                        <td><?= htmlspecialchars($user['id']); ?></td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">First Name</th>
+                        <td><?= htmlspecialchars($user['first_name']); ?></td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">Last Name</th>
+                        <td><?= htmlspecialchars($user['last_name']); ?></td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">Email</th>
+                        <td><?= htmlspecialchars($user['email']); ?></td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">Username</th>
+                        <td><?= htmlspecialchars($user['username']); ?></td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">Role</th>
+                        <td><span class="badge bg-info text-dark"><?= htmlspecialchars($user['role']); ?></span></td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">Created At</th>
+                        <td><?= htmlspecialchars($user['created_at']); ?></td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">Updated At</th>
+                        <td><?= htmlspecialchars($user['updated_at']); ?></td>
+                    </tr>
+                </table>
+
+                <div class="d-flex justify-content-evenly mt-4">
+                    <button type="button" class="btn btn-warning flex-grow-1 mx-2" data-bs-toggle="modal"
+                        data-bs-target="#editModal">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="modal-content rounded-4 shadow-lg">
+                <div class="modal-header bg-dark text-white text-center rounded-top-4">
+                    <h5 class="modal-title" id="editModalLabel">Edit User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
+                </div>
+
+                <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">First Name</label>
                         <input type="text" name="first_name" class="form-control"
@@ -127,16 +191,18 @@ if (
                     <div class="mb-3">
                         <input type="hidden" name="csrf_token" value="<?= $query->generate_csrf_token() ?>">
                     </div>
-                    <div class="d-grid">
-                        <button type="submit" name="submit" id="submit" class="btn btn-primary w-100">
-                            Update Profile</button>
-                    </div>
-                </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" name="submit" id="submit" class="btn btn-primary w-100">
+                        Update Profile</button>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.getElementById('toggle-password').addEventListener('click', function () {
         const passwordField = document.getElementById('password');
