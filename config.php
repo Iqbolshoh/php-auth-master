@@ -118,7 +118,7 @@ class Database
 
     public function checkSession($role)
     {
-        if (($_SESSION['loggedin'] ?? false) !== true || ($_SESSION['role'] ?? '') !== $role) {
+        if (($_SESSION['loggedin'] ?? false) !== true || ($_SESSION['user']['role'] ?? '') !== $role) {
             header("Location: " . SITE_PATH . "/login/");
             exit;
         }
@@ -130,7 +130,8 @@ class Database
 
     }
 
-    function generate_csrf_token() {
+    function generate_csrf_token()
+    {
         return $_SESSION['csrf_token'] ??= bin2hex(random_bytes(32));
-    }    
+    }
 }
