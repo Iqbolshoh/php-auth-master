@@ -141,7 +141,7 @@ $active_page = $active_pageInfo['active_page'] ?? null;
 
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <a href="<?= SITE_PATH ?>" class="brand-link">
-                <img src="<?= SITE_PATH ?>/src/images/logo.png" alt="Admin-panel Logo" class="brand-image img-circle">
+                <img src="<?= SITE_PATH ?>/src/images/logo.svg" alt="Logo" class="brand-image img-circle bg-white">
                 <span class="brand-text font-weight-light">
                     <?= ucfirst(string: $_SESSION['user']['role']) ?> Panel
                 </span>
