@@ -46,8 +46,9 @@ if (
     $update = $query->update("users", $data, "id = ?", [$_SESSION['user']['id']], "i");
 
     if ($update) {
-        $_SESSION['user']['first_name'] = $first_name;
-        $_SESSION['user']['last_name'] = $last_name;
+        $_SESSION['user']['first_name'] = $data['first_name'];
+        $_SESSION['user']['last_name'] = $data['last_name'];
+        $_SESSION['user']['updated_at'] = $data['updated_at'];
         ?>
         <script>
             window.onload = function () { Swal.fire({ icon: 'success', title: 'Success!', text: 'Your profile has been updated successfully!', timer: 1500, showConfirmButton: false }).then(() => { window.location.replace('profile.php'); }); };
