@@ -20,6 +20,7 @@ if (!empty($_COOKIE['username'])) {
     $user = $query->select('users', '*', "username = ?", [$username], 's')[0] ?? null;
 
     if (!empty($user)) {
+        unset($user['password']);
         $_SESSION['loggedin'] = true;
         $_SESSION['user'] = $user;
 
@@ -102,6 +103,7 @@ if (
     if (!empty($INSERT)) {
         $user = $query->select('users', '*', 'username = ?', [$username], 's')[0];
 
+        unset($user['password']);
         $_SESSION['loggedin'] = true;
         $_SESSION['user'] = $user;
 
