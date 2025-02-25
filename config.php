@@ -122,8 +122,6 @@ class Database
             header("Location: " . SITE_PATH . "/login/");
             exit;
         }
-        
-        // $_SESSION['has_active_session'];
 
         if (!$this->select('active_sessions', '*', 'session_token = ?', [session_id()], 's')) {
             header("Location: " . SITE_PATH . "/logout/");
@@ -131,4 +129,8 @@ class Database
         }
 
     }
+
+    function generate_csrf_token() {
+        return $_SESSION['csrf_token'] ??= bin2hex(random_bytes(32));
+    }    
 }

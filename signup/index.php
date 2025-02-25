@@ -4,8 +4,8 @@ session_start();
 include '../config.php';
 $query = new Database();
 
-if (!empty($_SESSION['loggedin']) && isset(ROLES[$_SESSION['role']])) {
-    header("Location: " . SITE_PATH . ROLES[$_SESSION['role']]);
+if (!empty($_SESSION['loggedin']) && isset(ROLES[$_SESSION['user']['role']])) {
+    header("Location: " . SITE_PATH . ROLES[$_SESSION['user']['role']]);
     exit;
 }
 
@@ -17,16 +17,11 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token']) && session
 
 if (!empty($_COOKIE['username'])) {
     $username = $_COOKIE['username'];
-    $user = $query->select('users', 'id, role', "username = ?", [$username], 's')[0] ?? null;
+    $user = $query->select('users', '*', "username = ?", [$username], 's')[0] ?? null;
 
     if (!empty($user)) {
         $_SESSION['loggedin'] = true;
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['first_name'] = $user['first_name'];
-        $_SESSION['last_name'] = $user['last_name'];
-        $_SESSION['username'] = $username;
-        $_SESSION['role'] = $user['role'];
-        $_SESSION['profile_picture'] = $user['profile_picture'];
+        $_SESSION['user'] = $user;
 
         $active_session = $query->select("active_sessions", "*", "session_token = ?", [session_id()], "s");
 
@@ -38,17 +33,14 @@ if (!empty($_COOKIE['username'])) {
                 [session_id()],
                 "s"
             );
-
         }
 
-        if (isset(ROLES[$user['role']])) {
-            header("Location: " . SITE_PATH . ROLES[$_SESSION['role']]);
+        if (isset(ROLES[$_SESSION['user']['role']])) {
+            header("Location: " . SITE_PATH . ROLES[$_SESSION['user']['role']]);
             exit;
         }
     }
 }
-
-$_SESSION['csrf_token'] ??= bin2hex(random_bytes(32));
 
 function get_user_info()
 {
@@ -75,6 +67,8 @@ function get_user_info()
     return "Unknown Device";
 }
 
+$query->generate_csrf_token();
+
 if (
     $_SERVER["REQUEST_METHOD"] === "POST" &&
     isset($_POST['submit']) &&
@@ -88,10 +82,11 @@ if (
     $email = $query->validate(strtolower($_POST['email']));
     $username = $query->validate(strtolower($_POST['username']));
     $password = $query->hashPassword($_POST['password']);
-    
+
     // DEFAULT ROLE
     // -----------------------------------------------
     $role = 'user';
+    // -----------------------------------------------
 
     $data = [
         'first_name' => $first_name,
@@ -104,18 +99,13 @@ if (
         'updated_at' => date('Y-m-d H:i:s')
     ];
 
-    $user = $query->insert('users', $data);
+    $INSERT = $query->insert('users', $data);
 
-    if (!empty($user)) {
-        $user_id = $query->select('users', 'id', 'username = ?', [$username], 's')[0]['id'];
+    if (!empty($INSERT)) {
+        $user = $query->select('users', '*', 'username = ?', [$username], 's')[0];
 
         $_SESSION['loggedin'] = true;
-        $_SESSION['user_id'] = $user_id;
-        $_SESSION['first_name'] = $user['first_name'];
-        $_SESSION['last_name'] = $user['last_name'];
-        $_SESSION['username'] = $username;
-        $_SESSION['role'] = $role;
-        $_SESSION['profile_picture'] = $user['profile_picture'];
+        $_SESSION['user'] = $user;
 
         $cookies = [
             'username' => $username,
@@ -133,16 +123,16 @@ if (
         }
 
         $query->insert('active_sessions', [
-            'user_id' => $user_id,
+            'user_id' => $_SESSION['user']['id'],
             'device_name' => get_user_info(),
             'ip_address' => $_SERVER['REMOTE_ADDR'],
             'last_activity' => date('Y-m-d H:i:s'),
             'session_token' => session_id()
         ]);
 
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        $query->generate_csrf_token();
 
-        $redirectPath = SITE_PATH . ROLES[$_SESSION['role']];
+        $redirectPath = SITE_PATH . ROLES[$_SESSION['user']['role']];
         ?>
         <script>
             window.onload = function () { Swal.fire({ icon: 'success', title: 'Registration successfu', timer: 1500, showConfirmButton: false }).then(() => { window.location.href = '<?= $redirectPath; ?>'; }); };
