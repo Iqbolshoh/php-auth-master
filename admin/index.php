@@ -3,7 +3,7 @@ session_start();
 
 include '../config.php';
 $query = new Database();
-$query->checkSession('admin');
+$query->session_check('admin');
 ?>
 
 <?php include './header.php'; ?>

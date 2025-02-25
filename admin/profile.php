@@ -3,7 +3,7 @@ session_start();
 
 include '../config.php';
 $query = new Database();
-$query->checkSession('admin');
+$query->session_check('admin');
 
 $user = $query->select("users", '*', "id = ?", [$_SESSION['user']['id']], 'i')[0];
 
