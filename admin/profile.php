@@ -7,8 +7,6 @@ $query->checkSession('admin');
 
 $user = $query->select("users", '*', "id = ?", [$_SESSION['user']['id']], 'i')[0];
 
-$query->generate_csrf_token();
-
 if (
     $_SERVER["REQUEST_METHOD"] === "POST" &&
     isset($_POST['submit']) &&
@@ -48,7 +46,6 @@ if (
     $update = $query->update("users", $data, "id = ?", [$_SESSION['user']['id']], "i");
 
     if ($update) {
-        $query->generate_csrf_token();
         $_SESSION['user']['first_name'] = $first_name;
         $_SESSION['user']['last_name'] = $last_name;
         ?>
@@ -127,7 +124,7 @@ if (
                         </div>
                     </div>
                     <div class="mb-3">
-                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
+                        <input type="hidden" name="csrf_token" value="<?= $query->generate_csrf_token() ?>">
                     </div>
                     <div class="d-grid">
                         <button type="submit" name="submit" id="submit" class="btn btn-primary w-100">Update
