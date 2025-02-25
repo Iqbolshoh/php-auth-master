@@ -5,7 +5,7 @@ include '../config.php';
 $query = new Database();
 $query->checkSession('admin');
 
-$sessions = $query->select('active_sessions', '*', 'user_id = ?', [$_SESSION['user']['id']], 'i');
+$active_sessions = $query->select('active_sessions', '*', 'user_id = ?', [$_SESSION['user']['id']], 'i');
 
 if (isset($_GET['token'])) {
     $query->delete('active_sessions', 'user_id = ? AND session_token = ?', [$_SESSION['user']['id'], $_GET['token']], 'is');
@@ -42,7 +42,7 @@ if (isset($_POST['update_session'])) {
         </tr>
     </thead>
     <tbody>
-        <?php foreach ($sessions as $index => $session): ?>
+        <?php foreach ($active_sessions as $index => $session): ?>
             <tr id="session-<?php echo htmlspecialchars($session['session_token']); ?>" class="text-center">
                 <td><?= $index + 1 ?></td>
                 <td class="device-name"> <?php echo htmlspecialchars($session['device_name']); ?></td>
