@@ -5,7 +5,7 @@ include '../config.php';
 $query = new Database();
 $query->check_session('admin');
 
-$users = $query->select('users', '*', 'id <> ? ORDER BY role', [$_SESSION['user']['id']], 's');
+$users = $query->select('users', '*', 'id <> ?', [$_SESSION['user']['id']], 's');
 
 if (
     $_SERVER["REQUEST_METHOD"] === "POST" &&
@@ -54,6 +54,7 @@ if (
 }
 ?>
 
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 <style>
     #email-message,
     #username-message,
@@ -93,7 +94,7 @@ if (
         <div class="card">
             <div class="card-header bg-dark text-white">Users List</div>
             <div class="card-body">
-                <table class="table table-bordered">
+                <table id="usersTable" class="table table-bordered">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -179,6 +180,30 @@ if (
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#usersTable').DataTable({
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "lengthMenu": [5, 10, 25, 50, 100],
+            "language": {
+                "search": "Search:",
+                "lengthMenu": "Show _MENU_ entries",
+                "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                "paginate": {
+                    "next": "Next",
+                    "previous": "Previous"
+                }
+            }
+        });
+    });
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const emailField = document.getElementById('email');
