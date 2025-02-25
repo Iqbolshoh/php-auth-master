@@ -5,10 +5,10 @@ include '../config.php';
 $query = new Database();
 $query->checkSession('admin');
 
-$sessions = $query->select('active_sessions', '*', 'user_id = ?', [$_SESSION['user_id']], 'i');
+$sessions = $query->select('active_sessions', '*', 'user_id = ?', [$_SESSION['user']['id']], 'i');
 
 if (isset($_GET['token'])) {
-    $query->delete('active_sessions', 'user_id = ? AND session_token = ?', [$_SESSION['user_id'], $_GET['token']], 'is');
+    $query->delete('active_sessions', 'user_id = ? AND session_token = ?', [$_SESSION['user']['id'], $_GET['token']], 'is');
     header('Location: ' . $_SERVER['PHP_SELF']);
     exit;
 }
@@ -20,7 +20,7 @@ if (isset($_POST['update_session'])) {
         'active_sessions',
         ['device_name' => $device_name],
         'session_token = ? AND user_id = ?',
-        [session_id(), $_SESSION['user_id']],
+        [session_id(), $_SESSION['user']['id']],
         'si'
     );
 

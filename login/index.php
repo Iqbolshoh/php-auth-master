@@ -120,14 +120,14 @@ if (
     } else {
         ?>
         <script>
-            window.onload = function () { Swal.fire({ icon: 'error', title: 'Oops...', text: 'Login or password is incorrect', showConfirmButton: true }); };
+            window.onload = function () { Swal.fire({ icon: 'error', title: 'Oops...', text: 'Login or password is incorrect', showConfirmButton: true }).then(() => { window.location.replace('index.php'); });; };
         </script>
         <?php
     }
 } elseif (isset($_POST['submit'])) {
     ?>
     <script>
-        window.onload = function () { Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.', showConfirmButton: true }); };
+        window.onload = function () { Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.', showConfirmButton: true }).then(() => { window.location.replace('index.php'); });; };
     </script>
     <?php
 }

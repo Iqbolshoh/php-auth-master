@@ -7,7 +7,7 @@ $query->checkSession('user');
 
 $user = $query->select("users", '*', "id = ?", [$_SESSION['user_id']], 'i')[0];
 
-$_SESSION['csrf_token'] ??= bin2hex(random_bytes(32));
+$query->generate_csrf_token();
 
 if (
     $_SERVER["REQUEST_METHOD"] === "POST" &&
@@ -48,7 +48,7 @@ if (
     $update = $query->update("users", $data, "id = ?", [$_SESSION['user_id']], "i");
 
     if ($update) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        $query->generate_csrf_token();
         $_SESSION['first_name'] = $first_name;
         $_SESSION['last_name'] = $last_name;
         ?>
@@ -60,7 +60,7 @@ if (
 } elseif (isset($_POST['submit'])) {
     ?>
     <script>
-        window.onload = function () { Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.', showConfirmButton: true }); };
+        window.onload = function () { Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.', showConfirmButton: true }).then(() => { window.location.replace('profile.php'); });; };
     </script>
     <?php
 }
