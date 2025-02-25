@@ -10,6 +10,13 @@ $menuItems = [
         ],
     ],
     [
+        "menuTitle" => "Users",
+        "icon" => "fas fa-users",
+        "pages" => [
+            ["title" => "Create User", "url" => "create_user.php"]
+        ],
+    ],
+    [
         "menuTitle" => "Settings",
         "icon" => "fas fa-cog",
         "pages" => [
