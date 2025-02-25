@@ -14,7 +14,7 @@ $menuItems = [
         "icon" => "fas fa-cog",
         "pages" => [
             ["title" => "Update Profile", "url" => "profile.php"],
-            ["title" => "Active Sessions", "url" => "active_sessions.php"]
+            ["title" => "Active Sessions", "url" => "active_session['user']s.php"]
         ],
     ]
 ];
@@ -142,17 +142,19 @@ $active_page = $active_pageInfo['active_page'] ?? null;
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <a href="<?= SITE_PATH ?>" class="brand-link">
                 <img src="<?= SITE_PATH ?>/src/images/logo.png" alt="Admin-panel Logo" class="brand-image img-circle">
-                <span class="brand-text font-weight-light"><?= ucfirst($_SESSION['role']) ?> Panel</span>
+                <span class="brand-text font-weight-light">
+                    <?= ucfirst(string: $_SESSION['user']['role']) ?> Panel
+                </span>
             </a>
             <div class="sidebar">
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <?php $image_path = SITE_PATH . "/src/images/profile_picture/" . $_SESSION['profile_picture'] ?>
+                        <?php $image_path = SITE_PATH . "/src/images/profile_picture/" . $_SESSION['user']['profile_picture'] ?>
                         <img src="<?= $image_path ?>" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
                         <a href="<?= SITE_PATH ?>" class="d-block">
-                            <?= $_SESSION['first_name'] . " " . $_SESSION['last_name'] ?>
+                            <?= $_SESSION['user']['first_name'] . " " . $_SESSION['user']['last_name'] ?>
                         </a>
                     </div>
                 </div>
