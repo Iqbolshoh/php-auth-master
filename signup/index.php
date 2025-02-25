@@ -259,9 +259,9 @@ if (
             }
 
             function updateSubmitButtonState() {
-                const isEmailValid = validateEmailFormat(emailField.value) && emailAvailable;
-                const isUsernameValid = validateUsernameFormat(usernameField.value) && usernameAvailable;
-                const isPasswordValid = passwordField.value.length == 0 ? true : validatePassword();
+                const isEmailValid = emailField.value.length === 0 || (validateEmailFormat(emailField.value) && emailAvailable);
+                const isUsernameValid = usernameField.value.length === 0 || (validateUsernameFormat(usernameField.value) && usernameAvailable);
+                const isPasswordValid = passwordField.value.length === 0 || validatePassword();
 
                 const isFormValid = isEmailValid && isUsernameValid && isPasswordValid;
 
