@@ -5,7 +5,7 @@ include '../config.php';
 $query = new Database();
 $query->check_session('admin');
 
-$users = $query->select('users', '*', 'role <> ?', ['admin'], 's');
+$users = $query->select('users', '*', 'id <> ? ORDER BY role', [$_SESSION['user']['id']], 's');
 
 if (
     $_SERVER["REQUEST_METHOD"] === "POST" &&

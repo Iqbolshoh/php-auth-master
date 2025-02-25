@@ -76,7 +76,7 @@ if (isset($_POST['delete_id'])) {
                             <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
                         </form>
 
-                        <a href="centers.php" class="btn btn-secondary">Back to List</a>
+                        <a href="create_user.php" class="btn btn-secondary">Back to List</a>
                     </div>
                 <?php else: ?>
                     <div class="alert alert-danger text-center">User not found!</div>
