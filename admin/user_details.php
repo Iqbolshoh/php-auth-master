@@ -105,54 +105,72 @@ if (isset($_POST['delete_id'])) {
 
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form method="POST" action="update_user.php">
+        <form method="POST">
             <div class="modal-content rounded-4 shadow-lg">
-                <div class="modal-header bg-warning text-dark rounded-top-4">
+                <div class="modal-header bg-dark text-white text-center rounded-top-4">
                     <h5 class="modal-title" id="editModalLabel">Edit User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
                 </div>
 
                 <div class="modal-body">
-                    <input type="hidden" name="user_id" value="<?= $user['id']; ?>">
-
                     <div class="mb-3">
-                        <label for="first_name" class="form-label">First Name</label>
-                        <input type="text" class="form-control" name="first_name"
-                            value="<?= htmlspecialchars($user['first_name']); ?>" required>
+                        <label class="form-label">First Name</label>
+                        <input type="text" name="first_name" class="form-control"
+                            value="<?php echo htmlspecialchars($user['first_name']); ?>" maxlength="30" required>
                     </div>
-
                     <div class="mb-3">
-                        <label for="last_name" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" name="last_name"
-                            value="<?= htmlspecialchars($user['last_name']); ?>" required>
+                        <label class="form-label">Last Name</label>
+                        <input type="text" name="last_name" class="form-control"
+                            value="<?php echo htmlspecialchars($user['last_name']); ?>" maxlength="30" required>
                     </div>
-
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" name="email"
-                            value="<?= htmlspecialchars($user['email']); ?>" required>
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" value="<?php echo htmlspecialchars($user['email']); ?>"
+                            maxlength="100" disabled>
                     </div>
-
                     <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" name="username"
-                            value="<?= htmlspecialchars($user['username']); ?>" required>
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control"
+                            value="<?php echo htmlspecialchars($user['username']); ?>" maxlength="30" disabled>
                     </div>
-
+                    <div class="mb-3 position-relative">
+                        <label class="form-label">Password</label>
+                        <div class="input-group">
+                            <input type="password" id="password" name="password" class="form-control" maxlength="255">
+                            <button type="button" id="toggle-password" class="btn btn-outline-secondary">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <small id="password-message" class="text-danger"></small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label fw-bold">Upload Image</label>
+                        <div class="input-group">
+                            <input type="file" name="profile_picture" id="profile_picture" accept="image/*"
+                                style="display: none;">
+                            <label for="profile_picture" style="background-color: white;
+                                color: #495057; 
+                                border: 2px solid #495057; 
+                                border-radius: 5px; 
+                                padding: 7px; 
+                                cursor: pointer; 
+                                transition: 0.3s; 
+                                width: 100%; 
+                                text-align: center; 
+                                font-weight: bold; 
+                                display: inline-block;">
+                                📂 Upload Image
+                            </label>
+                        </div>
+                    </div>
                     <div class="mb-3">
-                        <label for="role" class="form-label">Role</label>
-                        <select class="form-select" name="role" required>
-                            <option value="" disabled selected>-- Select Role --</option>
-                            <?php foreach (ROLES as $role => $path): ?>
-                                <option value="<?= htmlspecialchars($role) ?>"><?= ucfirst($role) ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        <input type="hidden" name="csrf_token" value="<?= $query->generate_csrf_token() ?>">
                     </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-warning">Save Changes</button>
+                    <button type="submit" name="submit" id="submit" class="btn btn-primary w-100">
+                        Update Profile</button>
                 </div>
             </div>
         </form>
