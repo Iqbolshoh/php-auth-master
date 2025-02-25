@@ -20,6 +20,8 @@ if (
     $email = $query->validate($_POST['email']);
     $username = $query->validate($_POST['username']);
     $password = $query->hashPassword($_POST['password']);
+    $role = $query->validate($_POST['role']);
+
 
     $data = [
         'first_name' => $first_name,
@@ -27,7 +29,7 @@ if (
         'email' => $email,
         'username' => $username,
         'password' => $password,
-        'role' => 'user'
+        'role' => $role
     ];
 
     if ($query->insert("users", $data)) {
@@ -39,14 +41,14 @@ if (
     } else {
         ?>
         <script>
-            window.onload = function () { Swal.fire({ icon: 'error', title: 'Oops...', text: 'Registration failed. Please try again.', showConfirmButton: true }).then(() => { window.location.replace('./'); });; };
+            window.onload = function () { Swal.fire({ icon: 'error', title: 'Oops...', text: 'Registration failed. Please try again.', showConfirmButton: true }).then(() => { window.location.replace('create_user'); });; };
         </script>
         <?php
     }
 } elseif (isset($_POST['submit'])) {
     ?>
     <script>
-        window.onload = function () { Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.', showConfirmButton: true }).then(() => { window.location.replace('./'); });; };
+        window.onload = function () { Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.', showConfirmButton: true }).then(() => { window.location.replace('create_user'); });; };
     </script>
     <?php
 }
@@ -83,7 +85,6 @@ if (
         background: transparent;
     }
 </style>
-
 
 <?php include './header.php'; ?>
 
@@ -155,6 +156,15 @@ if (
                             </button>
                         </div>
                         <small id="password-message"></small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Role</label>
+                        <select id="role" name="role" class="form-control" required>
+                            <option value="" disabled selected>-- Select Role --</option>
+                            <?php foreach (ROLES as $role => $path): ?>
+                                <option value="<?= htmlspecialchars($role) ?>"><?= ucfirst($role) ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <input type="hidden" name="csrf_token" value="<?= $query->generate_csrf_token() ?>">
