@@ -54,7 +54,7 @@ if (
         <?php foreach ($active_sessions as $index => $session): ?>
             <tr id="session-<?= htmlspecialchars($session['session_token']); ?>" class="text-center">
                 <td><?= $index + 1 ?></td>
-                <td class="device-name">
+                <td id="device-name-<?= htmlspecialchars($session['session_token']); ?>">
                     <?= htmlspecialchars($session['device_name']); ?>
                 </td>
                 <td><?= htmlspecialchars($session['ip_address']); ?></td>
@@ -62,7 +62,7 @@ if (
                 <td>
                     <?php if (session_id() == $session['session_token']): ?>
                         <button class="btn btn-warning btn-sm"
-                            onclick="openEditModal('<?= htmlspecialchars($session['device_name']); ?>')">
+                            onclick="openEditModal('<?= htmlspecialchars($session['device_name']); ?>', '<?= htmlspecialchars($session['session_token']); ?>')">
                             <i class="fas fa-edit"></i> Edit
                         </button>
                     <?php endif; ?>
@@ -77,7 +77,7 @@ if (
 </table>
 
 <script>
-    function openEditModal(deviceName) {
+    function openEditModal(deviceName, token) {
         Swal.fire({
             title: "Edit Device Name",
             input: "text",
@@ -101,7 +101,7 @@ if (
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === "success") {
-                            document.querySelector('.device-name').textContent = data.device_name;
+                            document.getElementById(`device-name-${token}`).textContent = data.device_name;
                             Swal.fire('Success!', data.message, 'success');
                         } else {
                             Swal.fire('Error!', data.message, 'error');
@@ -134,6 +134,9 @@ if (
                         if (data.status === "success") {
                             document.getElementById(`session-${data.token}`).remove();
                             Swal.fire('Deleted!', data.message, 'success');
+                            if ("<?= session_id() ?>" == token) {
+                                window.location.reload();
+                            }
                         } else {
                             Swal.fire('Error!', data.message, 'error');
                         }
