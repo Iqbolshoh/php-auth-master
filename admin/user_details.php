@@ -252,21 +252,9 @@ if (
             .then(response => response.json())
             .then(data => {
                 if (data.status === "success") {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Success!",
-                        text: data.message,
-                        timer: 1500,
-                        showConfirmButton: false
-                    }).then(() => { window.location.reload(); })
-
+                    Swal.fire({ icon: "success", title: "Success!", text: data.message, timer: 1500, showConfirmButton: false }).then(() => { window.location.reload(); })
                 } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error!",
-                        text: data.message,
-                        showConfirmButton: true
-                    });
+                    Swal.fire({ icon: "error", title: "Error!", text: data.message, showConfirmButton: true });
                 }
             })
             .catch(error => console.error("Error:", error));
