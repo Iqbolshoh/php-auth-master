@@ -60,7 +60,7 @@ if (
                 <td>
                     <?php if (session_id() == $session['session_token']): ?>
                         <button class="btn btn-warning btn-sm"
-                            onclick="openEditModal('<?= htmlspecialchars($session['device_name']); ?>', '<?= htmlspecialchars($session['session_token']); ?>')">
+                            onclick="openEditModal('<?= htmlspecialchars($session['session_token']); ?>')">
                             <i class="fas fa-edit"></i> Edit
                         </button>
                     <?php endif; ?>
