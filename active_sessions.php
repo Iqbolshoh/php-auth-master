@@ -42,7 +42,7 @@ if (
 } elseif (isset($_POST['submit'])) {
     ?>
     <script>
-        window.onload = function () { Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.', showConfirmButton: true }).then(() => { window.location.replace('./'); });; };
+        window.onload = function () { Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.', showConfirmButton: true }).then(() => { window.location.replace('active_sessions.php'); });; };
     </script>
     <?php
 }
@@ -53,7 +53,7 @@ if (
 <table class="table table-striped table-hover table-bordered">
     <thead class="bg-dark text-white text-center">
         <tr>
-            <th>№</th>
+            <th> №</th>
             <th><i class="fas fa-desktop"></i> Device Name</th>
             <th><i class="fas fa-network-wired"></i> IP Address</th>
             <th><i class="fas fa-clock"></i> Last Activity</th>
@@ -74,10 +74,14 @@ if (
                             <i class="fas fa-edit"></i> Edit
                         </button>
                     <?php endif ?>
-                    <button class="btn btn-danger btn-sm"
-                        onclick="confirmRemoval('<?php echo htmlspecialchars($session['session_token']); ?>')">
-                        <i class="fas fa-trash-alt"></i> Remove
-                    </button>
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="token" value="<?= htmlspecialchars($session['session_token']); ?>">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                        <button type="submit" name="submit" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash-alt"></i> Remove
+                        </button>
+                    </form>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -102,7 +106,7 @@ if (
                         <input type="text" class="form-control" name="device_name" id="deviceName" required>
                     </div>
                     <div class="form-group">
-                        <input type="hidden" name="csrf_token" value="<?= $query->generate_csrf_token() ?>">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                     </div>
                     <button type="submit" name="submit" class="btn btn-primary">
                         Save changes
