@@ -137,8 +137,18 @@ if (
                     </div>
 
                 <?php else: ?>
-                    <div class="alert alert-warning text-center rounded-3 shadow-sm">
-                        <i class="fas fa-exclamation-circle"></i> User not found!
+                    <div class="alert alert-warning text-center rounded-3 shadow-sm p-4">
+                        <i class="fas fa-exclamation-triangle fa-2x text-danger mb-2"></i>
+                        <h5 class="fw-bold mb-2">User Not Found!</h5>
+                        <p class="mb-3">
+                            No user details available. To view user information, please go to the <strong>"Create
+                                User"</strong> page
+                            and add a new user. Then, click the <strong>"Details"</strong> button to see the full
+                            information.
+                        </p>
+                        <a href="create_user.php" class="btn btn-primary px-4" style="text-decoration: none">
+                            <i class="fas fa-user-plus me-2"></i> Create User
+                        </a>
                     </div>
                 <?php endif; ?>
             </div>
@@ -239,8 +249,7 @@ if (
         document.getElementById('submit').disabled = this.value.length < 8;
         passwordMessage.textContent = this.value.length < 8 ? 'Password must be at least 8 characters long!' : '';
     });
-</script>
-<script>
+
     document.getElementById("editProfileForm").addEventListener("submit", function (event) {
         event.preventDefault();
 
@@ -259,8 +268,7 @@ if (
             })
             .catch(error => console.error("Error:", error));
     });
-</script>
-<script>
+
     function confirmDelete() {
         Swal.fire({
             title: 'Are you sure?',

@@ -13,7 +13,8 @@ $menuItems = [
         "menuTitle" => "Users",
         "icon" => "fas fa-users",
         "pages" => [
-            ["title" => "Create User", "url" => "create_user.php"]
+            ["title" => "Create User", "url" => "create_user.php"],
+            ["title" => "User Details", "url" => "user_details.php"]
         ],
     ],
     [
@@ -160,7 +161,7 @@ $active_page = $active_pageInfo['active_page'] ?? null;
                         <img src="<?= $image_path ?>" class="img-circle elevation-2 bg-white" alt="User Image">
                     </div>
                     <div class="info">
-                        <a href="<?= SITE_PATH ?>/profile.php" class="d-block">
+                        <a href="<?= SITE_PATH ?>/admin/profile.php" class="d-block">
                             <?= $_SESSION['user']['first_name'] . " " . $_SESSION['user']['last_name'] ?>
                         </a>
                     </div>
