@@ -9,7 +9,6 @@ $users = $query->select('users', '*', 'id <> ?', [$_SESSION['user']['id']], 's')
 
 if (
     $_SERVER["REQUEST_METHOD"] === "POST" &&
-    isset($_POST['submit']) &&
     isset($_POST['csrf_token']) &&
     isset($_SESSION['csrf_token']) &&
     hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
@@ -31,25 +30,14 @@ if (
         'role' => $role
     ];
 
-    if ($query->insert("users", $data)) {
-        ?>
-        <script>
-            window.onload = function () { Swal.fire({ icon: 'success', title: 'Success!', text: 'New user added successfully!', timer: 1500, showConfirmButton: false }).then(() => { window.location.replace('create_user.php'); }); };
-        </script>
-        <?php
+    $result = $query->insert("users", $data);
+    if ($result) {
+        $data['id'] = $result;
+        echo json_encode(['status' => 'success', 'message' => 'New user added successfully!', 'user' => $data]);
     } else {
-        ?>
-        <script>
-            window.onload = function () { Swal.fire({ icon: 'error', title: 'Oops...', text: 'Registration failed. Please try again.', showConfirmButton: true }).then(() => { window.location.replace('create_user.php'); });; };
-        </script>
-        <?php
+        echo json_encode(['status' => 'error', 'message' => 'Failed to add user.']);
     }
-} elseif (isset($_POST['submit'])) {
-    ?>
-    <script>
-        window.onload = function () { Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.', showConfirmButton: true }).then(() => { window.location.replace('create_user.php'); });; };
-    </script>
-    <?php
+    exit;
 }
 ?>
 
@@ -301,6 +289,44 @@ if (
             this.querySelector('i').classList.toggle('fa-eye-slash');
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('signupForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            let formData = new FormData(this);
+
+            fetch('', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        Swal.fire('Success!', data.message, 'success');
+
+                        let newRow = `
+                    <tr>
+                        <td>${data.user.id}</td>
+                        <td>${data.user.first_name} ${data.user.last_name}</td>
+                        <td>${data.user.username}</td>
+                        <td>${data.user.role}</td>
+                        <td>
+                            <a href="user_details.php?id=${data.user.id}" class="btn btn-warning btn-sm">Details</a>
+                        </td>
+                    </tr>`;
+
+                        document.querySelector('#usersTable tbody').insertAdjacentHTML('beforeend', newRow);
+
+                        document.getElementById('signupForm').reset();
+                    } else {
+                        Swal.fire('Error!', data.message, 'error');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    });
+
 </script>
 
 <?php include './footer.php'; ?>
