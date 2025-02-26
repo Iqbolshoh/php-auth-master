@@ -66,7 +66,7 @@ $active_page = $active_pageInfo['active_page'] ?? null;
     <!-- Open Graph (OG) tags -->
     <meta property="og:title" content="<?= htmlspecialchars($page_title) ?>">
     <meta property="og:description" content="Powerful admin panel by Iqbolshoh Ilhomjonov">
-    <meta property="og:image" content="<?= SITE_PATH ?>/src/images/logo.png">
+    <meta property="og:image" content="<?= SITE_PATH ?>/src/images/logo.svg">
     <meta property="og:url" content="<?= SITE_PATH ?>">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Iqbolshoh Admin Panel">
@@ -160,7 +160,7 @@ $active_page = $active_pageInfo['active_page'] ?? null;
                         <img src="<?= $image_path ?>" class="img-circle elevation-2 bg-white" alt="User Image">
                     </div>
                     <div class="info">
-                        <a href="<?= SITE_PATH ?>" class="d-block">
+                        <a href="<?= SITE_PATH ?>/profile.php" class="d-block">
                             <?= $_SESSION['user']['first_name'] . " " . $_SESSION['user']['last_name'] ?>
                         </a>
                     </div>

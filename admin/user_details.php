@@ -7,10 +7,7 @@ $query->check_session('admin');
 
 if (isset($_GET['id'])) {
     $user_id = intval($_GET['id']);
-    $result = $query->select('users', '*', 'id = ?', [$user_id], 'i');
-    if (!empty($result)) {
-        $user = $result[0];
-    }
+    $user = $query->select('users', '*', 'id = ?', [$user_id], 'i')[0] ?? null;
 }
 
 if (isset($_POST['delete_id'])) {
@@ -22,11 +19,11 @@ if (isset($_POST['delete_id'])) {
 
 if (
     $_SERVER["REQUEST_METHOD"] === "POST" &&
-    isset($_POST['submit']) &&
     isset($_POST['csrf_token']) &&
     isset($_SESSION['csrf_token']) &&
     hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
 ) {
+    header('Content-Type: application/json');
 
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
@@ -59,18 +56,11 @@ if (
     $update = $query->update("users", $data, "id = ?", [$user_id], "i");
 
     if ($update) {
-        ?>
-        <script>
-            window.onload = function () { Swal.fire({ icon: 'success', title: 'Success!', text: 'Your profile has been updated successfully!', timer: 1500, showConfirmButton: false }).then(() => { window.location.replace('user_details.php?id=' + <?= $user_id ?>); }); };
-        </script>
-        <?php
+        echo json_encode(['status' => 'success', 'message' => 'Profile updated successfully!']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Failed to update profile!']);
     }
-} elseif (isset($_POST['submit'])) {
-    ?>
-    <script>
-        window.onload = function () { Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.', showConfirmButton: true }).then(() => { window.location.replace('user_details.php?id=' + <?= $user_id ?>); });; };
-    </script>
-    <?php
+    exit;
 }
 ?>
 
@@ -120,11 +110,11 @@ if (
                         </tr>
                         <tr>
                             <th class="bg-light">Created At</th>
-                            <td><?= htmlspecialchars($user['created_at']); ?></td>
+                            <td><?= date('H:i:s d-m-Y', strtotime($user['created_at'])); ?></td>
                         </tr>
                         <tr>
                             <th class="bg-light">Updated At</th>
-                            <td><?= htmlspecialchars($user['updated_at']); ?></td>
+                            <td><?= date('H:i:s d-m-Y', strtotime($user['updated_at'])); ?></td>
                         </tr>
                     </table>
 
@@ -158,7 +148,7 @@ if (
 
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data" id="editProfileForm">
             <div class="modal-content rounded-4 shadow-lg">
                 <div class="modal-header bg-dark text-white text-center rounded-top-4">
                     <h5 class="modal-title" id="editModalLabel">Edit User</h5>
@@ -235,6 +225,53 @@ if (
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('toggle-password').addEventListener('click', function () {
+        const passwordField = document.getElementById('password');
+        const toggleIcon = this.querySelector('i');
+        passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+        toggleIcon.classList.toggle('fa-eye');
+        toggleIcon.classList.toggle('fa-eye-slash');
+    });
+
+    document.getElementById('password').addEventListener('input', function () {
+        const passwordMessage = document.getElementById('password-message');
+        document.getElementById('submit').disabled = this.value.length < 8;
+        passwordMessage.textContent = this.value.length < 8 ? 'Password must be at least 8 characters long!' : '';
+    });
+</script>
+<script>
+    document.getElementById("editProfileForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        let formData = new FormData(this);
+        fetch("", {
+            method: "POST",
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Success!",
+                        text: data.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => { window.location.reload(); })
+
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error!",
+                        text: data.message,
+                        showConfirmButton: true
+                    });
+                }
+            })
+            .catch(error => console.error("Error:", error));
+    });
+</script>
 <script>
     function confirmDelete() {
         Swal.fire({

@@ -15,11 +15,6 @@ if (
 ) {
     header('Content-Type: application/json');
 
-    if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-        echo json_encode(['status' => 'error', 'message' => 'Invalid CSRF token!']);
-        exit;
-    }
-
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
 
@@ -74,50 +69,42 @@ if (
             </div>
             <div class="card-body">
                 <div class="text-center mb-4">
-                    <img id="profile-picture"
-                        src="<?= SITE_PATH . "/src/images/profile_picture/" . $user['profile_picture']; ?>"
+                    <img src="<?= SITE_PATH . "/src/images/profile_picture/" . $user['profile_picture']; ?>"
                         alt="Profile Picture" class="rounded-circle border border-3 border-dark shadow-sm" width="140"
                         height="140" style="object-fit: cover; transition: 0.3s;"
                         onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-                    <h4 class="mt-3" id="profile-name">
-                        <?= htmlspecialchars($user['first_name'] . " " . $user['last_name']); ?>
-                    </h4>
+                    <h4 class="mt-3"><?= htmlspecialchars($user['first_name'] . " " . $user['last_name']); ?></h4>
                     <p class="text-muted">@<?= htmlspecialchars($user['username']); ?></p>
                 </div>
 
                 <table class="table table-hover table-bordered rounded-3 overflow-hidden">
                     <tr>
-                        <th class="bg-light">ID</th>
-                        <td id="profile-id"><?= htmlspecialchars($user['id']); ?></td>
-                    </tr>
-                    <tr>
                         <th class="bg-light">First Name</th>
-                        <td id="profile-firstname"><?= htmlspecialchars($user['first_name']); ?></td>
+                        <td><?= htmlspecialchars($user['first_name']); ?></td>
                     </tr>
                     <tr>
                         <th class="bg-light">Last Name</th>
-                        <td id="profile-lastname"><?= htmlspecialchars($user['last_name']); ?></td>
+                        <td><?= htmlspecialchars($user['last_name']); ?></td>
                     </tr>
                     <tr>
                         <th class="bg-light">Email</th>
-                        <td id="profile-email"><?= htmlspecialchars($user['email']); ?></td>
+                        <td><?= htmlspecialchars($user['email']); ?></td>
                     </tr>
                     <tr>
                         <th class="bg-light">Username</th>
-                        <td id="profile-username"><?= htmlspecialchars($user['username']); ?></td>
+                        <td><?= htmlspecialchars($user['username']); ?></td>
                     </tr>
                     <tr>
                         <th class="bg-light">Role</th>
-                        <td><span class="badge bg-info text-dark"
-                                id="profile-role"><?= htmlspecialchars($user['role']); ?></span></td>
+                        <td><span class="badge bg-info text-dark"><?= htmlspecialchars($user['role']); ?></span></td>
                     </tr>
                     <tr>
                         <th class="bg-light">Created At</th>
-                        <td id="profile-created"><?= date('H:i:s d-m-Y', strtotime($user['created_at'])); ?></td>
+                        <td><?= date('H:i:s d-m-Y', strtotime($user['created_at'])); ?></td>
                     </tr>
                     <tr>
                         <th class="bg-light">Updated At</th>
-                        <td id="profile-updated"><?= date('H:i:s d-m-Y', strtotime($user['updated_at'])) ?></td>
+                        <td><?= date('H:i:s d-m-Y', strtotime($user['updated_at'])); ?></td>
                     </tr>
                 </table>
 
@@ -233,28 +220,16 @@ if (
         event.preventDefault();
 
         let formData = new FormData(this);
-        fetch("profile.php", {
+        fetch("", {
             method: "POST",
             body: formData
         })
             .then(response => response.json())
             .then(data => {
                 if (data.status === "success") {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Success!",
-                        text: data.message,
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                    window.location.reload();
+                    Swal.fire({ icon: "success", title: "Success!", text: data.message, timer: 1500, showConfirmButton: false }).then(() => { window.location.reload(); })
                 } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error!",
-                        text: data.message,
-                        showConfirmButton: true
-                    });
+                    Swal.fire({ icon: "error", title: "Error!", text: data.message, showConfirmButton: true });
                 }
             })
             .catch(error => console.error("Error:", error));

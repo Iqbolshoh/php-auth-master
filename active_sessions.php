@@ -60,7 +60,7 @@ if (
                 <td>
                     <?php if (session_id() == $session['session_token']): ?>
                         <button class="btn btn-warning btn-sm"
-                            onclick="openEditModal('<?= htmlspecialchars($session['device_name']); ?>', '<?= htmlspecialchars($session['session_token']); ?>')">
+                            onclick="openEditModal('<?= htmlspecialchars($session['session_token']); ?>')">
                             <i class="fas fa-edit"></i> Edit
                         </button>
                     <?php endif; ?>
@@ -75,7 +75,8 @@ if (
 </table>
 
 <script>
-    function openEditModal(deviceName, token) {
+    function openEditModal(token) {
+        let deviceName = document.getElementById(`device-name-${token}`).textContent.trim();
         Swal.fire({
             title: "Edit Device Name",
             input: "text",
@@ -100,9 +101,9 @@ if (
                     .then(data => {
                         if (data.status === "success") {
                             document.getElementById(`device-name-${token}`).textContent = data.device_name;
-                            Swal.fire('Success!', data.message, 'success');
+                            Swal.fire({ title: 'Success!', text: data.message, icon: 'success', showConfirmButton: false, timer: 1500 });
                         } else {
-                            Swal.fire('Error!', data.message, 'error');
+                            Swal.fire({ title: 'Error!', text: data.message, icon: 'error', showConfirmButton: true });
                         }
                     })
                     .catch(error => console.error("Fetch error:", error));
@@ -131,12 +132,13 @@ if (
                     .then(data => {
                         if (data.status === "success") {
                             document.getElementById(`session-${data.token}`).remove();
-                            Swal.fire('Deleted!', data.message, 'success');
-                            if ("<?= session_id() ?>" == token) {
-                                window.location.reload();
-                            }
+                            Swal.fire({ title: 'Deleted!', text: data.message, icon: 'success', showConfirmButton: false, timer: 1500 }).then(() => {
+                                if ("<?= session_id() ?>" == token) {
+                                    window.location.reload();
+                                }
+                            });
                         } else {
-                            Swal.fire('Error!', data.message, 'error');
+                            Swal.fire({ title: 'Error!', text: data.message, icon: 'error', showConfirmButton: true });
                         }
                     })
                     .catch(error => console.error("Fetch error:", error));

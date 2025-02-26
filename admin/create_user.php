@@ -303,7 +303,7 @@ if (
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        Swal.fire('Success!', data.message, 'success');
+                        Swal.fire({ icon: "success", title: "Success!", text: data.message, timer: 1500, showConfirmButton: false })
 
                         let newRow = `
                     <tr>
@@ -317,10 +317,9 @@ if (
                     </tr>`;
 
                         document.querySelector('#usersTable tbody').insertAdjacentHTML('beforeend', newRow);
-
                         document.getElementById('signupForm').reset();
                     } else {
-                        Swal.fire('Error!', data.message, 'error');
+                        Swal.fire({ icon: "error", title: "Error!", text: data.message, showConfirmButton: true });
                     }
                 })
                 .catch(error => console.error('Error:', error));
