@@ -9,12 +9,17 @@ $user = $query->select("users", '*', "id = ?", [$_SESSION['user']['id']], 'i')[0
 
 if (
     $_SERVER["REQUEST_METHOD"] === "POST" &&
-    isset($_POST['submit']) &&
     isset($_POST['csrf_token']) &&
     isset($_SESSION['csrf_token']) &&
     hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
 ) {
-    
+    header('Content-Type: application/json');
+
+    if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid CSRF token!']);
+        exit;
+    }
+
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
 
@@ -50,18 +55,12 @@ if (
         $_SESSION['user']['first_name'] = $data['first_name'];
         $_SESSION['user']['last_name'] = $data['last_name'];
         $_SESSION['user']['updated_at'] = $data['updated_at'];
-        ?>
-        <script>
-            window.onload = function () { Swal.fire({ icon: 'success', title: 'Success!', text: 'Your profile has been updated successfully!', timer: 1500, showConfirmButton: false }).then(() => { window.location.replace('profile.php'); }); };
-        </script>
-        <?php
+
+        echo json_encode(['status' => 'success', 'message' => 'Profile updated successfully!']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Failed to update profile!']);
     }
-} elseif (isset($_POST['submit'])) {
-    ?>
-    <script>
-        window.onload = function () { Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.', showConfirmButton: true }).then(() => { window.location.replace('profile.php'); });; };
-    </script>
-    <?php
+    exit;
 }
 ?>
 
@@ -75,46 +74,50 @@ if (
             </div>
             <div class="card-body">
                 <div class="text-center mb-4">
-                    <img src="<?= SITE_PATH . "/src/images/profile_picture/" . $user['profile_picture']; ?>"
+                    <img id="profile-picture"
+                        src="<?= SITE_PATH . "/src/images/profile_picture/" . $user['profile_picture']; ?>"
                         alt="Profile Picture" class="rounded-circle border border-3 border-dark shadow-sm" width="140"
                         height="140" style="object-fit: cover; transition: 0.3s;"
                         onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-                    <h4 class="mt-3"><?= htmlspecialchars($user['first_name'] . " " . $user['last_name']); ?></h4>
+                    <h4 class="mt-3" id="profile-name">
+                        <?= htmlspecialchars($user['first_name'] . " " . $user['last_name']); ?>
+                    </h4>
                     <p class="text-muted">@<?= htmlspecialchars($user['username']); ?></p>
                 </div>
 
                 <table class="table table-hover table-bordered rounded-3 overflow-hidden">
                     <tr>
                         <th class="bg-light">ID</th>
-                        <td><?= htmlspecialchars($user['id']); ?></td>
+                        <td id="profile-id"><?= htmlspecialchars($user['id']); ?></td>
                     </tr>
                     <tr>
                         <th class="bg-light">First Name</th>
-                        <td><?= htmlspecialchars($user['first_name']); ?></td>
+                        <td id="profile-firstname"><?= htmlspecialchars($user['first_name']); ?></td>
                     </tr>
                     <tr>
                         <th class="bg-light">Last Name</th>
-                        <td><?= htmlspecialchars($user['last_name']); ?></td>
+                        <td id="profile-lastname"><?= htmlspecialchars($user['last_name']); ?></td>
                     </tr>
                     <tr>
                         <th class="bg-light">Email</th>
-                        <td><?= htmlspecialchars($user['email']); ?></td>
+                        <td id="profile-email"><?= htmlspecialchars($user['email']); ?></td>
                     </tr>
                     <tr>
                         <th class="bg-light">Username</th>
-                        <td><?= htmlspecialchars($user['username']); ?></td>
+                        <td id="profile-username"><?= htmlspecialchars($user['username']); ?></td>
                     </tr>
                     <tr>
                         <th class="bg-light">Role</th>
-                        <td><span class="badge bg-info text-dark"><?= htmlspecialchars($user['role']); ?></span></td>
+                        <td><span class="badge bg-info text-dark"
+                                id="profile-role"><?= htmlspecialchars($user['role']); ?></span></td>
                     </tr>
                     <tr>
                         <th class="bg-light">Created At</th>
-                        <td><?= htmlspecialchars($user['created_at']); ?></td>
+                        <td id="profile-created"><?= date('H:i:s d-m-Y', strtotime($user['created_at'])); ?></td>
                     </tr>
                     <tr>
                         <th class="bg-light">Updated At</th>
-                        <td><?= htmlspecialchars($user['updated_at']); ?></td>
+                        <td id="profile-updated"><?= date('H:i:s d-m-Y', strtotime($user['updated_at'])) ?></td>
                     </tr>
                 </table>
 
@@ -133,7 +136,7 @@ if (
 
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data" id="editProfileForm">
             <div class="modal-content rounded-4 shadow-lg">
                 <div class="modal-header bg-dark text-white text-center rounded-top-4">
                     <h5 class="modal-title" id="editModalLabel">Edit User</h5>
@@ -223,6 +226,38 @@ if (
         const passwordMessage = document.getElementById('password-message');
         document.getElementById('submit').disabled = this.value.length < 8;
         passwordMessage.textContent = this.value.length < 8 ? 'Password must be at least 8 characters long!' : '';
+    });
+</script>
+<script>
+    document.getElementById("editProfileForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        let formData = new FormData(this);
+        fetch("profile.php", {
+            method: "POST",
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Success!",
+                        text: data.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    window.location.reload();
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error!",
+                        text: data.message,
+                        showConfirmButton: true
+                    });
+                }
+            })
+            .catch(error => console.error("Error:", error));
     });
 </script>
 

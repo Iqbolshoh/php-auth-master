@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 include './config.php';
 $query = new Database();
 $query->check_session('user');
@@ -30,9 +31,6 @@ if (
         } else {
             echo json_encode(["status" => "error", "message" => "Failed to delete session. Try again!"]);
         }
-        exit;
-    } else {
-        echo json_encode(["status" => "error", "message" => "Invalid action!"]);
         exit;
     }
 }
