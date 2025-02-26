@@ -71,7 +71,7 @@ if (
     <div class="col-md-8">
         <div class="card shadow-lg rounded-4 border-0">
             <div class="card-header bg-dark text-white text-center rounded-top-4">
-                <h3 class="mb-0">User Profile</h3>
+                <h3 class="mb-0">My Profile</h3>
             </div>
             <div class="card-body">
                 <div class="text-center mb-4">

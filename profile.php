@@ -14,7 +14,7 @@ if (
     isset($_SESSION['csrf_token']) &&
     hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
 ) {
-    
+
     $first_name = $query->validate($_POST['first_name']);
     $last_name = $query->validate($_POST['last_name']);
 
@@ -71,7 +71,7 @@ if (
     <div class="col-md-8">
         <div class="card shadow-lg rounded-4 border-0">
             <div class="card-header bg-dark text-white text-center rounded-top-4">
-                <h3 class="mb-0">User Profile</h3>
+                <h3 class="mb-0">My profile</h3>
             </div>
             <div class="card-body">
                 <div class="text-center mb-4">
