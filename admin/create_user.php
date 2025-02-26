@@ -22,7 +22,6 @@ if (
     $password = $query->hashPassword($_POST['password']);
     $role = $query->validate($_POST['role']);
 
-
     $data = [
         'first_name' => $first_name,
         'last_name' => $last_name,
@@ -183,7 +182,6 @@ if (
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
 <script>
     $(document).ready(function () {
         $('#usersTable').DataTable({

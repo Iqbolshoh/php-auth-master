@@ -7,25 +7,44 @@ $query->check_session('user');
 
 $active_sessions = $query->select('active_sessions', '*', 'user_id = ?', [$_SESSION['user']['id']], 'i');
 
-if (isset($_GET['token'])) {
-    $query->delete('active_sessions', 'user_id = ? AND session_token = ?', [$_SESSION['user']['id'], $_GET['token']], 'is');
-    header('Location: ' . $_SERVER['PHP_SELF']);
-    exit;
-}
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_POST['submit']) &&
+    isset($_POST['csrf_token']) &&
+    isset($_SESSION['csrf_token']) &&
+    isset($_POST['action']) &&
+    hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+) {
 
-if (isset($_POST['update_session'])) {
-    $device_name = $_POST['device_name'];
+    if ($_POST['action'] === 'edit' && isset($_POST['device_name'])) {
+        $device_name = $_POST['device_name'];
 
-    $query->update(
-        'active_sessions',
-        ['device_name' => $device_name],
-        'session_token = ? AND user_id = ?',
-        [session_id(), $_SESSION['user']['id']],
-        'si'
-    );
-
-    header('Location: ' . $_SERVER['PHP_SELF']);
-    exit;
+        $query->update(
+            'active_sessions',
+            ['device_name' => $device_name],
+            'session_token = ? AND user_id = ?',
+            [session_id(), $_SESSION['user']['id']],
+            'si'
+        );
+        ?>
+        <script>
+            window.onload = function () { Swal.fire({ icon: 'success', title: 'Device Name Updated!', text: 'Your device name has been successfully changed.', timer: 1500, showConfirmButton: false }).then(() => { window.location.replace('active_sessions.php'); }); };
+        </script>
+        <?php
+    } elseif ($_POST['action'] === 'delete' && isset($_POST['token'])) {
+        $query->delete('active_sessions', 'user_id = ? AND session_token = ?', [$_SESSION['user']['id'], $_POST['token']], 'is');
+        ?>
+        <script>
+            window.onload = function () { Swal.fire({ icon: 'success', title: 'Session Deleted!', text: 'The selected session has been successfully removed.', timer: 1500, showConfirmButton: false }).then(() => { window.location.replace('active_sessions.php'); }); };
+        </script>
+        <?php
+    }
+} elseif (isset($_POST['submit'])) {
+    ?>
+    <script>
+        window.onload = function () { Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.', showConfirmButton: true }).then(() => { window.location.replace('./'); });; };
+    </script>
+    <?php
 }
 ?>
 
@@ -34,7 +53,7 @@ if (isset($_POST['update_session'])) {
 <table class="table table-striped table-hover table-bordered">
     <thead class="bg-dark text-white text-center">
         <tr>
-            <th> №</th>
+            <th>№</th>
             <th><i class="fas fa-desktop"></i> Device Name</th>
             <th><i class="fas fa-network-wired"></i> IP Address</th>
             <th><i class="fas fa-clock"></i> Last Activity</th>
@@ -77,11 +96,15 @@ if (isset($_POST['update_session'])) {
             </div>
             <div class="modal-body">
                 <form method="POST">
+                    <input type="hidden" name="action" value="edit">
                     <div class="form-group">
                         <label for="deviceName">Device Name</label>
                         <input type="text" class="form-control" name="device_name" id="deviceName" required>
                     </div>
-                    <button type="submit" name="update_session" class="btn btn-primary">
+                    <div class="form-group">
+                        <input type="hidden" name="csrf_token" value="<?= $query->generate_csrf_token() ?>">
+                    </div>
+                    <button type="submit" name="submit" class="btn btn-primary">
                         Save changes
                     </button>
                 </form>
@@ -94,22 +117,6 @@ if (isset($_POST['update_session'])) {
     function openEditModal(deviceName) {
         document.getElementById('deviceName').value = deviceName;
         $('#editModal').modal('show');
-    }
-
-    function confirmRemoval(token) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'You won\'t be able to revert this!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, remove it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = 'active_sessions.php?token=' + token;
-            }
-        });
     }
 </script>
 
