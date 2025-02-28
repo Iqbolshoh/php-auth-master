@@ -20,56 +20,16 @@ This repository is a user authentication and role management system built with P
 ✅ **Scalable** – Add new roles & users effortlessly.  
 ✅ **Real-Time Control** – Monitor & remove active sessions anytime.  
 
-🚀 **Get started with PHP Auth Master today!**
-
 ---
 
-### Login 
-![Login](src/images/login.png) 
+### 🔐 Login Information  
 
-## 🔐 Security & Active Sessions  
+🖥 **Admin Login:** `iqbolshoh`  
+👤 **User Login:** `user`  
+🔑 **Password:** `IQBOLSHOH`  
 
-**PHP Auth Master** ensures **strong security** with an **Active Session Management System**, allowing users to track and manage logged-in devices in real time.  
-
-### 🔹 Key Security Features  
-
-- 🖥 **Session Monitoring** – View all active sessions with:  
-  - 📌 **Device Name**  
-  - 🌍 **IP Address**  
-  - ⏳ **Last Activity Time**  
-- ❌ **Logout Unwanted Devices** – Remove unauthorized or inactive sessions.  
-- 🔄 **Auto Logout on Password Change** – When a password is updated, **all active sessions** are automatically logged out.  
-- 🛡 **Real-Time Protection** – Prevents unauthorized access with **session tracking & manual control**.  
-
-### Example: Active Session Table  
-
-When users navigate to **Active Sessions**, they will see something like this:  
-
-| №  | Device Name         | IP Address  | Last Activity        | Action  |
-|----|---------------------|------------|----------------------|---------|
-| 1  | Windows 11 PC      | 192.168.1.100  | 10:28:42 16-02-2025  | 🔴 Logout |
-| 2  | iPhone 15 Pro Max  | 203.45.67.89  | 10:27:34 16-02-2025  | 🔴 Logout |
-
-Users can log out of any session with just one click.  
-
----
-
-## 🛠 Admin Panel  
-
-To use the admin panel, simply define the menu structure. The system will automatically generate the necessary navigation and pages:  
-
-```php
-$menuItems = [
-    [
-        "menuTitle" => "Settings",
-        "icon" => "fas fa-cog",
-        "pages" => [
-            ["title" => "Update Profile", "url" => "index.php"],
-            ["title" => "Active Sessions", "url" => "active_sessions.php"]
-        ],
-    ]
-];
-```
+📸 **Login Screen:**  
+![Login](src/images/login.png)
 
 ---
 
@@ -80,6 +40,36 @@ $menuItems = [
 
 ### User Dashboard  
 ![User](src/images/user.png)  
+
+---
+
+## 🛠 **Easy Menu Creation**  
+
+Creating a menu in the admin panel is **super easy!** Just define the menu structure, and the system will **automatically** generate the necessary navigation and pages for you. 🎉  
+
+Here’s a simple example:  
+
+```php
+$menuItems = [
+    [
+        "menuTitle" => "Dashboard",
+        "icon" => "fas fa-tachometer-alt",
+        "pages" => [
+            ["title" => "Home", "url" => "index.php"]
+        ],
+    ],
+    [
+        "menuTitle" => "Settings",
+        "icon" => "fas fa-cog",
+        "pages" => [
+            ["title" => "Profile", "url" => "profile.php"],
+            ["title" => "Active Sessions", "url" => "active_sessions.php"]
+        ],
+    ]
+];
+```  
+
+📌 **No need for manual coding**—just define your menu items, and the system takes care of the rest! 🚀
 
 ---
 
@@ -101,28 +91,26 @@ mysql -u yourusername -p yourpassword < database.sql
 
 ---
 
-## 🔧 Database & Role Configuration  
+### 🛠 **Easy Database & Role Setup**  
 
-Edit `config.php` to set up the database:  
+Just edit `config.php` to set up the database:  
 
 ```php
 define("DB_SERVER", "localhost");
 define("DB_USERNAME", "root");
 define("DB_PASSWORD", "");
 define("DB_NAME", "auth_master");
-
-const ROLES = [
-    'admin' => '/admin/',
-    'user' => '/'
-];
 ```
 
-### 🔹 Key Settings  
-✅ **DB Connection** – Default `localhost`, user `root`.  
-✅ **Role Management** – Admin & User with auto redirection.  
+🔑 **Adding Roles?** Just update `ROLES`—the system handles the rest! 🚀  
 
-🚀 **You're ready to go!** Start the project & manage users easily.
-
+```php
+const ROLES = [
+    'admin' => '/admin/',
+    'user' => '/', // New role
+    'manager' => '/manager/'
+];
+```
 ---
 
 ## Technologies Used
