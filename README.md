@@ -22,15 +22,14 @@ This repository is a user authentication and role management system built with P
 
 ---
 
-### 🔐 Login Information  
-
-🖥 **Admin Login:** `iqbolshoh`  
-👤 **User Login:** `user`  
-🔑 **Password:** `IQBOLSHOH`  
+### 🔐 Login Page  
 
 📸 **Login Screen:**  
 ![Login](src/images/login.png)
 
+🖥 **Admin Login:** `iqbolshoh`  
+👤 **User Login:** `user`  
+🔑 **Password:** `IQBOLSHOH`  
 ---
 
 ## Preview Pages  
@@ -107,8 +106,8 @@ define("DB_NAME", "auth_master");
 ```php
 const ROLES = [
     'admin' => '/admin/',
-    'user' => '/', // New role
-    'manager' => '/manager/'
+    'user' => '/', 
+    'manager'=>'/manager/' // Add role
 ];
 ```
 ---
