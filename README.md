@@ -20,25 +20,27 @@ This repository is a user authentication and role management system built with P
 ✅ **Scalable** – Add new roles & users effortlessly.  
 ✅ **Real-Time Control** – Monitor & remove active sessions anytime.  
 
----
-
 ### 🔐 Login Page  
 
-📸 **Login Screen:**  
-![Login](src/images/login.png)
+![Login](src/images/login.png)  
 
-🖥 **Admin Login:** `iqbolshoh`  
-👤 **User Login:** `user`  
-🔑 **Password:** `IQBOLSHOH`  
----
+- **🖥 Admin Login:** `iqbolshoh`  
+- **👤 User Login:** `user`  
+- **🔑 Password:** `IQBOLSHOH`  
 
-## Preview Pages  
+## 🔍 Preview Pages  
 
-### Admin Dashboard  
+### 🛠 Admin Dashboard  
 ![Admin](src/images/admin_panel.png)  
+**Admin can view and update their profile.** They can also access system settings and manage various administrative functions.
 
-### User Dashboard  
-![User](src/images/user.png)  
+### 👥 Create User
+![Create-User](src/images/create_user.png)
+**Admin can view all users and create multiple new users.** They have full control over user management and permissions.
+
+### 👤 User Dashboard
+![User](src/images/user.png)
+**Users can view and update their profile.** They can also access available features
 
 ---
 
