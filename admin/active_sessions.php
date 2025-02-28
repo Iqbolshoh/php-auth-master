@@ -7,32 +7,35 @@ $query->check_session('admin');
 
 $active_sessions = $query->select('active_sessions', '*', 'user_id = ?', [$_SESSION['user']['id']], 'i');
 
-if (
-    $_SERVER["REQUEST_METHOD"] === "POST" &&
-    isset($_POST['csrf_token']) &&
-    isset($_SESSION['csrf_token']) &&
-    hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
-) {
-    header('Content-Type: application/json');
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    if (
+        isset($_POST['csrf_token']) &&
+        isset($_SESSION['csrf_token']) &&
+        hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+    ) {
+        header('Content-Type: application/json');
 
-    if ($_POST['action'] === 'edit' && isset($_POST['device_name'])) {
-        $device_name = trim($_POST['device_name']);
-        if (empty($device_name)) {
-            echo json_encode(["status" => "error", "message" => "Device name cannot be empty!"]);
+        if ($_POST['action'] === 'edit' && isset($_POST['device_name'])) {
+            $device_name = trim($_POST['device_name']);
+            if (empty($device_name)) {
+                echo json_encode(["status" => "error", "message" => "Device name cannot be empty!"]);
+                exit;
+            }
+            $query->update('active_sessions', ['device_name' => $device_name], 'session_token = ? AND user_id = ?', [session_id(), $_SESSION['user']['id']], 'si');
+            echo json_encode(["status" => "success", "message" => "Device name updated!", "device_name" => $device_name]);
             exit;
+        } elseif ($_POST['action'] === 'delete' && isset($_POST['token'])) {
+            $deleted = $query->delete('active_sessions', 'user_id = ? AND session_token = ?', [$_SESSION['user']['id'], $_POST['token']], 'is');
+            if ($deleted) {
+                echo json_encode(["status" => "success", "message" => "Session deleted!", "token" => $_POST['token']]);
+            } else {
+                echo json_encode(["status" => "error", "message" => "Failed to delete session. Try again!"]);
+            }
         }
-        $query->update('active_sessions', ['device_name' => $device_name], 'session_token = ? AND user_id = ?', [session_id(), $_SESSION['user']['id']], 'si');
-        echo json_encode(["status" => "success", "message" => "Device name updated!", "device_name" => $device_name]);
-        exit;
-    } elseif ($_POST['action'] === 'delete' && isset($_POST['token'])) {
-        $deleted = $query->delete('active_sessions', 'user_id = ? AND session_token = ?', [$_SESSION['user']['id'], $_POST['token']], 'is');
-        if ($deleted) {
-            echo json_encode(["status" => "success", "message" => "Session deleted!", "token" => $_POST['token']]);
-        } else {
-            echo json_encode(["status" => "error", "message" => "Failed to delete session. Try again!"]);
-        }
-        exit;
+    } else {
+        echo json_encode(['status' => 'error', 'title' => 'Invalid CSRF Token', 'message' => 'Please refresh the page and try again.']);
     }
+    exit;
 }
 ?>
 

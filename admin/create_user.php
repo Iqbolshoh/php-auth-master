@@ -7,73 +7,45 @@ $query->check_session('admin');
 
 $users = $query->select('users', '*', 'id <> ?', [$_SESSION['user']['id']], 's');
 
-if (
-    $_SERVER["REQUEST_METHOD"] === "POST" &&
-    isset($_POST['csrf_token']) &&
-    isset($_SESSION['csrf_token']) &&
-    hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
-) {
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    if (
+        isset($_POST['csrf_token']) &&
+        isset($_SESSION['csrf_token']) &&
+        hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+    ) {
+        header('Content-Type: application/json');
 
-    $first_name = $query->validate($_POST['first_name']);
-    $last_name = $query->validate($_POST['last_name']);
-    $email = $query->validate($_POST['email']);
-    $username = $query->validate($_POST['username']);
-    $password = $query->hashPassword($_POST['password']);
-    $role = $query->validate($_POST['role']);
+        $first_name = $query->validate($_POST['first_name']);
+        $last_name = $query->validate($_POST['last_name']);
+        $email = $query->validate($_POST['email']);
+        $username = $query->validate($_POST['username']);
+        $password = $query->hashPassword($_POST['password']);
+        $role = $query->validate($_POST['role']);
 
-    $data = [
-        'first_name' => $first_name,
-        'last_name' => $last_name,
-        'email' => $email,
-        'username' => $username,
-        'password' => $password,
-        'role' => $role
-    ];
+        $data = [
+            'first_name' => $first_name,
+            'last_name' => $last_name,
+            'email' => $email,
+            'username' => $username,
+            'password' => $password,
+            'role' => $role
+        ];
 
-    $result = $query->insert("users", $data);
-    if ($result) {
-        $data['id'] = $result;
-        echo json_encode(['status' => 'success', 'message' => 'New user added successfully!', 'user' => $data]);
+        $result = $query->insert("users", $data);
+        if ($result) {
+            $data['id'] = $result;
+            echo json_encode(['status' => 'success', 'title' => 'Success!', 'message' => 'New user added successfully!', 'user' => $data]);
+        } else {
+            echo json_encode(['status' => 'error', 'title' => 'Error!', 'message' => 'Failed to add user.']);
+        }
     } else {
-        echo json_encode(['status' => 'error', 'message' => 'Failed to add user.']);
+        echo json_encode(['status' => 'error', 'title' => 'Invalid CSRF Token', 'message' => 'Please refresh the page and try again.']);
     }
     exit;
 }
 ?>
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-<style>
-    #email-message,
-    #username-message,
-    #password-message {
-        color: red;
-        font-size: 14px;
-        margin-top: 5px;
-    }
-
-    .password-container {
-        position: relative;
-        display: flex;
-        align-items: user;
-    }
-
-    .password-container input {
-        flex: 1;
-        padding-right: 40px;
-    }
-
-    .password-toggle {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 18px;
-        cursor: pointer;
-        border: none;
-        background: transparent;
-    }
-</style>
-
 <?php include './header.php'; ?>
 
 <div class="row">
@@ -126,24 +98,24 @@ if (
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" id="email" name="email" class="form-control" maxlength="100" required>
-                        <small id="email-message"></small>
+                        <input type="email" id="email" name="email" class="form-control" required maxlength="100">
+                        <small id="email-message" class="text-danger"></small>
                     </div>
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
-                        <input type="text" id="username" name="username" class="form-control" maxlength="30" required>
-                        <small id="username-message"></small>
+                        <input type="text" id="username" name="username" class="form-control" required maxlength="30">
+                        <small id="username-message" class="text-danger"></small>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3 position-relative">
                         <label for="password" class="form-label">Password</label>
-                        <div class="password-container">
-                            <input type="password" id="password" name="password" class="form-control" maxlength="255"
-                                required>
-                            <button type="button" id="toggle-password" class="password-toggle">
+                        <div class="input-group">
+                            <input type="password" id="password" name="password" class="form-control" required
+                                maxlength="255">
+                            <button type="button" id="toggle-password" class="btn btn-outline-secondary">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
-                        <small id="password-message"></small>
+                        <small id="password-message" class="text-danger"></small>
                     </div>
                     <div class="mb-3">
                         <label for="role" class="form-label">Role</label>
@@ -243,8 +215,8 @@ if (
         }
 
         function updateSubmitButtonState() {
-            const isEmailValid = emailField.value.length === 0 || (validateEmailFormat(emailField.value) && emailAvailable);
-            const isUsernameValid = usernameField.value.length === 0 || (validateUsernameFormat(usernameField.value) && usernameAvailable);
+            const isEmailValid = (validateEmailFormat(emailField.value) && emailAvailable);
+            const isUsernameValid = (validateUsernameFormat(usernameField.value) && usernameAvailable);
             const isPasswordValid = passwordField.value.length === 0 || validatePassword();
 
             const isFormValid = isEmailValid && isUsernameValid && isPasswordValid;
@@ -303,7 +275,7 @@ if (
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        Swal.fire({ icon: "success", title: "Success!", text: data.message, timer: 1500, showConfirmButton: false })
+                        Swal.fire({ icon: "success", title: data.title, text: data.message, timer: 1500, showConfirmButton: false })
 
                         let newRow = `
                     <tr>
@@ -319,7 +291,7 @@ if (
                         document.querySelector('#usersTable tbody').insertAdjacentHTML('beforeend', newRow);
                         document.getElementById('signupForm').reset();
                     } else {
-                        Swal.fire({ icon: "error", title: "Error!", text: data.message, showConfirmButton: true });
+                        Swal.fire({ icon: "error", title: data.title, text: data.message, showConfirmButton: true });
                     }
                 })
                 .catch(error => console.error('Error:', error));

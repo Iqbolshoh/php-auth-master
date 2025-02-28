@@ -7,53 +7,56 @@ $query->check_session('admin');
 
 $user = $query->select("users", '*', "id = ?", [$_SESSION['user']['id']], 'i')[0];
 
-if (
-    $_SERVER["REQUEST_METHOD"] === "POST" &&
-    isset($_POST['csrf_token']) &&
-    isset($_SESSION['csrf_token']) &&
-    hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
-) {
-    header('Content-Type: application/json');
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    if (
+        isset($_POST['csrf_token']) &&
+        isset($_SESSION['csrf_token']) &&
+        hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+    ) {
+        header('Content-Type: application/json');
 
-    $first_name = $query->validate($_POST['first_name']);
-    $last_name = $query->validate($_POST['last_name']);
+        $first_name = $query->validate($_POST['first_name']);
+        $last_name = $query->validate($_POST['last_name']);
 
-    $data = [
-        'first_name' => $first_name,
-        'last_name' => $last_name,
-        'updated_at' => date('Y-m-d H:i:s')
-    ];
+        $data = [
+            'first_name' => $first_name,
+            'last_name' => $last_name,
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
 
-    if (!empty($_POST['password'])) {
-        $data['password'] = $query->hashPassword($_POST['password']);
-        $query->delete('active_sessions', 'user_id = ? AND session_token <> ?', [$_SESSION['user']['id'], session_id()], 'is');
-    }
-
-    if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-        $encrypted_name = md5(bin2hex(random_bytes(32)) . '_' . bin2hex(random_bytes(16)) . '_' . uniqid('', true)) . '.' . pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
-        $targetFile = "../src/images/profile_picture/";
-
-        $filePath = $targetFile . $user['profile_picture'];
-        if (file_exists($filePath) && $user['profile_picture'] != 'default.png') {
-            unlink($filePath);
+        if (!empty($_POST['password'])) {
+            $data['password'] = $query->hashPassword($_POST['password']);
+            $query->delete('active_sessions', 'user_id = ? AND session_token <> ?', [$_SESSION['user']['id'], session_id()], 'is');
         }
 
-        if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $targetFile . $encrypted_name)) {
-            $data['profile_picture'] = $encrypted_name;
-            $_SESSION['user']['profile_picture'] = $encrypted_name;
+        if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+            $encrypted_name = md5(bin2hex(random_bytes(32)) . '_' . bin2hex(random_bytes(16)) . '_' . uniqid('', true)) . '.' . pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
+            $targetFile = "../src/images/profile_picture/";
+
+            $filePath = $targetFile . $user['profile_picture'];
+            if (file_exists($filePath) && $user['profile_picture'] != 'default.png') {
+                unlink($filePath);
+            }
+
+            if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $targetFile . $encrypted_name)) {
+                $data['profile_picture'] = $encrypted_name;
+                $_SESSION['user']['profile_picture'] = $encrypted_name;
+            }
         }
-    }
 
-    $update = $query->update("users", $data, "id = ?", [$_SESSION['user']['id']], "i");
+        $update = $query->update("users", $data, "id = ?", [$_SESSION['user']['id']], "i");
 
-    if ($update) {
-        $_SESSION['user']['first_name'] = $data['first_name'];
-        $_SESSION['user']['last_name'] = $data['last_name'];
-        $_SESSION['user']['updated_at'] = $data['updated_at'];
+        if ($update) {
+            $_SESSION['user']['first_name'] = $data['first_name'];
+            $_SESSION['user']['last_name'] = $data['last_name'];
+            $_SESSION['user']['updated_at'] = $data['updated_at'];
 
-        echo json_encode(['status' => 'success', 'message' => 'Profile updated successfully!']);
+            echo json_encode(['status' => 'success', 'title' => 'Success!', 'message' => 'Profile updated successfully!']);
+        } else {
+            echo json_encode(['status' => 'error', 'title' => 'Error!', 'message' => 'Failed to update profile!']);
+        }
     } else {
-        echo json_encode(['status' => 'error', 'message' => 'Failed to update profile!']);
+        echo json_encode(['status' => 'error', 'title' => 'Invalid CSRF Token', 'message' => 'Please refresh the page and try again.']);
     }
     exit;
 }
@@ -227,9 +230,9 @@ if (
             .then(response => response.json())
             .then(data => {
                 if (data.status === "success") {
-                    Swal.fire({ icon: "success", title: "Success!", text: data.message, timer: 1500, showConfirmButton: false }).then(() => { window.location.reload(); })
+                    Swal.fire({ icon: "success", title: data.title, text: data.message, timer: 1500, showConfirmButton: false }).then(() => { window.location.reload(); })
                 } else {
-                    Swal.fire({ icon: "error", title: "Error!", text: data.message, showConfirmButton: true });
+                    Swal.fire({ icon: "error", title: data.title, text: data.message, showConfirmButton: true });
                 }
             })
             .catch(error => console.error("Error:", error));

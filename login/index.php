@@ -68,66 +68,55 @@ function get_user_info()
     return "Unknown Device";
 }
 
-if (
-    $_SERVER["REQUEST_METHOD"] === "POST" &&
-    isset($_POST['submit']) &&
-    isset($_POST['csrf_token']) &&
-    isset($_SESSION['csrf_token']) &&
-    hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
-) {
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    if (
+        isset($_POST['csrf_token']) &&
+        isset($_SESSION['csrf_token']) &&
+        hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+    ) {
+        header('Content-Type: application/json');
 
-    $username = strtolower(trim($_POST['username']));
-    $password = $query->hashPassword($_POST['password']);
+        $username = strtolower(trim($_POST['username']));
+        $password = $query->hashPassword($_POST['password']);
 
-    $user = $query->select('users', '*', "username = ? AND password = ?", [$username, $password], 'ss')[0] ?? null;
+        $user = $query->select('users', '*', "username = ? AND password = ?", [$username, $password], 'ss')[0] ?? null;
 
-    if (!empty($user)) {
-        unset($user['password']);
-        $_SESSION['loggedin'] = true;
-        $_SESSION['user'] = $user;
+        if (!empty($user)) {
+            unset($user['password']);
+            $_SESSION['loggedin'] = true;
+            $_SESSION['user'] = $user;
 
-        $cookies = [
-            'username' => $username,
-            'session_token' => session_id()
-        ];
+            $cookies = [
+                'username' => $username,
+                'session_token' => session_id()
+            ];
 
-        foreach ($cookies as $name => $value) {
-            setcookie($name, $value, [
-                'expires' => time() + (86400 * 30),
-                'path' => '/',
-                'secure' => true,
-                'httponly' => true,
-                'samesite' => 'Strict'
+            foreach ($cookies as $name => $value) {
+                setcookie($name, $value, [
+                    'expires' => time() + (86400 * 30),
+                    'path' => '/',
+                    'secure' => true,
+                    'httponly' => true,
+                    'samesite' => 'Strict'
+                ]);
+            }
+
+            $query->insert('active_sessions', [
+                'user_id' => $_SESSION['user']['id'],
+                'device_name' => get_user_info(),
+                'ip_address' => $_SERVER['REMOTE_ADDR'],
+                'last_activity' => date('Y-m-d H:i:s'),
+                'session_token' => session_id()
             ]);
+
+            echo json_encode(['status' => 'success', 'redirect' => SITE_PATH . ROLES[$_SESSION['user']['role']]]);
+        } else {
+            echo json_encode(['status' => 'error', 'title' => 'Oops...', 'message' => 'Login or password is incorrect']);
         }
-
-        $query->insert('active_sessions', [
-            'user_id' => $_SESSION['user']['id'],
-            'device_name' => get_user_info(),
-            'ip_address' => $_SERVER['REMOTE_ADDR'],
-            'last_activity' => date('Y-m-d H:i:s'),
-            'session_token' => session_id()
-        ]);
-
-        $redirectPath = SITE_PATH . ROLES[$_SESSION['user']['role']];
-        ?>
-        <script>
-            window.onload = function () { Swal.fire({ icon: 'success', title: 'Login successful', timer: 1500, showConfirmButton: false }).then(() => { window.location.href = '<?= $redirectPath; ?>'; }); };
-        </script>
-        <?php
     } else {
-        ?>
-        <script>
-            window.onload = function () { Swal.fire({ icon: 'error', title: 'Oops...', text: 'Login or password is incorrect', showConfirmButton: true }).then(() => { window.location.replace('./'); });; };
-        </script>
-        <?php
+        echo json_encode(['status' => 'error', 'title' => 'Invalid CSRF Token', 'message' => 'Please refresh the page and try again.']);
     }
-} elseif (isset($_POST['submit'])) {
-    ?>
-    <script>
-        window.onload = function () { Swal.fire({ icon: 'error', title: 'Invalid CSRF Token', text: 'Please refresh the page and try again.', showConfirmButton: true }).then(() => { window.location.replace('./'); });; };
-    </script>
-    <?php
+    exit;
 }
 ?>
 
@@ -140,45 +129,62 @@ if (
     <link rel="icon" type="image/x-icon" href="<?= SITE_PATH ?>/favicon.ico">
     <title>Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="<?= SITE_PATH ?>/src/css/login_signup.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body>
-    <div class="form-container">
-        <h1>Login</h1>
-        <form id="loginForm" method="POST">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required maxlength="30">
-                <small id="username-error" style="color: red;"></small>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <div class="password-container">
-                    <input type="password" id="password" name="password" required maxlength="255">
-                    <button type="button" id="toggle-password" class="password-toggle">
-                        <i class="fas fa-eye"></i>
-                    </button>
+<body class="bg-light d-flex justify-content-center align-items-center min-vh-100 py-5">
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card p-4 shadow-lg rounded-4">
+                    <div class="text-center">
+                        <a href="https://iqbolshoh.uz" target="_blank">
+                            <img src="<?= SITE_PATH ?>/src/images/logo.svg" alt="Logo" style="width: 120px;">
+                        </a>
+                    </div>
+                    <h3 class="text-center mb-3">Login</h3>
+                    <form id="loginForm" method="POST">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" id="username" name="username" class="form-control" required
+                                maxlength="30">
+                            <small id="username-message" class="text-danger"></small>
+                        </div>
+                        <div class="mb-3 position-relative">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <input type="password" id="password" name="password" class="form-control" required
+                                    maxlength="255">
+                                <button type="button" id="toggle-password" class="btn btn-outline-secondary">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small id="password-message" class="text-danger"></small>
+                        </div>
+                        <div class="mb-3">
+                            <input type="hidden" name="csrf_token" value="<?= $query->generate_csrf_token() ?>">
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" id="submit" class="btn btn-primary"
+                                style="border: none;">Login</button>
+                        </div>
+                    </form>
+                    <div class="text-center mt-3">
+                        <p>Don't have an account? <a href="<?= SITE_PATH ?>/signup/">Sign Up</a></p>
+                    </div>
                 </div>
-                <small id="password-message" style="color: red;"></small>
             </div>
-            <div class="form-group">
-                <input type="hidden" name="csrf_token" value="<?= $query->generate_csrf_token() ?>">
-            </div>
-            <div class="form-group">
-                <button type="submit" name="submit" id="submit">Login</button>
-            </div>
-        </form>
-        <div class="text-center">
-            <p>Don't have an account? <a href="<?= SITE_PATH ?>/signup/">Sign Up</a></p>
         </div>
     </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const usernameField = document.getElementById('username');
             const passwordField = document.getElementById('password');
-            const usernameError = document.getElementById('username-error');
+            const usernameError = document.getElementById('username-message');
             const passwordMessage = document.getElementById('password-message');
             const submitButton = document.getElementById('submit');
             const togglePassword = document.getElementById('toggle-password');
@@ -204,7 +210,7 @@ if (
             function validatePassword() {
                 const password = passwordField.value;
                 if (password.length < 8) {
-                    passwordMessage.textContent = 'Invalid email format!';
+                    passwordMessage.textContent = 'Password must be at least 8 characters long.';
                     submitButton.disabled = true;
                     submitButton.style.cssText = 'background-color: #b8daff; cursor: not-allowed;';
                     return false;
@@ -225,11 +231,38 @@ if (
             });
 
             loginForm.addEventListener('submit', function (event) {
-                submitButton.style.backgroundColor = '#b8daff';
-                submitButton.style.cursor = 'not-allowed';
+                event.preventDefault();
                 if (!validateUsername() || !validatePassword()) {
-                    event.preventDefault();
+                    return;
                 }
+
+                const formData = new FormData(loginForm);
+
+                fetch('', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Login successful',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                window.location.href = data.redirect;
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: data.title,
+                                text: data.message,
+                                showConfirmButton: true
+                            });
+                        }
+                    })
+                    .catch(error => console.error('Fetch error:', error));
             });
         });
     </script>
