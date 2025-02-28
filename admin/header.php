@@ -155,16 +155,16 @@ $active_page = $active_pageInfo['active_page'] ?? null;
                 </span>
             </a>
             <div class="sidebar">
-                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                    <div class="image">
-                        <?php $image_path = SITE_PATH . "/src/images/profile_picture/" . $_SESSION['user']['profile_picture'] ?>
-                        <img src="<?= $image_path ?>" class="img-circle elevation-2 bg-white" alt="User Image">
-                    </div>
-                    <div class="info">
-                        <a href="<?= SITE_PATH . ROLES[$_SESSION['user']['role']] ?>profile.php" class="d-block">
+                <div class="user-panel mt-3 pb-3 mb-3">
+                    <a href="<?= SITE_PATH . ROLES[$_SESSION['user']['role']] ?>profile.php" class="d-flex">
+                        <div class="image">
+                            <?php $image_path = SITE_PATH . "/src/images/profile_picture/" . $_SESSION['user']['profile_picture'] ?>
+                            <img src="<?= $image_path ?>" class="img-circle elevation-2 bg-white" alt="User Image">
+                        </div>
+                        <div class="info">
                             <?= $_SESSION['user']['first_name'] . " " . $_SESSION['user']['last_name'] ?>
-                        </a>
-                    </div>
+                        </div>
+                    </a>
                 </div>
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
