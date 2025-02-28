@@ -100,7 +100,7 @@ $active_page = $active_pageInfo['active_page'] ?? null;
                     </a>
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
-                    <a href="<?= SITE_PATH ?>" class="nav-link">Home</a>
+                    <a href="<?= SITE_PATH . ROLES[$_SESSION['user']['role']] ?>" class="nav-link">Home</a>
                 </li>
             </ul>
             <form class="form-inline ml-3">
@@ -148,7 +148,7 @@ $active_page = $active_pageInfo['active_page'] ?? null;
         </div>
 
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
-            <a href="<?= SITE_PATH ?>" class="brand-link">
+            <a href="<?= SITE_PATH . ROLES[$_SESSION['user']['role']] ?>" class="brand-link">
                 <img src="<?= SITE_PATH ?>/src/images/logo.svg" alt="Logo" class="brand-image img-circle bg-white">
                 <span class="brand-text font-weight-light">
                     <?= ucfirst(string: $_SESSION['user']['role']) ?> Panel
@@ -161,7 +161,7 @@ $active_page = $active_pageInfo['active_page'] ?? null;
                         <img src="<?= $image_path ?>" class="img-circle elevation-2 bg-white" alt="User Image">
                     </div>
                     <div class="info">
-                        <a href="<?= SITE_PATH ?>/admin/profile.php" class="d-block">
+                        <a href="<?= SITE_PATH . ROLES[$_SESSION['user']['role']] ?>profile.php" class="d-block">
                             <?= $_SESSION['user']['first_name'] . " " . $_SESSION['user']['last_name'] ?>
                         </a>
                     </div>
