@@ -317,7 +317,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             function validatePassword() {
                 if (passwordField.value.length < 8) {
-                    passwordMessage.textContent = 'Min 8 characters required.';
+                    passwordMessage.textContent = 'Password must be at least 8 characters long!';
                     return false;
                 }
                 passwordMessage.textContent = '';

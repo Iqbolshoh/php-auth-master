@@ -1,103 +1,78 @@
 <?php
-session_start();
-
-include '../config.php';
-$query = new Database();
-
-if (!empty($_SESSION['loggedin']) && isset(ROLES[$_SESSION['user']['role']])) {
-    header("Location: " . SITE_PATH . ROLES[$_SESSION['user']['role']]);
-    exit;
-}
-
-if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token']) && session_id() !== $_COOKIE['session_token']) {
-    session_write_close();
-    session_id($_COOKIE['session_token']);
-    session_start();
-}
-
-if (!empty($_COOKIE['username'])) {
-    $username = $_COOKIE['username'];
-    $user = $query->select('users', '*', "username = ?", [$username], 's')[0] ?? null;
-
-    if (!empty($user)) {
-        unset($user['password']);
-        $_SESSION['loggedin'] = true;
-        $_SESSION['user'] = $user;
-
-        $active_session = $query->select("active_sessions", "*", "session_token = ?", [session_id()], "s");
-
-        if (!empty($active_session)) {
-            $query->update(
-                "active_sessions",
-                ['last_activity' => date('Y-m-d H:i:s')],
-                "session_token = ?",
-                [session_id()],
-                "s"
-            );
-        }
-
-        if (isset(ROLES[$_SESSION['user']['role']])) {
-            header("Location: " . SITE_PATH . ROLES[$_SESSION['user']['role']]);
-            exit;
-        }
-    }
-}
-
-function get_user_info()
-{
-    $user_agent = $_SERVER['HTTP_USER_AGENT'];
-
-    $devices = [
-        'iPhone' => 'iPhone',
-        'iPad' => 'iPad',
-        'Macintosh|Mac OS X' => 'Mac',
-        'Windows NT 10.0' => 'Windows 10 PC',
-        'Windows NT 6.3' => 'Windows 8.1 PC',
-        'Windows NT 6.2' => 'Windows 8 PC',
-        'Windows NT 6.1' => 'Windows 7 PC',
-        'Android' => 'Android Phone',
-        'Linux' => 'Linux Device',
-    ];
-
-    foreach ($devices as $regex => $device) {
-        if (stripos($user_agent, $regex) !== false) {
-            return $device;
-        }
-    }
-
-    return "Unknown Device";
-}
+include '../login/check_cookie.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (
-        isset($_POST['csrf_token']) &&
-        isset($_SESSION['csrf_token']) &&
-        hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+        !isset($_POST['csrf_token']) ||
+        !isset($_SESSION['csrf_token']) ||
+        !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
     ) {
-        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'title' => 'Invalid CSRF Token', 'message' => 'Invalid CSRF token!']);
+        exit;
+    }
+    header('Content-Type: application/json');
 
+    if ($_POST['action'] == 'signup') {
         $first_name = $query->validate($_POST['first_name']);
         $last_name = $query->validate($_POST['last_name']);
         $email = $query->validate(strtolower($_POST['email']));
         $username = $query->validate(strtolower($_POST['username']));
-        $password = $query->hashPassword($_POST['password']);
+        $password = $_POST['password'];
 
-        // ---- DEFAULT ROLE ---- //
+        // ---- Default Role ---- //
         $role = 'user';
         // ---------------------- //
 
-        $data = [
-            'first_name' => $first_name,
-            'last_name' => $last_name,
-            'email' => $email,
-            'username' => $username,
-            'password' => $password,
-            'role' => $role,
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s')
-        ];
+        if (empty($first_name) || empty($last_name) || empty($email) || empty($username) || empty($password)) {
+            echo json_encode(['status' => 'error', 'title' => 'Validation Error', 'message' => 'All fields are required!']);
+            exit;
+        }
 
-        $query->insert('users', $data);
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            echo json_encode(['status' => 'error', 'title' => 'Email', 'message' => 'Invalid email format!']);
+            exit;
+        }
+
+        if (!empty($query->select('users', 'email', 'email = ?', [$email], 's'))) {
+            echo json_encode(['status' => 'error', 'title' => 'Email', 'message' => 'This email is already registered!']);
+            exit;
+        }
+
+        if (strlen($username) < 3) {
+            echo json_encode(['status' => 'error', 'title' => 'Username', 'message' => 'Username must be at least 3 characters long!']);
+            exit;
+        }
+
+        if (!preg_match('/^[a-zA-Z0-9_]{3,30}$/', $username)) {
+            echo json_encode(['status' => 'error', 'title' => 'Username', 'message' => 'Username must be 3-30 characters: A-Z, a-z, 0-9, or _!']);
+            exit;
+        }
+
+        if (!empty($query->select('users', 'username', 'username = ?', [$username], 's'))) {
+            echo json_encode(['status' => 'error', 'title' => 'Username', 'message' => 'This username is already taken!']);
+            exit;
+        }
+
+        if (strlen($password) < 8) {
+            echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Password must be at least 8 characters long!']);
+            exit;
+        }
+        $hashed_password = $query->hashPassword($password);
+
+        $query->insert(
+            'users',
+            [
+                'first_name' => $first_name,
+                'last_name' => $last_name,
+                'email' => $email,
+                'username' => $username,
+                'password' => $hashed_password,
+                'role' => $role,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]
+        );
+
         $user = $query->select('users', '*', 'username = ?', [$username], 's')[0] ?? null;
 
         if (!empty($user)) {
@@ -122,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $query->insert('active_sessions', [
                 'user_id' => $_SESSION['user']['id'],
-                'device_name' => get_user_info(),
+                'device_name' => get_device_name(),
                 'ip_address' => $_SERVER['REMOTE_ADDR'],
                 'last_activity' => date('Y-m-d H:i:s'),
                 'session_token' => session_id()
@@ -132,10 +107,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         } else {
             echo json_encode(['status' => 'error', 'title' => 'Oops...', 'message' => 'Registration failed. Please try again.']);
         }
-    } else {
-        echo json_encode(['status' => 'error', 'title' => 'Invalid CSRF Token', 'message' => 'Please refresh the page and try again.']);
+        exit;
     }
-    exit;
 }
 ?>
 
@@ -145,9 +118,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="<?= SITE_PATH ?>/favicon.ico">
+    <meta name="description" content="Sign Up Page for Registration">
+    <meta name="keywords" content="iqbolshoh, iqbolshoh_777, iqbolshoh_dev, iqbolshoh.uz, <?= $_SERVER['HTTP_HOST'] ?>">
+    <meta name="author" content="iqbolshoh.uz">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Open Graph (OG) tags -->
+    <meta property="og:title" content="Signup">
+    <meta property="og:description" content="Sign Up Page for Registration">
+    <meta property="og:image" content="<?= SITE_PATH ?>/src/images/logo.svg">
+    <meta property="og:url" content="<?= SITE_PATH ?>">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="<?= $_SERVER['HTTP_HOST'] ?>">
+
     <title>Sign Up</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="<?= SITE_PATH . "/favicon.ico" ?>" type="image/x-icon">
+
+    <!-- CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -197,6 +186,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             <small id="password-message" class="text-danger"></small>
                         </div>
                         <div class="mb-3">
+                            <input type="hidden" name="action" value="signup">
+                        </div>
+                        <div class="mb-3">
                             <input type="hidden" name="csrf_token" value="<?= $query->generate_csrf_token() ?>">
                         </div>
                         <div class="d-grid gap-2">
@@ -215,134 +207,91 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const signupForm = document.getElementById('signupForm');
-            const emailField = document.getElementById('email');
-            const usernameField = document.getElementById('username');
-            const passwordField = document.getElementById('password');
-            const emailMessage = document.getElementById('email-message');
-            const usernameMessage = document.getElementById('username-message');
-            const passwordMessage = document.getElementById('password-message');
-            const submitButton = document.getElementById('submit');
+            const form = document.getElementById('signupForm');
+            const fields = {
+                email: document.getElementById('email'),
+                username: document.getElementById('username'),
+                password: document.getElementById('password')
+            };
+            const messages = {
+                email: document.getElementById('email-message'),
+                username: document.getElementById('username-message'),
+                password: document.getElementById('password-message')
+            };
+            const submitBtn = document.getElementById('submit');
             const togglePassword = document.getElementById('toggle-password');
 
-            let emailAvailable = false;
-            let usernameAvailable = false;
+            let availability = { email: false, username: false };
 
-            function validateEmailFormat(email) {
-                return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(email);
-            }
+            const validators = {
+                email: email => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(email),
+                username: username => /^[a-zA-Z0-9_]{3,30}$/.test(username),
+                password: password => password.length >= 8
+            };
 
-            function validateUsernameFormat(username) {
-                return /^[a-zA-Z0-9_]{3,30}$/.test(username);
-            }
-
-            function validatePassword() {
-                if (passwordField.value.length < 8) {
-                    passwordMessage.textContent = 'Password must be at least 8 characters long!';
-                    return false;
-                }
-                passwordMessage.textContent = '';
-                return true;
-            }
-
-            function checkAvailability(type, value, messageElement, callback) {
+            function checkAvailability(type, value) {
                 if (!value) return;
-
                 fetch('check_availability.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `${type}=${encodeURIComponent(value)}`
                 })
-                    .then(response => response.json())
+                    .then(res => res.json())
                     .then(data => {
-                        if (data.exists) {
-                            messageElement.textContent = `This ${type} is already taken!`;
-                            callback(false);
-                        } else {
-                            messageElement.textContent = '';
-                            callback(true);
-                        }
-                        updateSubmitButtonState();
+                        messages[type].textContent = data.exists ? `This ${type} is already taken!` : '';
+                        availability[type] = !data.exists;
+                        updateSubmitState();
                     });
             }
 
-            function updateSubmitButtonState() {
-                const isEmailValid = emailField.value.length === 0 || (validateEmailFormat(emailField.value) && emailAvailable);
-                const isUsernameValid = usernameField.value.length === 0 || (validateUsernameFormat(usernameField.value) && usernameAvailable);
-                const isPasswordValid = passwordField.value.length === 0 || validatePassword();
+            function updateSubmitState() {
+                const validEmail = fields.email.value.length === 0 || validators.email(fields.email.value) && availability.email;
+                const validUsername = fields.username.value.length === 0 || validators.username(fields.username.value) && availability.username;
+                const validPassword = fields.password.value.length === 0 || validators.password(fields.password.value);
 
-                const isFormValid = isEmailValid && isUsernameValid && isPasswordValid;
-
-                submitButton.disabled = !isFormValid;
-                submitButton.style.backgroundColor = isFormValid ? '#007bff' : '#b8daff';
-                submitButton.style.borderColor = isFormValid ? '#007bff' : '#b8daff';
-                submitButton.style.cursor = isFormValid ? 'pointer' : 'not-allowed';
+                const isValid = validEmail && validUsername && validPassword;
+                submitBtn.disabled = !isValid;
+                submitBtn.style.backgroundColor = isValid ? '#007bff' : '#b8daff';
+                submitBtn.style.borderColor = isValid ? '#007bff' : '#b8daff';
+                submitBtn.style.cursor = isValid ? 'pointer' : 'not-allowed';
             }
 
-            emailField.addEventListener('input', function () {
-                if (!validateEmailFormat(this.value)) {
-                    emailMessage.textContent = 'Invalid email format!';
-                    emailAvailable = false;
-                    updateSubmitButtonState();
-                    return;
-                }
-                checkAvailability('email', this.value, emailMessage, status => {
-                    emailAvailable = status;
+            Object.keys(fields).forEach(type => {
+                fields[type].addEventListener('input', function () {
+                    if (!validators[type](this.value)) {
+                        messages[type].textContent = type === 'password' ? 'Password must be at least 8 characters long!' : `Invalid ${type} format!`;
+                        availability[type] = false;
+                        updateSubmitState();
+                        return;
+                    }
+                    messages[type].textContent = '';
+                    if (type !== 'password') checkAvailability(type, this.value);
+                    updateSubmitState();
                 });
-            });
-
-            usernameField.addEventListener('input', function () {
-                if (!validateUsernameFormat(this.value)) {
-                    usernameMessage.textContent = 'Username must be 3-30 characters: A-Z, a-z, 0-9, or _.';
-                    usernameAvailable = false;
-                    updateSubmitButtonState();
-                    return;
-                }
-                checkAvailability('username', this.value, usernameMessage, status => {
-                    usernameAvailable = status;
-                });
-            });
-
-            passwordField.addEventListener('input', function () {
-                validatePassword();
-                updateSubmitButtonState();
             });
 
             togglePassword.addEventListener('click', function () {
-                passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+                fields.password.type = fields.password.type === 'password' ? 'text' : 'password';
                 this.querySelector('i').classList.toggle('fa-eye');
                 this.querySelector('i').classList.toggle('fa-eye-slash');
             });
 
-            signupForm.addEventListener('submit', function (event) {
+            form.addEventListener('submit', function (event) {
                 event.preventDefault();
-                const formData = new FormData(signupForm);
-
-                fetch('', {
-                    method: 'POST',
-                    body: formData
-                })
-                    .then(response => response.json())
+                fetch('', { method: 'POST', body: new FormData(form) })
+                    .then(res => res.json())
                     .then(data => {
-                        if (data.status === 'success') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Registration successful',
-                                timer: 1500,
-                                showConfirmButton: false
-                            }).then(() => {
-                                window.location.href = data.redirect;
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: data.title,
-                                text: data.message,
-                                showConfirmButton: true
-                            });
-                        }
+                        Swal.fire({
+                            icon: data.status === 'success' ? 'success' : 'error',
+                            title: data.status === 'success' ? 'Registration successful' : data.title,
+                            text: data.message,
+                            timer: data.status === 'success' ? 1500 : null,
+                            showConfirmButton: data.status !== 'success'
+                        }).then(() => {
+                            if (data.status === 'success') window.location.href = data.redirect;
+                        });
                     })
-                    .catch(error => console.error('Fetch error:', error));
+                    .catch(console.error);
             });
         });
     </script>

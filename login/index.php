@@ -1,85 +1,43 @@
 <?php
-session_start();
-
-include '../config.php';
-$query = new Database();
-
-if (!empty($_SESSION['loggedin']) && isset(ROLES[$_SESSION['user']['role']])) {
-    header("Location: " . SITE_PATH . ROLES[$_SESSION['user']['role']]);
-    exit;
-}
-
-if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token']) && session_id() !== $_COOKIE['session_token']) {
-    session_write_close();
-    session_id($_COOKIE['session_token']);
-    session_start();
-}
-
-if (!empty($_COOKIE['username'])) {
-    $username = $_COOKIE['username'];
-    $user = $query->select('users', '*', "username = ?", [$username], 's')[0] ?? null;
-
-    if (!empty($user)) {
-        unset($user['password']);
-        $_SESSION['loggedin'] = true;
-        $_SESSION['user'] = $user;
-
-        $active_session = $query->select("active_sessions", "*", "session_token = ?", [session_id()], "s");
-
-        if (!empty($active_session)) {
-            $query->update(
-                "active_sessions",
-                ['last_activity' => date('Y-m-d H:i:s')],
-                "session_token = ?",
-                [session_id()],
-                "s"
-            );
-        }
-
-        if (isset(ROLES[$_SESSION['user']['role']])) {
-            header("Location: " . SITE_PATH . ROLES[$_SESSION['user']['role']]);
-            exit;
-        }
-    }
-}
-
-function get_user_info()
-{
-    $user_agent = $_SERVER['HTTP_USER_AGENT'];
-
-    $devices = [
-        'iPhone' => 'iPhone',
-        'iPad' => 'iPad',
-        'Macintosh|Mac OS X' => 'Mac',
-        'Windows NT 10.0' => 'Windows 10 PC',
-        'Windows NT 6.3' => 'Windows 8.1 PC',
-        'Windows NT 6.2' => 'Windows 8 PC',
-        'Windows NT 6.1' => 'Windows 7 PC',
-        'Android' => 'Android Phone',
-        'Linux' => 'Linux Device',
-    ];
-
-    foreach ($devices as $regex => $device) {
-        if (stripos($user_agent, $regex) !== false) {
-            return $device;
-        }
-    }
-
-    return "Unknown Device";
-}
+include 'check_cookie.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (
-        isset($_POST['csrf_token']) &&
-        isset($_SESSION['csrf_token']) &&
-        hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+        !isset($_POST['csrf_token']) ||
+        !isset($_SESSION['csrf_token']) ||
+        !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
     ) {
-        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'title' => 'Invalid CSRF Token', 'message' => 'Invalid CSRF token!']);
+        exit;
+    }
+    header('Content-Type: application/json');
 
-        $username = strtolower(trim($_POST['username']));
-        $password = $query->hashPassword($_POST['password']);
+    if ($_POST['action'] == 'login') {
+        $username = $query->validate(strtolower($_POST['username']));
+        $password = $_POST['password'];
 
-        $user = $query->select('users', '*', "username = ? AND password = ?", [$username, $password], 'ss')[0] ?? null;
+        if (empty($username) || empty($password)) {
+            echo json_encode(['status' => 'error', 'title' => 'Validation Error', 'message' => 'All fields are required!']);
+            exit;
+        }
+
+        if (strlen($username) < 3) {
+            echo json_encode(['status' => 'error', 'title' => 'Username', 'message' => 'Username must be at least 3 characters long!']);
+            exit;
+        }
+
+        if (!preg_match('/^[a-zA-Z0-9_]{3,30}$/', $username)) {
+            echo json_encode(['status' => 'error', 'title' => 'Username', 'message' => 'Username must be 3-30 characters: A-Z, a-z, 0-9, or _!']);
+            exit;
+        }
+
+        if (strlen($password) < 8) {
+            echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Password must be at least 8 characters long!']);
+            exit;
+        }
+        $hashed_password = $query->hashPassword($password);
+
+        $user = $query->select('users', '*', 'username = ? AND password = ?', [$username, $hashed_password], 'ss')[0] ?? null;
 
         if (!empty($user)) {
             unset($user['password']);
@@ -103,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $query->insert('active_sessions', [
                 'user_id' => $_SESSION['user']['id'],
-                'device_name' => get_user_info(),
+                'device_name' => get_device_name(),
                 'ip_address' => $_SERVER['REMOTE_ADDR'],
                 'last_activity' => date('Y-m-d H:i:s'),
                 'session_token' => session_id()
@@ -113,10 +71,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         } else {
             echo json_encode(['status' => 'error', 'title' => 'Oops...', 'message' => 'Login or password is incorrect']);
         }
-    } else {
-        echo json_encode(['status' => 'error', 'title' => 'Invalid CSRF Token', 'message' => 'Please refresh the page and try again.']);
+        exit;
     }
-    exit;
 }
 ?>
 
@@ -126,9 +82,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="<?= SITE_PATH ?>/favicon.ico">
+    <meta name="description" content="Account Login Page">
+    <meta name="keywords" content="iqbolshoh, iqbolshoh_777, iqbolshoh_dev, iqbolshoh.uz, <?= $_SERVER['HTTP_HOST'] ?>">
+    <meta name="author" content="iqbolshoh.uz">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Open Graph (OG) tags -->
+    <meta property="og:title" content="Signup">
+    <meta property="og:description" content="Account Login Page">
+    <meta property="og:image" content="<?= SITE_PATH ?>/src/images/logo.svg">
+    <meta property="og:url" content="<?= SITE_PATH ?>">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="<?= $_SERVER['HTTP_HOST'] ?>">
+
     <title>Login</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="<?= SITE_PATH . "/favicon.ico" ?>" type="image/x-icon">
+
+    <!-- CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -163,11 +135,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             <small id="password-message" class="text-danger"></small>
                         </div>
                         <div class="mb-3">
+                            <input type="hidden" name="action" value="login">
+                        </div>
+                        <div class="mb-3">
                             <input type="hidden" name="csrf_token" value="<?= $query->generate_csrf_token() ?>">
                         </div>
                         <div class="d-grid gap-2">
-                            <button type="submit" id="submit" class="btn btn-primary"
-                                style="border: none;">Login</button>
+                            <button type="submit" id="submit" class="btn btn-primary">Login</button>
                         </div>
                     </form>
                     <div class="text-center mt-3">
@@ -181,7 +155,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', () => {
             const usernameField = document.getElementById('username');
             const passwordField = document.getElementById('password');
             const usernameError = document.getElementById('username-message');
@@ -190,80 +164,58 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             const togglePassword = document.getElementById('toggle-password');
             const loginForm = document.getElementById('loginForm');
 
-            function validateUsername() {
+            const setButtonState = (disabled) => {
+                submitButton.disabled = disabled;
+                submitButton.style.cssText = disabled
+                    ? 'background-color: #b8daff; cursor: not-allowed; border-color: #b8daff;'
+                    : 'background-color: #007bff; cursor: pointer; border-color: #007bff;';
+            };
+
+            const validateUsername = () => {
                 const username = usernameField.value.trim();
-                const usernamePattern = /^[a-zA-Z0-9_]{3,30}$/;
+                const isValid = /^[a-zA-Z0-9_]{3,30}$/.test(username);
+                usernameError.textContent = isValid ? '' : "Username must be 3-30 characters: A-Z, a-z, 0-9, or _.";
+                setButtonState(!isValid);
+                return isValid;
+            };
 
-                if (!usernamePattern.test(username)) {
-                    usernameError.textContent = "Username must be 3-30 characters: A-Z, a-z, 0-9, or _.";
-                    submitButton.disabled = true;
-                    submitButton.style.cssText = 'background-color: #b8daff; cursor: not-allowed; border-color: #b8daff;';
-                    return false;
-                } else {
-                    usernameError.textContent = "";
-                    submitButton.disabled = false;
-                    submitButton.style.cssText = 'background-color: #007bff; cursor: pointer; border-color: #007bff;';
-                    return true;
-                }
-            }
-
-            function validatePassword() {
-                const password = passwordField.value;
-                if (password.length < 8) {
-                    passwordMessage.textContent = 'Password must be at least 8 characters long.';
-                    submitButton.disabled = true;
-                    submitButton.style.cssText = 'background-color: #b8daff; cursor: not-allowed; border-color: #b8daff;';
-
-                    return false;
-                }
-                passwordMessage.textContent = '';
-                submitButton.disabled = false;
-                submitButton.style.cssText = 'background-color: #007bff; cursor: pointer; border-color: #007bff;';
-                return true;
-            }
+            const validatePassword = () => {
+                const isValid = passwordField.value.length >= 8;
+                passwordMessage.textContent = isValid ? '' : 'Password must be at least 8 characters long.';
+                setButtonState(!isValid);
+                return isValid;
+            };
 
             usernameField.addEventListener('input', validateUsername);
             passwordField.addEventListener('input', validatePassword);
 
-            togglePassword.addEventListener('click', function () {
+            togglePassword.addEventListener('click', () => {
                 passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
-                this.querySelector('i').classList.toggle('fa-eye');
-                this.querySelector('i').classList.toggle('fa-eye-slash');
+                togglePassword.querySelector('i').classList.toggle('fa-eye');
+                togglePassword.querySelector('i').classList.toggle('fa-eye-slash');
             });
 
-            loginForm.addEventListener('submit', function (event) {
+            loginForm.addEventListener('submit', async (event) => {
                 event.preventDefault();
-                if (!validateUsername() || !validatePassword()) {
-                    return;
+                if (!validateUsername() || !validatePassword()) return;
+
+                try {
+                    const formData = new FormData(loginForm);
+                    const response = await fetch('', { method: 'POST', body: formData });
+                    const data = await response.json();
+
+                    Swal.fire({
+                        icon: data.status === 'success' ? 'success' : 'error',
+                        title: data.status === 'success' ? 'Login successful' : data.title,
+                        text: data.status === 'success' ? '' : data.message,
+                        timer: data.status === 'success' ? 1500 : undefined,
+                        showConfirmButton: data.status !== 'success'
+                    }).then(() => {
+                        if (data.status === 'success') window.location.href = data.redirect;
+                    });
+                } catch (error) {
+                    console.error('Fetch error:', error);
                 }
-
-                const formData = new FormData(loginForm);
-
-                fetch('', {
-                    method: 'POST',
-                    body: formData
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Login successful',
-                                timer: 1500,
-                                showConfirmButton: false
-                            }).then(() => {
-                                window.location.href = data.redirect;
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: data.title,
-                                text: data.message,
-                                showConfirmButton: true
-                            });
-                        }
-                    })
-                    .catch(error => console.error('Fetch error:', error));
             });
         });
     </script>

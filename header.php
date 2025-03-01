@@ -50,8 +50,7 @@ $active_page = $active_pageInfo['active_page'] ?? null;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Powerful admin panel by Iqbolshoh Ilhomjonov">
-    <meta name="keywords"
-        content="iqbolshoh, iqbolshoh_777, iqbolshoh_dev, iqbolshoh.uz, <?= htmlspecialchars($page_title) . ', ' . htmlspecialchars(SITE_PATH) ?>">
+    <meta name="keywords" content="iqbolshoh, iqbolshoh_777, iqbolshoh_dev, iqbolshoh.uz, <?= $page_title . ', ' .  $_SERVER['HTTP_HOST'] ?>">
     <meta name="author" content="iqbolshoh.uz">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#ffffff">
@@ -62,7 +61,7 @@ $active_page = $active_pageInfo['active_page'] ?? null;
     <meta property="og:image" content="<?= SITE_PATH ?>/src/images/logo.svg">
     <meta property="og:url" content="<?= SITE_PATH ?>">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Iqbolshoh Admin Panel">
+    <meta property="og:site_name" content="<?= $_SERVER['HTTP_HOST'] ?>">
 
     <title><?= htmlspecialchars($page_title) ?></title>
     <link rel="icon" href="<?= SITE_PATH . "/favicon.ico" ?>" type="image/x-icon">
