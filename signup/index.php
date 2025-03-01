@@ -276,22 +276,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 this.querySelector('i').classList.toggle('fa-eye-slash');
             });
 
-            form.addEventListener('submit', function (event) {
+            form.addEventListener('submit', async function (event) {
                 event.preventDefault();
-                fetch('', { method: 'POST', body: new FormData(form) })
-                    .then(res => res.json())
-                    .then(data => {
-                        Swal.fire({
-                            icon: data.status === 'success' ? 'success' : 'error',
-                            title: data.status === 'success' ? 'Registration successful' : data.title,
-                            text: data.message,
-                            timer: data.status === 'success' ? 1500 : null,
-                            showConfirmButton: data.status !== 'success'
-                        }).then(() => {
-                            if (data.status === 'success') window.location.href = data.redirect;
-                        });
-                    })
-                    .catch(console.error);
+
+                try {
+                    const response = await fetch('', { method: 'POST', body: new FormData(form) });
+                    const data = await response.json();
+
+                    await Swal.fire({
+                        icon: data.status === 'success' ? 'success' : 'error',
+                        title: data.status === 'success' ? 'Registration successful' : data.title,
+                        text: data.message,
+                        timer: data.status === 'success' ? 1500 : undefined,
+                        showConfirmButton: data.status !== 'success'
+                    });
+
+                    if (data.status === 'success') window.location.href = data.redirect;
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Something went wrong! Try again.' });
+                }
             });
         });
     </script>

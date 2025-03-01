@@ -174,7 +174,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             const validateUsername = () => {
                 const username = usernameField.value.trim();
                 const isValid = /^[a-zA-Z0-9_]{3,30}$/.test(username);
-                usernameError.textContent = isValid ? '' : "Username must be 3-30 characters: A-Z, a-z, 0-9, or _.";
+                usernameError.textContent = isValid ? '' : 'Username must be 3-30 characters: A-Z, a-z, 0-9, or _.';
                 setButtonState(!isValid);
                 return isValid;
             };

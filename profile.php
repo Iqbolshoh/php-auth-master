@@ -9,14 +9,23 @@ $user = $query->select("users", '*', "id = ?", [$_SESSION['user']['id']], 'i')[0
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (
-        isset($_POST['csrf_token']) &&
-        isset($_SESSION['csrf_token']) &&
-        hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+        !isset($_POST['csrf_token']) ||
+        !isset($_SESSION['csrf_token']) ||
+        !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
     ) {
-        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'title' => 'Invalid CSRF Token', 'message' => 'Invalid CSRF token!']);
+        exit;
+    }
+    header('Content-Type: application/json');
 
+    if ($_POST['action'] === 'edit') {
         $first_name = $query->validate($_POST['first_name']);
         $last_name = $query->validate($_POST['last_name']);
+
+        if (empty($first_name) || empty($last_name)) {
+            echo json_encode(['status' => 'error', 'title' => 'Validation Error', 'message' => 'All fields are required!']);
+            exit;
+        }
 
         $data = [
             'first_name' => $first_name,
@@ -25,6 +34,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         ];
 
         if (!empty($_POST['password'])) {
+            if (strlen($password) < 8) {
+                echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Password must be at least 8 characters long!']);
+                exit;
+            }
             $data['password'] = $query->hashPassword($_POST['password']);
             $query->delete('active_sessions', 'user_id = ? AND session_token <> ?', [$_SESSION['user']['id'], session_id()], 'is');
         }
@@ -55,11 +68,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         } else {
             echo json_encode(['status' => 'error', 'title' => 'Error!', 'message' => 'Failed to update profile!']);
         }
-
-    } else {
-        echo json_encode(['status' => 'error', 'title' => 'Invalid CSRF Token', 'message' => 'Please refresh the page and try again.']);
+        exit;
     }
-    exit;
 }
 ?>
 
@@ -191,6 +201,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         </div>
                     </div>
                     <div class="mb-3">
+                        <input type="hidden" name="action" value="edit">
+                    </div>
+                    <div class="mb-3">
                         <input type="hidden" name="csrf_token" value="<?= $query->generate_csrf_token() ?>">
                     </div>
                 </div>
@@ -223,25 +236,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         submitBtn.style.cursor = !isDisabled ? 'pointer' : 'not-allowed';
         passwordMessage.textContent = isDisabled ? 'Password must be at least 8 characters long!' : '';
     });
-</script>
-<script>
-    document.getElementById("editProfileForm").addEventListener("submit", function (event) {
+
+    document.getElementById('editProfileForm').addEventListener('submit', function (event) {
         event.preventDefault();
 
         let formData = new FormData(this);
-        fetch("", {
-            method: "POST",
+        fetch('', {
+            method: 'POST',
             body: formData
         })
             .then(response => response.json())
             .then(data => {
-                if (data.status === "success") {
-                    Swal.fire({ icon: "success", title: data.title, text: data.message, timer: 1500, showConfirmButton: false }).then(() => { window.location.reload(); })
+                if (data.status === 'success') {
+                    Swal.fire({ icon: 'success', title: data.title, text: data.message, timer: 1500, showConfirmButton: false }).then(() => { window.location.reload(); })
                 } else {
-                    Swal.fire({ icon: "error", title: data.title, text: data.message, showConfirmButton: true });
+                    Swal.fire({ icon: 'error', title: data.title, text: data.message, showConfirmButton: true });
                 }
             })
-            .catch(error => console.error("Error:", error));
+            .catch(error => console.error('Error:', error));
     });
 </script>
 

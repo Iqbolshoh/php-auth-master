@@ -1,3 +1,4 @@
+
                     <!-- Container-fluid closed -->
                     </div>
                 <!-- Content section closed -->
@@ -25,11 +26,20 @@
                     cancelButtonColor: '#d33',
                     confirmButtonText: 'Yes, log me out!'
                 }).then((result) => {
-                    if (result.value) {
-                        window.location.href = '<?= SITE_PATH ?>/logout/';
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Logged out!',
+                            text: 'You have been successfully logged out.',
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            window.location.href = '<?= SITE_PATH ?>/logout/';
+                        });
                     }
                 });
             }
+
         </script>
 
         <!-- Wrapper closed -->

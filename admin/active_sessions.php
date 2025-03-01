@@ -9,34 +9,33 @@ $active_sessions = $query->select('active_sessions', '*', 'user_id = ?', [$_SESS
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (
-        isset($_POST['csrf_token']) &&
-        isset($_SESSION['csrf_token']) &&
-        hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+        !isset($_POST['csrf_token']) ||
+        !isset($_SESSION['csrf_token']) ||
+        !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
     ) {
-        header('Content-Type: application/json');
-
-        if ($_POST['action'] === 'edit' && isset($_POST['device_name'])) {
-            $device_name = trim($_POST['device_name']);
-            if (empty($device_name)) {
-                echo json_encode(["status" => "error", "message" => "Device name cannot be empty!"]);
-                exit;
-            }
-            $query->update('active_sessions', ['device_name' => $device_name], 'session_token = ? AND user_id = ?', [session_id(), $_SESSION['user']['id']], 'si');
-            echo json_encode(["status" => "success", "message" => "Device name updated!", "device_name" => $device_name]);
-            exit;
-        } elseif ($_POST['action'] === 'delete' && isset($_POST['token'])) {
-            $deleted = $query->delete('active_sessions', 'user_id = ? AND session_token = ?', [$_SESSION['user']['id'], $_POST['token']], 'is');
-            if ($deleted) {
-                echo json_encode(["status" => "success", "message" => "Session deleted!", "token" => $_POST['token']]);
-            } else {
-                echo json_encode(["status" => "error", "message" => "Failed to delete session. Try again!"]);
-            }
-        }
-
-    } else {
-        echo json_encode(['status' => 'error', 'title' => 'Invalid CSRF Token', 'message' => 'Please refresh the page and try again.']);
+        echo json_encode(['status' => 'error', 'title' => 'Invalid CSRF Token', 'message' => 'Invalid CSRF token!']);
+        exit;
     }
-    exit;
+    header('Content-Type: application/json');
+
+    if ($_POST['action'] === 'edit' && isset($_POST['device_name'])) {
+        $device_name = trim($_POST['device_name']);
+        if (empty($device_name)) {
+            echo json_encode(['status' => 'error', 'message' => 'Device name cannot be empty!']);
+            exit;
+        }
+        $query->update('active_sessions', ['device_name' => $device_name], 'session_token = ? AND user_id = ?', [session_id(), $_SESSION['user']['id']], 'si');
+        echo json_encode(['status' => 'success', 'message' => 'Device name updated!', 'device_name' => $device_name]);
+        exit;
+    } elseif ($_POST['action'] === 'delete' && isset($_POST['token'])) {
+        $deleted = $query->delete('active_sessions', 'user_id = ? AND session_token = ?', [$_SESSION['user']['id'], $_POST['token']], 'is');
+        if ($deleted) {
+            echo json_encode(['status' => 'success', 'message' => 'Session deleted!', 'token' => $_POST['token']]);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Failed to delete session. Try again!']);
+        }
+        exit;
+    }
 }
 ?>
 
@@ -82,62 +81,67 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     function openEditModal(token) {
         let deviceName = document.getElementById(`device-name-${token}`).textContent.trim();
         Swal.fire({
-            title: "Edit Device Name",
-            input: "text",
+            title: 'Edit Device Name',
+            input: 'text',
             inputValue: deviceName,
             showCancelButton: true,
-            confirmButtonText: "Save",
+            confirmButtonText: 'Save',
             preConfirm: (newName) => {
                 if (!newName.trim()) {
-                    Swal.showValidationMessage("Device name cannot be empty!");
+                    Swal.showValidationMessage('Device name cannot be empty!');
                 }
                 return newName.trim();
             }
         }).then((result) => {
             if (result.isConfirmed) {
                 let formData = new FormData();
-                formData.append("action", "edit");
-                formData.append("device_name", result.value);
-                formData.append("csrf_token", "<?= $_SESSION['csrf_token'] ?>");
+                formData.append('action', 'edit');
+                formData.append('device_name', result.value);
+                formData.append('csrf_token', '<?= $query->generate_csrf_token() ?>');
 
                 fetch('', { method: 'POST', body: formData })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.status === "success") {
+                        if (data.status === 'success') {
                             document.getElementById(`device-name-${token}`).textContent = data.device_name;
-                            Swal.fire({ title: 'Success!', text: data.message, icon: 'success', showConfirmButton: false, timer: 1500 });
-                        } else {
-                            Swal.fire({ title: 'Error!', text: data.message, icon: 'error', showConfirmButton: true });
                         }
+
+                        Swal.fire({
+                            icon: data.status === 'success' ? 'success' : 'error',
+                            title: data.status === 'success' ? 'Success!' : 'Error!',
+                            text: data.message,
+                            showConfirmButton: data.status !== 'success',
+                            timer: 1500
+                        });
                     })
-                    .catch(error => console.error("Fetch error:", error));
+                    .catch(error => console.error('Fetch error:', error));
             }
         });
     }
 
     function confirmRemoval(token) {
         Swal.fire({
-            title: "Are you sure?",
-            text: "This cannot be undone!",
-            icon: "warning",
+            title: 'Are you sure?',
+            text: 'This cannot be undone!',
+            icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, remove it!"
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, remove it!'
         }).then((result) => {
             if (result.isConfirmed) {
                 let formData = new FormData();
-                formData.append("action", "delete");
-                formData.append("token", token);
-                formData.append("csrf_token", "<?= $_SESSION['csrf_token'] ?>");
+                formData.append('action', 'delete');
+                formData.append('token', token);
+                formData.append('csrf_token', '<?= $_SESSION['csrf_token'] ?>');
 
                 fetch('', { method: 'POST', body: formData })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.status === "success") {
+                        if (data.status === 'success') {
                             document.getElementById(`session-${data.token}`).remove();
                             Swal.fire({ title: 'Deleted!', text: data.message, icon: 'success', showConfirmButton: false, timer: 1500 }).then(() => {
-                                if ("<?= session_id() ?>" == token) {
+                                if ('<?= session_id() ?>' == token) {
                                     window.location.reload();
                                 }
                             });
@@ -145,7 +149,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             Swal.fire({ title: 'Error!', text: data.message, icon: 'error', showConfirmButton: true });
                         }
                     })
-                    .catch(error => console.error("Fetch error:", error));
+                    .catch(error => console.error('Fetch error:', error));
             }
         });
     }
