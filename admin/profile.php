@@ -55,6 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         } else {
             echo json_encode(['status' => 'error', 'title' => 'Error!', 'message' => 'Failed to update profile!']);
         }
+
     } else {
         echo json_encode(['status' => 'error', 'title' => 'Invalid CSRF Token', 'message' => 'Please refresh the page and try again.']);
     }
@@ -195,7 +196,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </div>
 
                 <div class="modal-footer">
-                    <button type="submit" name="submit" id="submit" class="btn btn-primary w-100">Save</button>
+                    <button type="submit" name="submit" id="submit" class="btn btn-primary w-100">Update</button>
                 </div>
             </div>
         </form>
@@ -214,28 +215,33 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     document.getElementById('password').addEventListener('input', function () {
         const passwordMessage = document.getElementById('password-message');
-        document.getElementById('submit').disabled = this.value.length < 8;
-        passwordMessage.textContent = this.value.length < 8 ? 'Password must be at least 8 characters long!' : '';
+        let submitBtn = document.getElementById('submit')
+        let isDisabled = this.value.length < 8;
+        submitBtn.disabled = isDisabled;
+        submitBtn.style.backgroundColor = !isDisabled ? '#007bff' : '#b8daff';
+        submitBtn.style.borderColor = !isDisabled ? '#007bff' : '#b8daff';
+        submitBtn.style.cursor = !isDisabled ? 'pointer' : 'not-allowed';
+        passwordMessage.textContent = isDisabled ? 'Password must be at least 8 characters long!' : '';
     });
 </script>
 <script>
-    document.getElementById("editProfileForm").addEventListener("submit", function (event) {
+    document.getElementById('editProfileForm').addEventListener('submit', function (event) {
         event.preventDefault();
 
         let formData = new FormData(this);
-        fetch("", {
-            method: "POST",
+        fetch('', {
+            method: 'POST',
             body: formData
         })
             .then(response => response.json())
             .then(data => {
-                if (data.status === "success") {
-                    Swal.fire({ icon: "success", title: data.title, text: data.message, timer: 1500, showConfirmButton: false }).then(() => { window.location.reload(); })
+                if (data.status === 'success') {
+                    Swal.fire({ icon: 'success', title: data.title, text: data.message, timer: 1500, showConfirmButton: false }).then(() => { window.location.reload(); })
                 } else {
-                    Swal.fire({ icon: "error", title: data.title, text: data.message, showConfirmButton: true });
+                    Swal.fire({ icon: 'error', title: data.title, text: data.message, showConfirmButton: true });
                 }
             })
-            .catch(error => console.error("Error:", error));
+            .catch(error => console.error('Error:', error));
     });
 </script>
 

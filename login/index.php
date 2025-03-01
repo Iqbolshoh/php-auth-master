@@ -177,7 +177,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </div>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -197,12 +197,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 if (!usernamePattern.test(username)) {
                     usernameError.textContent = "Username must be 3-30 characters: A-Z, a-z, 0-9, or _.";
                     submitButton.disabled = true;
-                    submitButton.style.cssText = 'background-color: #b8daff; cursor: not-allowed;';
+                    submitButton.style.cssText = 'background-color: #b8daff; cursor: not-allowed; border-color: #b8daff;';
                     return false;
                 } else {
                     usernameError.textContent = "";
                     submitButton.disabled = false;
-                    submitButton.style.cssText = 'background-color: #007bff; cursor: pointer;';
+                    submitButton.style.cssText = 'background-color: #007bff; cursor: pointer; border-color: #007bff;';
                     return true;
                 }
             }
@@ -212,12 +212,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 if (password.length < 8) {
                     passwordMessage.textContent = 'Password must be at least 8 characters long.';
                     submitButton.disabled = true;
-                    submitButton.style.cssText = 'background-color: #b8daff; cursor: not-allowed;';
+                    submitButton.style.cssText = 'background-color: #b8daff; cursor: not-allowed; border-color: #b8daff;';
+
                     return false;
                 }
                 passwordMessage.textContent = '';
                 submitButton.disabled = false;
-                submitButton.style.cssText = 'background-color: #007bff; cursor: pointer;';
+                submitButton.style.cssText = 'background-color: #007bff; cursor: pointer; border-color: #007bff;';
                 return true;
             }
 

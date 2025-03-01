@@ -13,8 +13,7 @@ $menuItems = [
         "menuTitle" => "Users",
         "icon" => "fas fa-users",
         "pages" => [
-            ["title" => "Create User", "url" => "create_user.php"],
-            ["title" => "User Details", "url" => "user_details.php"]
+            ["title" => "User Settings", "url" => "users.php"]
         ],
     ],
     [

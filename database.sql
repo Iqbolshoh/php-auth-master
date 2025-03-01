@@ -40,3 +40,12 @@ CREATE TABLE active_sessions (
 INSERT INTO users (first_name, last_name, email, username, password, role, profile_picture) VALUES 
 ('Iqbolshoh', 'Ilhomjonov', 'iilhomjonov777@gmail.com', 'iqbolshoh', '52be5ff91284c65bac56f280df55f797a5c505f7ef66317ff358e34791507027', 'admin', '790d5772254c72bf5c01d43920d8e6a6.jpeg'),
 ('User', 'User', 'user@iqbolshoh.uz', 'user',  '52be5ff91284c65bac56f280df55f797a5c505f7ef66317ff358e34791507027',  'user', 'default.png');
+
+INSERT INTO users (first_name, last_name, email, username, password, role, profile_picture) VALUES 
+('Muhammad', 'Saidov', 'muhammad.saidov@example.com', 'muhammad_s', '52be5ff91284c65bac56f280df55f797a5c505f7ef66317ff358e34791507027', 'admin', 'profile10.jpg'),
+('Olim', 'Norboyev', 'olim.norboyev@example.com', 'olim_n', '52be5ff91284c65bac56f280df55f797a5c505f7ef66317ff358e34791507027', 'user', 'profile11.jpg'),
+('Laylo', 'Yusupova', 'laylo.yusupova@example.com', 'laylo_y', '52be5ff91284c65bac56f280df55f797a5c505f7ef66317ff358e34791507027', 'admin', 'profile12.jpg'),
+('Sanjar', 'Bekmurodov', 'sanjar.bekmurodov@example.com', 'sanjar_b', '52be5ff91284c65bac56f280df55f797a5c505f7ef66317ff358e34791507027', 'user', 'profile13.jpg'),
+('Nilufar', 'Shodmonova', 'nilufar.shodmonova@example.com', 'nilufar_s', '52be5ff91284c65bac56f280df55f797a5c505f7ef66317ff358e34791507027', 'user', 'profile14.jpg'),
+('Temur', 'Rahimov', 'temur.rahimov@example.com', 'temur_r', '52be5ff91284c65bac56f280df55f797a5c505f7ef66317ff358e34791507027', 'admin', 'profile15.jpg'),
+('Malika', 'Iskandarova', 'malika.iskandarova@example.com', 'malika_i', '52be5ff91284c65bac56f280df55f797a5c505f7ef66317ff358e34791507027', 'admin', 'profile16.jpg');

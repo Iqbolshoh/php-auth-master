@@ -32,6 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 echo json_encode(["status" => "error", "message" => "Failed to delete session. Try again!"]);
             }
         }
+
     } else {
         echo json_encode(['status' => 'error', 'title' => 'Invalid CSRF Token', 'message' => 'Please refresh the page and try again.']);
     }

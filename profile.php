@@ -55,6 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         } else {
             echo json_encode(['status' => 'error', 'title' => 'Error!', 'message' => 'Failed to update profile!']);
         }
+
     } else {
         echo json_encode(['status' => 'error', 'title' => 'Invalid CSRF Token', 'message' => 'Please refresh the page and try again.']);
     }
@@ -214,8 +215,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     document.getElementById('password').addEventListener('input', function () {
         const passwordMessage = document.getElementById('password-message');
-        document.getElementById('submit').disabled = this.value.length < 8;
-        passwordMessage.textContent = this.value.length < 8 ? 'Password must be at least 8 characters long!' : '';
+        let submitBtn = document.getElementById('submit')
+        let isDisabled = this.value.length < 8;
+        submitBtn.disabled = isDisabled;
+        submitBtn.style.backgroundColor = !isDisabled ? '#007bff' : '#b8daff';
+        submitBtn.style.borderColor = !isDisabled ? '#007bff' : '#b8daff';
+        submitBtn.style.cursor = !isDisabled ? 'pointer' : 'not-allowed';
+        passwordMessage.textContent = isDisabled ? 'Password must be at least 8 characters long!' : '';
     });
 </script>
 <script>
