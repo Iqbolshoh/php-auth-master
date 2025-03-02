@@ -37,6 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 }
+$query->generate_csrf_token();
 ?>
 
 <?php include './header.php'; ?>
@@ -97,7 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 let formData = new FormData();
                 formData.append('action', 'edit');
                 formData.append('device_name', result.value);
-                formData.append('csrf_token', '<?= $query->generate_csrf_token() ?>');
+                formData.append('csrf_token', '<?= $_SESSION['csrf_token'] ?>');
 
                 fetch('', { method: 'POST', body: formData })
                     .then(response => response.json())

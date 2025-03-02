@@ -12,89 +12,135 @@ if (isset($_GET['id'])) {
     $user = $query->select('users', '*', 'id = ?', [$user_id], 'i')[0] ?? null;
 }
 
-if (isset($_POST['delete_id'])) {
-    $delete_id = $_POST['delete_id'];
-    $query->delete("users", "id = ?", [$delete_id], 'i');
-    header("Location: ./users.php");
-    exit;
-}
-
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (
-        isset($_POST['csrf_token']) &&
-        isset($_SESSION['csrf_token']) &&
-        hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+        !isset($_POST['csrf_token']) ||
+        !isset($_SESSION['csrf_token']) ||
+        !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
     ) {
-        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'title' => 'Invalid CSRF Token', 'message' => 'Invalid CSRF token!']);
+        exit;
+    }
+    header('Content-Type: application/json');
 
-        if ($_POST['action'] === 'create') {
-            $first_name = $query->validate($_POST['first_name']);
-            $last_name = $query->validate($_POST['last_name']);
-            $email = $query->validate($_POST['email']);
-            $username = $query->validate($_POST['username']);
-            $password = $query->hashPassword($_POST['password']);
-            $role = $query->validate($_POST['role']);
+    if ($_POST['action'] === 'create') {
+        $first_name = trim($_POST['first_name']);
+        $last_name = trim($_POST['last_name']);
+        $email = trim(strtolower($_POST['email']));
+        $username = trim(strtolower($_POST['username']));
+        $password = $_POST['password'];
+        $role = trim($_POST['role']);
 
-            $data = [
-                'first_name' => $first_name,
-                'last_name' => $last_name,
-                'email' => $email,
-                'username' => $username,
-                'password' => $password,
-                'role' => $role
-            ];
+        if (empty($first_name) || empty($last_name) || empty($email) || empty($username) || empty($password)) {
+            echo json_encode(['status' => 'error', 'title' => 'Validation Error', 'message' => 'All fields are required!']);
+            exit;
+        }
 
-            $result = $query->insert("users", $data);
-            if ($result) {
-                $data['id'] = $result;
-                echo json_encode(['status' => 'success', 'title' => 'Success!', 'message' => 'New user added successfully!', 'user' => $data]);
-            } else {
-                echo json_encode(['status' => 'error', 'title' => 'Error!', 'message' => 'Failed to add user.']);
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            echo json_encode(['status' => 'error', 'title' => 'Email', 'message' => 'Invalid email format!']);
+            exit;
+        }
+
+        if (!empty($query->select('users', 'email', 'email = ?', [$email], 's'))) {
+            echo json_encode(['status' => 'error', 'title' => 'Email', 'message' => 'This email is already registered!']);
+            exit;
+        }
+
+        if (strlen($username) < 3) {
+            echo json_encode(['status' => 'error', 'title' => 'Username', 'message' => 'Username must be at least 3 characters long!']);
+            exit;
+        }
+
+        if (!preg_match('/^[a-zA-Z0-9_]{3,30}$/', $username)) {
+            echo json_encode(['status' => 'error', 'title' => 'Username', 'message' => 'Username must be 3-30 characters: A-Z, a-z, 0-9, or _!']);
+            exit;
+        }
+
+        if (!empty($query->select('users', 'username', 'username = ?', [$username], 's'))) {
+            echo json_encode(['status' => 'error', 'title' => 'Username', 'message' => 'This username is already taken!']);
+            exit;
+        }
+
+        if (strlen($password) < 8) {
+            echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Password must be at least 8 characters long!']);
+            exit;
+        }
+        $hashed_password = $query->hashPassword($password);
+
+        $data = [
+            'first_name' => $first_name,
+            'last_name' => $last_name,
+            'email' => $email,
+            'username' => $username,
+            'password' => $hashed_password,
+            'role' => $role
+        ];
+
+        $result = $query->insert("users", $data);
+        if ($result) {
+            $data['id'] = $result;
+            unset($data['password']);
+            echo json_encode(['status' => 'success', 'title' => 'Success!', 'message' => 'New user added successfully!', 'user' => $data]);
+        } else {
+            echo json_encode(['status' => 'error', 'title' => 'Error!', 'message' => 'Failed to add user.']);
+        }
+        exit;
+    } elseif ($_POST['action'] === 'edit') {
+        $first_name = trim($_POST['first_name']);
+        $last_name = trim($_POST['last_name']);
+
+        if (empty($first_name) || empty($last_name)) {
+            echo json_encode(['status' => 'error', 'title' => 'Validation Error', 'message' => 'All fields are required!']);
+            exit;
+        }
+
+        $data = [
+            'first_name' => $first_name,
+            'last_name' => $last_name,
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        if (!empty($_POST['password'])) {
+            if (strlen($_POST['password']) < 8) {
+                echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Password must be at least 8 characters long!']);
+                exit;
             }
-        } elseif ($_POST['action'] === 'edit') {
+            $data['password'] = $query->hashPassword($_POST['password']);
+            $query->delete('active_sessions', 'user_id = ?', [$user_id], 'i');
+        }
 
-            $first_name = $query->validate($_POST['first_name']);
-            $last_name = $query->validate($_POST['last_name']);
+        if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+            $encrypted_name = md5(bin2hex(random_bytes(32)) . '_' . date('Ymd_His') . '_' . uniqid('', true)) . '.' . pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
+            $targetFile = "../src/images/profile_picture/";
 
-            $data = [
-                'first_name' => $first_name,
-                'last_name' => $last_name,
-                'updated_at' => date('Y-m-d H:i:s')
-            ];
-
-            if (!empty($_POST['password'])) {
-                $data['password'] = $query->hashPassword($_POST['password']);
-                $query->delete('active_sessions', 'user_id = ?', [$user_id], 'i');
+            $filePath = $targetFile . $user['profile_picture'];
+            if (file_exists($filePath) && $user['profile_picture'] != 'default.png') {
+                unlink($filePath);
             }
 
-            if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-                $encrypted_name = md5(bin2hex(random_bytes(32)) . '_' . bin2hex(random_bytes(16)) . '_' . uniqid('', true)) . '.' . pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
-                $targetFile = "../src/images/profile_picture/";
-
-                $filePath = $targetFile . $user['profile_picture'];
-                if (file_exists($filePath) && $user['profile_picture'] != 'default.png') {
-                    unlink($filePath);
-                }
-
-                if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $targetFile . $encrypted_name)) {
-                    $data['profile_picture'] = $encrypted_name;
-                }
-            }
-
-            $update = $query->update("users", $data, "id = ?", [$user_id], "i");
-
-            if ($update) {
-                echo json_encode(['status' => 'success', 'title' => 'Success!', 'message' => 'Profile updated successfully!']);
-            } else {
-                echo json_encode(['status' => 'error', 'title' => 'Error!', 'message' => 'Failed to update profile!']);
+            if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $targetFile . $encrypted_name)) {
+                $data['profile_picture'] = $encrypted_name;
             }
         }
 
-    } else {
-        echo json_encode(['status' => 'error', 'title' => 'Invalid CSRF Token', 'message' => 'Please refresh the page and try again.']);
+        $update = $query->update("users", $data, "id = ?", [$user_id], "i");
+
+        if ($update) {
+            echo json_encode(['status' => 'success', 'title' => 'Success!', 'message' => 'Profile updated successfully!']);
+        } else {
+            echo json_encode(['status' => 'error', 'title' => 'Error!', 'message' => 'Failed to update profile!']);
+        }
+        exit;
+    } elseif ($_POST['action'] === 'delete') {
+        if (isset($_POST['delete_id'])) {
+            $delete_id = $_POST['delete_id'];
+            $query->delete("users", "id = ?", [$delete_id], 'i');
+            header("Location: ./users.php");
+            exit;
+        }
     }
-    exit;
 }
+$query->generate_csrf_token();
 ?>
 
 <?php include './header.php'; ?>
@@ -165,6 +211,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                         <form id="deleteForm" method="POST" class="flex-grow-1">
                             <input type="hidden" name="delete_id" value="<?= $user['id']; ?>">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                             <button type="button" class="btn btn-danger w-100" onclick="confirmDelete()">
                                 <i class="fas fa-trash-alt"></i> Delete
                             </button>
@@ -176,7 +224,150 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
     </div>
 
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="POST" enctype="multipart/form-data" id="editProfileForm">
+                <div class="modal-content rounded-4 shadow-lg">
+                    <div class="modal-header bg-dark text-white text-center rounded-top-4">
+                        <h5 class="modal-title" id="editModalLabel">Edit User</h5>
+                        <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close"
+                            style="background: transparent; border: none; font-size: 24px; font-weight: bold; color: white; cursor: pointer; line-height: 1;"
+                            onmouseover="this.style.color='#ff4d4d'; this.style.transform='scale(1.2)'; this.style.transition='0.2s';"
+                            onmouseout="this.style.color='white'; this.style.transform='scale(1)';">
+                            ×
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="first_name" class="form-control"
+                                value="<?php echo htmlspecialchars($user['first_name']); ?>" maxlength="30" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="last_name" class="form-control"
+                                value="<?php echo htmlspecialchars($user['last_name']); ?>" maxlength="30" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" value="<?php echo htmlspecialchars($user['email']); ?>"
+                                maxlength="100" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control"
+                                value="<?php echo htmlspecialchars($user['username']); ?>" maxlength="30" disabled>
+                        </div>
+                        <div class="mb-3 position-relative">
+                            <label class="form-label">Password</label>
+                            <div class="input-group">
+                                <input type="password" id="password" name="password" class="form-control" maxlength="255">
+                                <button type="button" id="toggle-password" class="btn btn-outline-secondary">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small id="password-message" class="text-danger"></small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label fw-bold">Upload Image</label>
+                            <div class="input-group">
+                                <input type="file" name="profile_picture" id="profile_picture" accept="image/*"
+                                    style="display: none;">
+                                <label for="profile_picture" style="background-color: white;
+                                color: #495057; 
+                                border: 2px solid #495057; 
+                                border-radius: 5px; 
+                                padding: 7px; 
+                                cursor: pointer; 
+                                transition: 0.3s; 
+                                width: 100%; 
+                                text-align: center; 
+                                font-weight: bold; 
+                                display: inline-block;">
+                                    📂 Upload Image
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <input type="hidden" name="action" value="edit">
+                        </div>
+                        <div class="mb-3">
+                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" name="submit" id="submit" class="btn btn-primary w-100">Update</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('toggle-password').addEventListener('click', function () {
+            const passwordField = document.getElementById('password');
+            const toggleIcon = this.querySelector('i');
+            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+            toggleIcon.classList.toggle('fa-eye');
+            toggleIcon.classList.toggle('fa-eye-slash');
+        });
+
+        document.getElementById('password').addEventListener('input', function () {
+            const passwordMessage = document.getElementById('password-message');
+            let submitBtn = document.getElementById('submit')
+            let isDisabled = this.value.length < 8;
+            submitBtn.disabled = isDisabled;
+            submitBtn.style.backgroundColor = !isDisabled ? '#007bff' : '#b8daff';
+            submitBtn.style.borderColor = !isDisabled ? '#007bff' : '#b8daff';
+            submitBtn.style.cursor = !isDisabled ? 'pointer' : 'not-allowed';
+            passwordMessage.textContent = isDisabled ? 'Password must be at least 8 characters long!' : '';
+        });
+
+        document.getElementById('editProfileForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            let formData = new FormData(this);
+            fetch('', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        Swal.fire({ icon: 'success', title: data.title, text: data.message, timer: 1500, showConfirmButton: false }).then(() => { window.location.reload(); })
+                    } else {
+                        Swal.fire({ icon: 'error', title: data.title, text: data.message, showConfirmButton: true });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        function confirmDelete() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('deleteForm').submit();
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    Swal.fire('Cancelled', 'The user is safe!', 'info');
+                }
+            });
+        }
+    </script>
+
 <?php else: ?>
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
     <div class="row">
         <div class="col-md-8">
@@ -197,10 +388,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             <?php foreach ($users as $user): ?>
                                 <tr>
                                     <td><?= $user['id'] ?></td>
-                                    <td><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?>
-                                    </td>
+                                    <td><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></td>
                                     <td><?= htmlspecialchars($user['username']) ?></td>
-                                    <td><?= htmlspecialchars($user['role']) ?></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-info text-dark"><?= htmlspecialchars($user['role']); ?></span>
+                                    </td>
                                     <td>
                                         <a href="users.php?id=<?= $user['id'] ?>" class="btn btn-warning btn-sm">Details</a>
                                     </td>
@@ -252,17 +444,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             <select id="role" name="role" class="form-control" required>
                                 <option value="" disabled selected>-- Select Role --</option>
                                 <?php foreach (ROLES as $role => $path): ?>
-                                    <option value="<?= htmlspecialchars($role) ?>"><?= ucfirst($role) ?>
+                                    <option value="<?= htmlspecialchars($role) ?>">
+                                        <?= ucfirst($role) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="mb-3">
+                            <input type="hidden" name="action" value="create">
+                        </div>
+                        <div class="mb-3">
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                         </div>
                         <div class="mb-3">
-                            <button type="submit" name="submit" id="submit" class="btn btn-primary w-100">
-                                Add User</button>
+                            <button type="submit" name="submit" id="submit" class="btn btn-primary w-100">Add User</button>
                         </div>
                     </form>
                 </div>
@@ -292,287 +487,118 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 }
             });
         });
-    </script>
-    <script>
+
         document.addEventListener('DOMContentLoaded', function () {
-            const emailField = document.getElementById('email');
-            const usernameField = document.getElementById('username');
-            const passwordField = document.getElementById('password');
-            const emailMessage = document.getElementById('email-message');
-            const usernameMessage = document.getElementById('username-message');
-            const passwordMessage = document.getElementById('password-message');
-            const submitButton = document.getElementById('submit');
+            const form = document.getElementById('signupForm');
+            const fields = {
+                email: document.getElementById('email'),
+                username: document.getElementById('username'),
+                password: document.getElementById('password')
+            };
+            const messages = {
+                email: document.getElementById('email-message'),
+                username: document.getElementById('username-message'),
+                password: document.getElementById('password-message')
+            };
+            const submitBtn = document.getElementById('submit');
             const togglePassword = document.getElementById('toggle-password');
 
-            let emailAvailable = false;
-            let usernameAvailable = false;
+            let availability = { email: false, username: false };
 
-            function validateEmailFormat(email) {
-                return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(email);
-            }
+            const validators = {
+                email: email => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(email),
+                username: username => /^[a-zA-Z0-9_]{3,30}$/.test(username),
+                password: password => password.length >= 8
+            };
 
-            function validateUsernameFormat(username) {
-                return /^[a-zA-Z0-9_]{3,30}$/.test(username);
-            }
-
-            function validatePassword() {
-                if (passwordField.value.length < 8) {
-                    passwordMessage.textContent = 'Password must be at least 8 characters long!';
-                    return false;
-                }
-                passwordMessage.textContent = '';
-                return true;
-            }
-
-            function checkAvailability(type, value, messageElement, callback) {
+            function checkAvailability(type, value) {
                 if (!value) return;
-
                 fetch('../signup/check_availability.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `${type}=${encodeURIComponent(value)}`
                 })
-                    .then(response => response.json())
+                    .then(res => res.json())
                     .then(data => {
-                        if (data.exists) {
-                            messageElement.textContent = `This ${type} is already taken!`;
-                            callback(false);
-                        } else {
-                            messageElement.textContent = '';
-                            callback(true);
-                        }
-                        updateSubmitButtonState();
+                        messages[type].textContent = data.exists ? `This ${type} is already taken!` : '';
+                        availability[type] = !data.exists;
+                        updateSubmitState();
                     });
             }
 
-            function updateSubmitButtonState() {
-                const isEmailValid = emailField.value.length === 0 || (validateEmailFormat(emailField.value) && emailAvailable);
-                const isUsernameValid = usernameField.value.length === 0 || (validateUsernameFormat(usernameField.value) && usernameAvailable);
-                const isPasswordValid = passwordField.value.length === 0 || validatePassword();
+            function updateSubmitState() {
+                const validEmail = fields.email.value.length === 0 || validators.email(fields.email.value) && availability.email;
+                const validUsername = fields.username.value.length === 0 || validators.username(fields.username.value) && availability.username;
+                const validPassword = fields.password.value.length === 0 || validators.password(fields.password.value);
 
-                const isFormValid = isEmailValid && isUsernameValid && isPasswordValid;
-
-                submitButton.disabled = !isFormValid;
-                submitButton.style.backgroundColor = isFormValid ? '#007bff' : '#b8daff';
-                submitButton.style.borderColor = isFormValid ? '#007bff' : '#b8daff';
-                submitButton.style.cursor = isFormValid ? 'pointer' : 'not-allowed';
+                const isValid = validEmail && validUsername && validPassword;
+                submitBtn.disabled = !isValid;
+                submitBtn.style.backgroundColor = isValid ? '#007bff' : '#b8daff';
+                submitBtn.style.borderColor = isValid ? '#007bff' : '#b8daff';
+                submitBtn.style.cursor = isValid ? 'pointer' : 'not-allowed';
             }
 
-            emailField.addEventListener('input', function () {
-                if (!validateEmailFormat(this.value)) {
-                    emailMessage.textContent = 'Invalid email format!';
-                    emailAvailable = false;
-                    updateSubmitButtonState();
-                    return;
-                }
-                checkAvailability('email', this.value, emailMessage, status => {
-                    emailAvailable = status;
+            Object.keys(fields).forEach(type => {
+                fields[type].addEventListener('input', function () {
+                    if (!validators[type](this.value)) {
+                        messages[type].textContent = type === 'password' ? 'Password must be at least 8 characters long!' : `Invalid ${type} format!`;
+                        availability[type] = false;
+                        updateSubmitState();
+                        return;
+                    }
+                    messages[type].textContent = '';
+                    if (type !== 'password') checkAvailability(type, this.value);
+                    updateSubmitState();
                 });
-            });
-
-            usernameField.addEventListener('input', function () {
-                if (!validateUsernameFormat(this.value)) {
-                    usernameMessage.textContent = 'Username must be 3-30 characters: A-Z, a-z, 0-9, or _.';
-                    usernameAvailable = false;
-                    updateSubmitButtonState();
-                    return;
-                }
-                checkAvailability('username', this.value, usernameMessage, status => {
-                    usernameAvailable = status;
-                });
-            });
-
-            passwordField.addEventListener('input', function () {
-                validatePassword();
-                updateSubmitButtonState();
             });
 
             togglePassword.addEventListener('click', function () {
-                passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+                fields.password.type = fields.password.type === 'password' ? 'text' : 'password';
                 this.querySelector('i').classList.toggle('fa-eye');
                 this.querySelector('i').classList.toggle('fa-eye-slash');
             });
-        });
 
-        document.addEventListener('DOMContentLoaded', function () {
-            document.getElementById('signupForm').addEventListener('submit', function (event) {
+            form.addEventListener('submit', async function (event) {
                 event.preventDefault();
 
-                let formData = new FormData(this);
-                formData.append('action', 'create')
+                try {
+                    const response = await fetch('', { method: 'POST', body: new FormData(form) });
+                    const data = await response.json();
 
-                fetch('', {
-                    method: 'POST',
-                    body: formData
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            Swal.fire({ icon: "success", title: data.title, text: data.message, timer: 1500, showConfirmButton: false })
+                    await Swal.fire({
+                        icon: data.status === 'success' ? 'success' : 'error',
+                        title: data.status === 'success' ? 'Registration successful' : data.title,
+                        text: data.message,
+                        timer: data.status === 'success' ? 1500 : undefined,
+                        showConfirmButton: data.status !== 'success'
+                    });
 
-                            let newRow = `
+                    console.log(data)
+                    if (data.status === 'success') {
+                        let newRow = `
                             <tr>
                                 <td>${data.user.id}</td>
                                 <td>${data.user.first_name} ${data.user.last_name}</td>
                                 <td>${data.user.username}</td>
-                                <td>${data.user.role}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-info text-dark">${data.user.role}</span>
+                                </td>
                                 <td>
                                     <a href="users.php?id=${data.user.id}" class="btn btn-warning btn-sm">Details</a>
                                 </td>
                             </tr>`;
 
-                            document.querySelector('#usersTable tbody').insertAdjacentHTML('beforeend', newRow);
-                            document.getElementById('signupForm').reset();
-                        } else {
-                            Swal.fire({ icon: "error", title: data.title, text: data.message, showConfirmButton: true });
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
+                        document.querySelector('#usersTable tbody').insertAdjacentHTML('beforeend', newRow);
+                        document.getElementById('signupForm').reset();
+                    }
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Something went wrong! Try again.' });
+                }
             });
         });
-
     </script>
 
 <?php endif; ?>
-
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form method="POST" enctype="multipart/form-data" id="editProfileForm">
-            <div class="modal-content rounded-4 shadow-lg">
-                <div class="modal-header bg-dark text-white text-center rounded-top-4">
-                    <h5 class="modal-title" id="editModalLabel">Edit User</h5>
-                    <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close"
-                        style="background: transparent; border: none; font-size: 24px; font-weight: bold; color: white; cursor: pointer; line-height: 1;"
-                        onmouseover="this.style.color='#ff4d4d'; this.style.transform='scale(1.2)'; this.style.transition='0.2s';"
-                        onmouseout="this.style.color='white'; this.style.transform='scale(1)';">
-                        ×
-                    </button>
-                </div>
-
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">First Name</label>
-                        <input type="text" name="first_name" class="form-control"
-                            value="<?php echo htmlspecialchars($user['first_name']); ?>" maxlength="30" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Last Name</label>
-                        <input type="text" name="last_name" class="form-control"
-                            value="<?php echo htmlspecialchars($user['last_name']); ?>" maxlength="30" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-control" value="<?php echo htmlspecialchars($user['email']); ?>"
-                            maxlength="100" disabled>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Username</label>
-                        <input type="text" class="form-control"
-                            value="<?php echo htmlspecialchars($user['username']); ?>" maxlength="30" disabled>
-                    </div>
-                    <div class="mb-3 position-relative">
-                        <label class="form-label">Password</label>
-                        <div class="input-group">
-                            <input type="password" id="password" name="password" class="form-control" maxlength="255">
-                            <button type="button" id="toggle-password" class="btn btn-outline-secondary">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                        <small id="password-message" class="text-danger"></small>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label fw-bold">Upload Image</label>
-                        <div class="input-group">
-                            <input type="file" name="profile_picture" id="profile_picture" accept="image/*"
-                                style="display: none;">
-                            <label for="profile_picture" style="background-color: white;
-                                color: #495057; 
-                                border: 2px solid #495057; 
-                                border-radius: 5px; 
-                                padding: 7px; 
-                                cursor: pointer; 
-                                transition: 0.3s; 
-                                width: 100%; 
-                                text-align: center; 
-                                font-weight: bold; 
-                                display: inline-block;">
-                                📂 Upload Image
-                            </label>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="submit" name="submit" id="submit" class="btn btn-primary w-100">Update</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    document.getElementById('toggle-password').addEventListener('click', function () {
-        const passwordField = document.getElementById('password');
-        const toggleIcon = this.querySelector('i');
-        passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
-        toggleIcon.classList.toggle('fa-eye');
-        toggleIcon.classList.toggle('fa-eye-slash');
-    });
-
-    document.getElementById('password').addEventListener('input', function () {
-        const passwordMessage = document.getElementById('password-message');
-        let submitBtn = document.getElementById('submit')
-        let isDisabled = this.value.length < 8;
-        submitBtn.disabled = isDisabled;
-        submitBtn.style.backgroundColor = !isDisabled ? '#007bff' : '#b8daff';
-        submitBtn.style.borderColor = !isDisabled ? '#007bff' : '#b8daff';
-        submitBtn.style.cursor = !isDisabled ? 'pointer' : 'not-allowed';
-        passwordMessage.textContent = isDisabled ? 'Password must be at least 8 characters long!' : '';
-    });
-
-    document.getElementById("editProfileForm").addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        let formData = new FormData(this);
-        formData.append('action', 'edit')
-
-        fetch('', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    Swal.fire({ icon: 'success', title: data.title, text: data.message, timer: 1500, showConfirmButton: false }).then(() => { window.location.reload(); })
-                } else {
-                    Swal.fire({ icon: 'error', title: data.title, text: data.message, showConfirmButton: true });
-                }
-            })
-            .catch(error => console.error('Error:', error));
-    });
-
-    function confirmDelete() {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'No, cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('deleteForm').submit();
-            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                Swal.fire('Cancelled', 'The user is safe!', 'info');
-            }
-        });
-    }
-</script>
 
 <?php include './footer.php'; ?>

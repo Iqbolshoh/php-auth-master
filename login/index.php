@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     header('Content-Type: application/json');
 
     if ($_POST['action'] == 'login') {
-        $username = $query->validate(strtolower($_POST['username']));
+        $username = trim(strtolower($_POST['username']));
         $password = $_POST['password'];
 
         if (empty($username) || empty($password)) {
@@ -74,6 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 }
+$query->generate_csrf_token();
 ?>
 
 <!DOCTYPE html>
@@ -138,7 +139,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             <input type="hidden" name="action" value="login">
                         </div>
                         <div class="mb-3">
-                            <input type="hidden" name="csrf_token" value="<?= $query->generate_csrf_token() ?>">
+                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                         </div>
                         <div class="d-grid gap-2">
                             <button type="submit" id="submit" class="btn btn-primary">Login</button>

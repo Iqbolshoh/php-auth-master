@@ -1,4 +1,3 @@
-
                     <!-- Container-fluid closed -->
                     </div>
                 <!-- Content section closed -->
@@ -8,10 +7,10 @@
 
         <footer class="main-footer">
             <div class="float-right d-none d-sm-inline">
-                Admin Panel <strong><a href="https://iqbolshoh.uz/">Iqbolshoh.uz</a></strong>
+                Admin Panel <strong><a target="_blank" href="https://iqbolshoh.uz/">Iqbolshoh.uz</a></strong>
             </div>
             <strong> &copy;<?php echo date('Y'); ?>
-                <a href="<?= SITE_PATH ?>"><?= $_SERVER['HTTP_HOST'] ?></a>.
+                <a href="<?= SITE_PATH . ROLES[$_SESSION['user']['role']] ?>"><?= $_SERVER['HTTP_HOST'] ?></a>.
             </strong> All rights reserved.
         </footer>
 

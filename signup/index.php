@@ -13,10 +13,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     header('Content-Type: application/json');
 
     if ($_POST['action'] == 'signup') {
-        $first_name = $query->validate($_POST['first_name']);
-        $last_name = $query->validate($_POST['last_name']);
-        $email = $query->validate(strtolower($_POST['email']));
-        $username = $query->validate(strtolower($_POST['username']));
+        $first_name = trim($_POST['first_name']);
+        $last_name = trim($_POST['last_name']);
+        $email = trim(strtolower($_POST['email']));
+        $username = trim(strtolower($_POST['username']));
         $password = $_POST['password'];
 
         // ---- Default Role ---- //
@@ -110,6 +110,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 }
+$query->generate_csrf_token();
 ?>
 
 <!DOCTYPE html>
@@ -189,7 +190,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             <input type="hidden" name="action" value="signup">
                         </div>
                         <div class="mb-3">
-                            <input type="hidden" name="csrf_token" value="<?= $query->generate_csrf_token() ?>">
+                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                         </div>
                         <div class="d-grid gap-2">
                             <button type="submit" id="submit" class="btn btn-primary">Sign Up</button>

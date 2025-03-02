@@ -51,11 +51,6 @@ class Database
         return $result;
     }
 
-    function validate($value)
-    {
-        return htmlspecialchars(trim(stripslashes($value)), ENT_QUOTES, 'UTF-8');
-    }
-
     public function select($table, $columns = "*", $condition = "", $params = [], $types = "")
     {
         $sql = "SELECT $columns FROM $table" . ($condition ? " WHERE $condition" : "");

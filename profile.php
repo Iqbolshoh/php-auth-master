@@ -19,8 +19,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     header('Content-Type: application/json');
 
     if ($_POST['action'] === 'edit') {
-        $first_name = $query->validate($_POST['first_name']);
-        $last_name = $query->validate($_POST['last_name']);
+        $first_name = trim($_POST['first_name']);
+        $last_name = trim($_POST['last_name']);
 
         if (empty($first_name) || empty($last_name)) {
             echo json_encode(['status' => 'error', 'title' => 'Validation Error', 'message' => 'All fields are required!']);
@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         ];
 
         if (!empty($_POST['password'])) {
-            if (strlen($password) < 8) {
+            if (strlen($_POST['password']) < 8) {
                 echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Password must be at least 8 characters long!']);
                 exit;
             }
@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
 
         if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-            $encrypted_name = md5(bin2hex(random_bytes(32)) . '_' . bin2hex(random_bytes(16)) . '_' . uniqid('', true)) . '.' . pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
+            $encrypted_name = md5(bin2hex(random_bytes(32)) . '_' . date('Ymd_His') . '_' . uniqid('', true)) . '.' . pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
             $targetFile = "./src/images/profile_picture/";
 
             $filePath = $targetFile . $user['profile_picture'];
@@ -71,6 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 }
+$query->generate_csrf_token();
 ?>
 
 <?php include './header.php'; ?>
@@ -107,10 +108,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <tr>
                         <th class="bg-light">Username</th>
                         <td><?= htmlspecialchars($user['username']); ?></td>
-                    </tr>
-                    <tr>
-                        <th class="bg-light">Role</th>
-                        <td><span class="badge bg-info text-dark"><?= htmlspecialchars($user['role']); ?></span></td>
                     </tr>
                     <tr>
                         <th class="bg-light">Created At</th>
@@ -204,12 +201,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         <input type="hidden" name="action" value="edit">
                     </div>
                     <div class="mb-3">
-                        <input type="hidden" name="csrf_token" value="<?= $query->generate_csrf_token() ?>">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                     </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="submit" id="submit" class="btn btn-primary w-100">Save</button>
+                    <button type="submit" id="submit" class="btn btn-primary w-100">Update</button>
                 </div>
             </div>
         </form>
