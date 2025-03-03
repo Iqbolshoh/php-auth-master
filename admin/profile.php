@@ -36,13 +36,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if (!empty($_POST['password']) && !empty($_POST['confirm_password'])) {
             $password = $_POST['password'];
             $confirm_password = $_POST['confirm_password'];
-            if ($password !== $confirm_password) {
-                echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Passwords do not match!']);
-                exit;
-            }
-
             if (strlen($password) < 8) {
                 echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Password must be at least 8 characters long!']);
+                exit;
+            }
+            if ($password !== $confirm_password) {
+                echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Passwords do not match!']);
                 exit;
             }
             $data['password'] = $query->hashPassword($password);

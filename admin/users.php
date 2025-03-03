@@ -62,13 +62,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit;
         }
 
-        if ($password !== $confirm_password) {
-            echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Passwords do not match!']);
+        if (strlen($password) < 8) {
+            echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Password must be at least 8 characters long!']);
             exit;
         }
 
-        if (strlen($password) < 8) {
-            echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Password must be at least 8 characters long!']);
+        if ($password !== $confirm_password) {
+            echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Passwords do not match!']);
             exit;
         }
         $hashed_password = $query->hashPassword($password);
@@ -590,10 +590,10 @@ $query->generate_csrf_token();
             }
 
             function updateSubmitState() {
-                const validEmail = validators.email(fields.email.value) && availability.email;
-                const validUsername = validators.username(fields.username.value) && availability.username;
-                const validPassword = validators.password(fields.password.value);
-                const validConfirmPassword = validators.confirmPassword();
+                const validEmail = fields.email.value.length === 0 || validators.email(fields.email.value) && availability.email;
+                const validUsername = fields.username.value.length === 0 || validators.username(fields.username.value) && availability.username;
+                const validPassword = fields.password.value.length === 0 || validators.password(fields.password.value);
+                const validConfirmPassword = fields.password.value.length === 0 || validators.confirmPassword();
 
                 messages.confirmPassword.textContent = validConfirmPassword ? '' : 'Passwords do not match!';
 
@@ -601,7 +601,7 @@ $query->generate_csrf_token();
                 submitBtn.disabled = !isValid;
                 submitBtn.style.backgroundColor = isValid ? '#007bff' : '#b8daff';
                 submitBtn.style.borderColor = isValid ? '#007bff' : '#b8daff';
-                submitBtn.style.cursor = isValid ? 'pointer' : 'not-allowed';
+                submitBtn.style.cursor = isValid ? 'pointer' : 'not-allowed'
             }
 
             Object.keys(fields).forEach(type => {
