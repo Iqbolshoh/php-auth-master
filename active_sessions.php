@@ -42,41 +42,46 @@ $query->generate_csrf_token();
 
 <?php include './header.php'; ?>
 
-<table class="table table-striped table-hover table-bordered">
-    <thead class="bg-dark text-white text-center">
-        <tr>
-            <th> №</th>
-            <th><i class="fas fa-desktop"></i> Device Name</th>
-            <th><i class="fas fa-network-wired"></i> IP Address</th>
-            <th><i class="fas fa-clock"></i> Last Activity</th>
-            <th><i class="fas fa-cog"></i> Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($active_sessions as $index => $session): ?>
-            <tr id="session-<?= htmlspecialchars($session['session_token']); ?>" class="text-center">
-                <td><?= $index + 1 ?></td>
-                <td id="device-name-<?= htmlspecialchars($session['session_token']); ?>">
-                    <?= htmlspecialchars($session['device_name']); ?>
-                </td>
-                <td><?= htmlspecialchars($session['ip_address']); ?></td>
-                <td><?= date('H:i:s d-m-Y', strtotime($session['last_activity'])); ?></td>
-                <td>
-                    <?php if (session_id() == $session['session_token']): ?>
-                        <button class="btn btn-warning btn-sm"
-                            onclick="openEditModal('<?= htmlspecialchars($session['session_token']); ?>')">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                    <?php endif; ?>
-                    <button class="btn btn-danger btn-sm"
-                        onclick="confirmRemoval('<?= htmlspecialchars($session['session_token']); ?>')">
-                        <i class="fas fa-trash"></i> Remove
-                    </button>
-                </td>
+<div class="table-responsive" style="overflow-x: auto;">
+    <table class="table table-striped table-hover table-bordered" style="white-space: nowrap;">
+        <thead class="bg-dark text-white text-center">
+            <tr>
+                <th> №</th>
+                <th><i class="fas fa-desktop"></i> Device Name</th>
+                <th><i class="fas fa-network-wired"></i> IP Address</th>
+                <th><i class="fas fa-clock"></i> Last Activity</th>
+                <th><i class="fas fa-cog"></i> Action</th>
             </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            <?php foreach ($active_sessions as $index => $session): ?>
+                <tr id="session-<?= htmlspecialchars($session['session_token']); ?>" class="text-center">
+                    <td><?= $index + 1 ?></td>
+                    <td id="device-name-<?= htmlspecialchars($session['session_token']); ?>">
+                        <?= htmlspecialchars($session['device_name']); ?>
+                    </td>
+                    <td><?= htmlspecialchars($session['ip_address']); ?></td>
+                    <td><?= date('H:i:s d-m-Y', strtotime($session['last_activity'])); ?></td>
+                    <td>
+                        <div class="d-flex justify-content-center align-items-center gap-2 flex-nowrap"
+                            style="min-width: 140px;">
+                            <?php if (session_id() == $session['session_token']): ?>
+                                <button class="btn btn-warning btn-sm px-3 d-flex align-items-center p-2"
+                                    onclick="openEditModal('<?= htmlspecialchars($session['session_token']); ?>')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            <?php endif; ?>
+                            <button class="btn btn-danger btn-sm px-3 d-flex align-items-center ml-1 p-2"
+                                onclick="confirmRemoval('<?= htmlspecialchars($session['session_token']); ?>')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
 
 <script>
     function openEditModal(token) {

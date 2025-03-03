@@ -29,9 +29,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $email = trim(strtolower($_POST['email']));
         $username = trim(strtolower($_POST['username']));
         $password = $_POST['password'];
-        $role = trim($_POST['role']);
+        $confirm_password = $_POST['confirm_password'];
+        $role = $_POST['role'];
 
-        if (empty($first_name) || empty($last_name) || empty($email) || empty($username) || empty($password)) {
+        if (empty($first_name) || empty($last_name) || empty($email) || empty($username) || empty($password) || empty($confirm_password) || empty($role)) {
             echo json_encode(['status' => 'error', 'title' => 'Validation Error', 'message' => 'All fields are required!']);
             exit;
         }
@@ -58,6 +59,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if (!empty($query->select('users', 'username', 'username = ?', [$username], 's'))) {
             echo json_encode(['status' => 'error', 'title' => 'Username', 'message' => 'This username is already taken!']);
+            exit;
+        }
+
+        if ($password !== $confirm_password) {
+            echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Passwords do not match!']);
             exit;
         }
 
@@ -100,12 +106,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             'updated_at' => date('Y-m-d H:i:s')
         ];
 
-        if (!empty($_POST['password'])) {
-            if (strlen($_POST['password']) < 8) {
+        if (!empty($_POST['password']) && !empty($_POST['confirm_password'])) {
+            $password = $_POST['password'];
+            $confirm_password = $_POST['confirm_password'];
+            if ($password !== $confirm_password) {
+                echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Passwords do not match!']);
+                exit;
+            }
+
+            if (strlen($password) < 8) {
                 echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Password must be at least 8 characters long!']);
                 exit;
             }
-            $data['password'] = $query->hashPassword($_POST['password']);
+            $data['password'] = $query->hashPassword(password: $password);
             $query->delete('active_sessions', 'user_id = ?', [$user_id], 'i');
         }
 
@@ -260,7 +273,7 @@ $query->generate_csrf_token();
                                 value="<?php echo htmlspecialchars($user['username']); ?>" maxlength="30" disabled>
                         </div>
                         <div class="mb-3 position-relative">
-                            <label class="form-label">Password</label>
+                            <label for="password" class="form-label">Password</label>
                             <div class="input-group">
                                 <input type="password" id="password" name="password" class="form-control" maxlength="255">
                                 <button type="button" id="toggle-password" class="btn btn-outline-secondary">
@@ -268,6 +281,17 @@ $query->generate_csrf_token();
                                 </button>
                             </div>
                             <small id="password-message" class="text-danger"></small>
+                        </div>
+                        <div class="mb-3 position-relative">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                            <div class="input-group">
+                                <input type="password" id="confirm_password" name="confirm_password" class="form-control"
+                                    maxlength="255">
+                                <button type="button" id="toggle-confirm-password" class="btn btn-outline-secondary">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small id="confirm-password-message" class="text-danger"></small>
                         </div>
                         <div class="form-group">
                             <label class="form-label fw-bold">Upload Image</label>
@@ -307,42 +331,64 @@ $query->generate_csrf_token();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById('toggle-password').addEventListener('click', function () {
+        document.addEventListener("DOMContentLoaded", function () {
             const passwordField = document.getElementById('password');
-            const toggleIcon = this.querySelector('i');
-            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
-            toggleIcon.classList.toggle('fa-eye');
-            toggleIcon.classList.toggle('fa-eye-slash');
-        });
-
-        document.getElementById('password').addEventListener('input', function () {
+            const confirmPasswordField = document.getElementById('confirm_password');
+            const togglePassword = document.getElementById('toggle-password');
+            const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
             const passwordMessage = document.getElementById('password-message');
-            let submitBtn = document.getElementById('submit')
-            let isDisabled = this.value.length < 8;
-            submitBtn.disabled = isDisabled;
-            submitBtn.style.backgroundColor = !isDisabled ? '#007bff' : '#b8daff';
-            submitBtn.style.borderColor = !isDisabled ? '#007bff' : '#b8daff';
-            submitBtn.style.cursor = !isDisabled ? 'pointer' : 'not-allowed';
-            passwordMessage.textContent = isDisabled ? 'Password must be at least 8 characters long!' : '';
-        });
+            const confirmPasswordMessage = document.getElementById('confirm-password-message');
+            const submitBtn = document.getElementById('submit');
 
-        document.getElementById('editProfileForm').addEventListener('submit', function (event) {
-            event.preventDefault();
+            function toggleVisibility(field, icon) {
+                field.type = field.type === 'password' ? 'text' : 'password';
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            }
 
-            let formData = new FormData(this);
-            fetch('', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        Swal.fire({ icon: 'success', title: data.title, text: data.message, timer: 1500, showConfirmButton: false }).then(() => { window.location.reload(); })
-                    } else {
-                        Swal.fire({ icon: 'error', title: data.title, text: data.message, showConfirmButton: true });
-                    }
+            togglePassword.addEventListener('click', function () {
+                toggleVisibility(passwordField, this.querySelector('i'));
+            });
+
+            toggleConfirmPassword.addEventListener('click', function () {
+                toggleVisibility(confirmPasswordField, this.querySelector('i'));
+            });
+
+            function validatePasswords() {
+                const passwordValid = passwordField.value.length >= 8;
+                const passwordsMatch = passwordField.value === confirmPasswordField.value && passwordValid;
+
+                passwordMessage.textContent = passwordValid ? '' : 'Password must be at least 8 characters long!';
+                confirmPasswordMessage.textContent = passwordsMatch ? '' : 'Passwords do not match!';
+
+                submitBtn.disabled = !passwordsMatch;
+                submitBtn.style.backgroundColor = passwordsMatch ? '#007bff' : '#b8daff';
+                submitBtn.style.borderColor = passwordsMatch ? '#007bff' : '#b8daff';
+                submitBtn.style.cursor = passwordsMatch ? 'pointer' : 'not-allowed';
+            }
+
+            passwordField.addEventListener('input', validatePasswords);
+            confirmPasswordField.addEventListener('input', validatePasswords);
+
+            document.getElementById('editProfileForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                let formData = new FormData(this);
+
+                fetch('', {
+                    method: 'POST',
+                    body: formData
                 })
-                .catch(error => console.error('Error:', error));
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            Swal.fire({ icon: 'success', title: data.title, text: data.message, timer: 1500, showConfirmButton: false }).then(() => { window.location.reload(); });
+                        } else {
+                            Swal.fire({ icon: 'error', title: data.title, text: data.message, showConfirmButton: true });
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
         });
 
         function confirmDelete() {
@@ -374,32 +420,34 @@ $query->generate_csrf_token();
             <div class="card">
                 <div class="card-header bg-dark text-white">Users List</div>
                 <div class="card-body">
-                    <table id="usersTable" class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Username</th>
-                                <th>Role</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($users as $user): ?>
+                    <div class="table-responsive" style="overflow-x: auto;">
+                        <table id="usersTable" class="table table-bordered">
+                            <thead>
                                 <tr>
-                                    <td><?= $user['id'] ?></td>
-                                    <td><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></td>
-                                    <td><?= htmlspecialchars($user['username']) ?></td>
-                                    <td class="text-center">
-                                        <span class="badge bg-info text-dark"><?= htmlspecialchars($user['role']); ?></span>
-                                    </td>
-                                    <td>
-                                        <a href="users.php?id=<?= $user['id'] ?>" class="btn btn-warning btn-sm">Details</a>
-                                    </td>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Username</th>
+                                    <th>Role</th>
+                                    <th>Action</th>
                                 </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($users as $user): ?>
+                                    <tr>
+                                        <td><?= $user['id'] ?></td>
+                                        <td><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></td>
+                                        <td><?= htmlspecialchars($user['username']) ?></td>
+                                        <td class="text-center">
+                                            <span class="badge bg-info text-dark"><?= htmlspecialchars($user['role']); ?></span>
+                                        </td>
+                                        <td>
+                                            <a href="users.php?id=<?= $user['id'] ?>" class="btn btn-warning btn-sm">Details</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -438,6 +486,17 @@ $query->generate_csrf_token();
                                 </button>
                             </div>
                             <small id="password-message" class="text-danger"></small>
+                        </div>
+                        <div class="mb-3 position-relative">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                            <div class="input-group">
+                                <input type="password" id="confirm_password" name="confirm_password" class="form-control"
+                                    required maxlength="255">
+                                <button type="button" id="toggle-confirm-password" class="btn btn-outline-secondary">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small id="confirm-password-message" class="text-danger"></small>
                         </div>
                         <div class="mb-3">
                             <label for="role" class="form-label">Role</label>
@@ -493,22 +552,26 @@ $query->generate_csrf_token();
             const fields = {
                 email: document.getElementById('email'),
                 username: document.getElementById('username'),
-                password: document.getElementById('password')
+                password: document.getElementById('password'),
+                confirmPassword: document.getElementById('confirm_password')
             };
             const messages = {
                 email: document.getElementById('email-message'),
                 username: document.getElementById('username-message'),
-                password: document.getElementById('password-message')
+                password: document.getElementById('password-message'),
+                confirmPassword: document.getElementById('confirm-password-message')
             };
             const submitBtn = document.getElementById('submit');
             const togglePassword = document.getElementById('toggle-password');
+            const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
 
             let availability = { email: false, username: false };
 
             const validators = {
                 email: email => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(email),
                 username: username => /^[a-zA-Z0-9_]{3,30}$/.test(username),
-                password: password => password.length >= 8
+                password: password => password.length >= 8,
+                confirmPassword: () => fields.password.value === fields.confirmPassword.value
             };
 
             function checkAvailability(type, value) {
@@ -527,11 +590,14 @@ $query->generate_csrf_token();
             }
 
             function updateSubmitState() {
-                const validEmail = fields.email.value.length === 0 || validators.email(fields.email.value) && availability.email;
-                const validUsername = fields.username.value.length === 0 || validators.username(fields.username.value) && availability.username;
-                const validPassword = fields.password.value.length === 0 || validators.password(fields.password.value);
+                const validEmail = validators.email(fields.email.value) && availability.email;
+                const validUsername = validators.username(fields.username.value) && availability.username;
+                const validPassword = validators.password(fields.password.value);
+                const validConfirmPassword = validators.confirmPassword();
 
-                const isValid = validEmail && validUsername && validPassword;
+                messages.confirmPassword.textContent = validConfirmPassword ? '' : 'Passwords do not match!';
+
+                const isValid = validEmail && validUsername && validPassword && validConfirmPassword;
                 submitBtn.disabled = !isValid;
                 submitBtn.style.backgroundColor = isValid ? '#007bff' : '#b8daff';
                 submitBtn.style.borderColor = isValid ? '#007bff' : '#b8daff';
@@ -541,22 +607,31 @@ $query->generate_csrf_token();
             Object.keys(fields).forEach(type => {
                 fields[type].addEventListener('input', function () {
                     if (!validators[type](this.value)) {
-                        messages[type].textContent = type === 'password' ? 'Password must be at least 8 characters long!' : `Invalid ${type} format!`;
+                        messages[type].textContent = type === 'password'
+                            ? 'Password must be at least 8 characters long!'
+                            : type === 'confirmPassword'
+                                ? 'Passwords do not match!'
+                                : `Invalid ${type} format!`;
                         availability[type] = false;
                         updateSubmitState();
                         return;
                     }
                     messages[type].textContent = '';
-                    if (type !== 'password') checkAvailability(type, this.value);
+                    if (type !== 'password' && type !== 'confirmPassword') checkAvailability(type, this.value);
                     updateSubmitState();
                 });
             });
 
-            togglePassword.addEventListener('click', function () {
-                fields.password.type = fields.password.type === 'password' ? 'text' : 'password';
-                this.querySelector('i').classList.toggle('fa-eye');
-                this.querySelector('i').classList.toggle('fa-eye-slash');
-            });
+            function toggleVisibility(field, toggleButton) {
+                toggleButton.addEventListener('click', function () {
+                    field.type = field.type === 'password' ? 'text' : 'password';
+                    this.querySelector('i').classList.toggle('fa-eye');
+                    this.querySelector('i').classList.toggle('fa-eye-slash');
+                });
+            }
+
+            toggleVisibility(fields.password, togglePassword);
+            toggleVisibility(fields.confirmPassword, toggleConfirmPassword);
 
             form.addEventListener('submit', async function (event) {
                 event.preventDefault();
@@ -573,23 +648,22 @@ $query->generate_csrf_token();
                         showConfirmButton: data.status !== 'success'
                     });
 
-                    console.log(data)
                     if (data.status === 'success') {
                         let newRow = `
-                            <tr>
-                                <td>${data.user.id}</td>
-                                <td>${data.user.first_name} ${data.user.last_name}</td>
-                                <td>${data.user.username}</td>
-                                <td class="text-center">
-                                    <span class="badge bg-info text-dark">${data.user.role}</span>
-                                </td>
-                                <td>
-                                    <a href="users.php?id=${data.user.id}" class="btn btn-warning btn-sm">Details</a>
-                                </td>
-                            </tr>`;
+                    <tr>
+                        <td>${data.user.id}</td>
+                        <td>${data.user.first_name} ${data.user.last_name}</td>
+                        <td>${data.user.username}</td>
+                        <td class="text-center">
+                            <span class="badge bg-info text-dark">${data.user.role}</span>
+                        </td>
+                        <td>
+                            <a href="users.php?id=${data.user.id}" class="btn btn-warning btn-sm">Details</a>
+                        </td>
+                    </tr>`;
 
                         document.querySelector('#usersTable tbody').insertAdjacentHTML('beforeend', newRow);
-                        document.getElementById('signupForm').reset();
+                        form.reset();
                     }
                 } catch (error) {
                     console.error('Fetch error:', error);

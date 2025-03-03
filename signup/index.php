@@ -18,12 +18,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $email = trim(strtolower($_POST['email']));
         $username = trim(strtolower($_POST['username']));
         $password = $_POST['password'];
+        $confirm_password = $_POST['confirm_password'];
 
         // ---- Default Role ---- //
         $role = 'user';
         // ---------------------- //
 
-        if (empty($first_name) || empty($last_name) || empty($email) || empty($username) || empty($password)) {
+        if (empty($first_name) || empty($last_name) || empty($email) || empty($username) || empty($password) || empty($confirm_password) || empty($role)) {
             echo json_encode(['status' => 'error', 'title' => 'Validation Error', 'message' => 'All fields are required!']);
             exit;
         }
@@ -50,6 +51,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if (!empty($query->select('users', 'username', 'username = ?', [$username], 's'))) {
             echo json_encode(['status' => 'error', 'title' => 'Username', 'message' => 'This username is already taken!']);
+            exit;
+        }
+
+        if ($password !== $confirm_password) {
+            echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Passwords do not match!']);
             exit;
         }
 
@@ -186,6 +192,17 @@ $query->generate_csrf_token();
                             </div>
                             <small id="password-message" class="text-danger"></small>
                         </div>
+                        <div class="mb-3 position-relative">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                            <div class="input-group">
+                                <input type="password" id="confirm_password" name="confirm_password"
+                                    class="form-control" required maxlength="255">
+                                <button type="button" id="toggle-confirm-password" class="btn btn-outline-secondary">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small id="confirm-password-message" class="text-danger"></small>
+                        </div>
                         <div class="mb-3">
                             <input type="hidden" name="action" value="signup">
                         </div>
@@ -212,22 +229,26 @@ $query->generate_csrf_token();
             const fields = {
                 email: document.getElementById('email'),
                 username: document.getElementById('username'),
-                password: document.getElementById('password')
+                password: document.getElementById('password'),
+                confirmPassword: document.getElementById('confirm_password')
             };
             const messages = {
                 email: document.getElementById('email-message'),
                 username: document.getElementById('username-message'),
-                password: document.getElementById('password-message')
+                password: document.getElementById('password-message'),
+                confirmPassword: document.getElementById('confirm-password-message')
             };
             const submitBtn = document.getElementById('submit');
             const togglePassword = document.getElementById('toggle-password');
+            const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
 
             let availability = { email: false, username: false };
 
             const validators = {
                 email: email => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(email),
                 username: username => /^[a-zA-Z0-9_]{3,30}$/.test(username),
-                password: password => password.length >= 8
+                password: password => password.length >= 8,
+                confirmPassword: () => fields.password.value === fields.confirmPassword.value
             };
 
             function checkAvailability(type, value) {
@@ -246,11 +267,14 @@ $query->generate_csrf_token();
             }
 
             function updateSubmitState() {
-                const validEmail = fields.email.value.length === 0 || validators.email(fields.email.value) && availability.email;
-                const validUsername = fields.username.value.length === 0 || validators.username(fields.username.value) && availability.username;
-                const validPassword = fields.password.value.length === 0 || validators.password(fields.password.value);
+                const validEmail = validators.email(fields.email.value) && availability.email;
+                const validUsername = validators.username(fields.username.value) && availability.username;
+                const validPassword = validators.password(fields.password.value);
+                const validConfirmPassword = validators.confirmPassword();
 
-                const isValid = validEmail && validUsername && validPassword;
+                messages.confirmPassword.textContent = validConfirmPassword ? '' : 'Passwords do not match!';
+
+                const isValid = validEmail && validUsername && validPassword && validConfirmPassword;
                 submitBtn.disabled = !isValid;
                 submitBtn.style.backgroundColor = isValid ? '#007bff' : '#b8daff';
                 submitBtn.style.borderColor = isValid ? '#007bff' : '#b8daff';
@@ -260,22 +284,31 @@ $query->generate_csrf_token();
             Object.keys(fields).forEach(type => {
                 fields[type].addEventListener('input', function () {
                     if (!validators[type](this.value)) {
-                        messages[type].textContent = type === 'password' ? 'Password must be at least 8 characters long!' : `Invalid ${type} format!`;
+                        messages[type].textContent = type === 'password'
+                            ? 'Password must be at least 8 characters long!'
+                            : type === 'confirmPassword'
+                                ? 'Passwords do not match!'
+                                : `Invalid ${type} format!`;
                         availability[type] = false;
                         updateSubmitState();
                         return;
                     }
                     messages[type].textContent = '';
-                    if (type !== 'password') checkAvailability(type, this.value);
+                    if (type !== 'password' && type !== 'confirmPassword') checkAvailability(type, this.value);
                     updateSubmitState();
                 });
             });
 
-            togglePassword.addEventListener('click', function () {
-                fields.password.type = fields.password.type === 'password' ? 'text' : 'password';
-                this.querySelector('i').classList.toggle('fa-eye');
-                this.querySelector('i').classList.toggle('fa-eye-slash');
-            });
+            function toggleVisibility(field, toggleButton) {
+                toggleButton.addEventListener('click', function () {
+                    field.type = field.type === 'password' ? 'text' : 'password';
+                    this.querySelector('i').classList.toggle('fa-eye');
+                    this.querySelector('i').classList.toggle('fa-eye-slash');
+                });
+            }
+
+            toggleVisibility(fields.password, togglePassword);
+            toggleVisibility(fields.confirmPassword, toggleConfirmPassword);
 
             form.addEventListener('submit', async function (event) {
                 event.preventDefault();

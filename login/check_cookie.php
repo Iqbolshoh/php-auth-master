@@ -47,40 +47,57 @@ function get_device_name()
 {
     $user_agent = $_SERVER['HTTP_USER_AGENT'];
 
-    $devices = [
-        // Apple
-        '/iPhone/' => 'iPhone',
-        '/iPad/' => 'iPad',
-        '/Mac/' => 'Mac',
+    $patterns = [
+        // Windows versions (extracting the version dynamically)
+        'Windows NT ([0-9.]+)' => 'Windows',
 
-        // Windows
-        '/Windows NT 10/' => 'Windows 10',
-        '/Windows NT 6.3/' => 'Windows 8.1',
-        '/Windows NT 6.2/' => 'Windows 8',
-        '/Windows NT 6.1/' => 'Windows 7',
-        '/Windows NT 6.0/' => 'Windows Vista',
-        '/Windows NT 5.1/' => 'Windows XP',
+        // Apple devices (extracting the version for iPhone, iPad, and Mac)
+        'iPhone OS ([0-9_]+)' => 'iPhone',
+        'iPad; CPU OS ([0-9_]+)' => 'iPad',
+        'Mac OS X ([0-9_]+)' => 'Mac',
 
-        // Android
-        '/Android/' => 'Android',
+        // Android version extraction
+        'Android ([0-9.]+)' => 'Android',
 
-        // Linux
-        '/Ubuntu/' => 'Ubuntu',
-        '/Fedora/' => 'Fedora',
-        '/Debian/' => 'Debian',
-        '/Arch/' => 'Arch',
-        '/Linux/' => 'Linux',
+        // Linux distributions (some common ones)
+        'Ubuntu' => 'Ubuntu',
+        'Fedora' => 'Fedora',
+        'Debian' => 'Debian',
+        'Arch' => 'Arch',
+        'Mint' => 'Mint',
+        'Red Hat' => 'Red Hat',
+        'openSUSE' => 'openSUSE',
+        'CentOS' => 'CentOS',
+        'Gentoo' => 'Gentoo',
+        'Slackware' => 'Slackware',
+        'Linux' => 'Linux',
 
-        // Browsers
-        '/Chrome/' => 'Chrome',
-        '/Firefox/' => 'Firefox',
-        '/Edge/' => 'Edge',
-        '/Safari/' => 'Safari'
+        // Popular smartphone brands (extracting model numbers where possible)
+        'Samsung SM-([A-Za-z0-9]+)' => 'Samsung',
+        'Huawei ([A-Za-z0-9]+)' => 'Huawei',
+        'Redmi ([A-Za-z0-9]+)' => 'Redmi',
+        'Mi ([A-Za-z0-9]+)' => 'Xiaomi Mi',
+        'Poco ([A-Za-z0-9]+)' => 'Poco',
+        'OnePlus ([A-Za-z0-9]+)' => 'OnePlus',
+        'Oppo ([A-Za-z0-9]+)' => 'Oppo',
+        'Vivo ([A-Za-z0-9]+)' => 'Vivo',
+        'Realme ([A-Za-z0-9]+)' => 'Realme',
+        'Sony ([A-Za-z0-9]+)' => 'Sony Xperia',
+        'Nokia ([A-Za-z0-9]+)' => 'Nokia',
+        'Motorola ([A-Za-z0-9]+)' => 'Motorola',
+        'LG ([A-Za-z0-9]+)' => 'LG',
+        'Asus ([A-Za-z0-9]+)' => 'Asus',
+
+        // Tablet devices
+        'Lenovo TB-([A-Za-z0-9]+)' => 'Lenovo Tablet',
+        'Samsung SM-T([A-Za-z0-9]+)' => 'Samsung Tablet',
+        'iPad' => 'iPad',
     ];
 
-    foreach ($devices as $pattern => $device) {
-        if (preg_match($pattern, $user_agent)) {
-            return $device;
+    foreach ($patterns as $pattern => $device) {
+        if (preg_match('/' . $pattern . '/i', $user_agent, $matches)) {
+            $version = isset($matches[1]) ? ' ' . str_replace('_', '.', $matches[1]) : '';
+            return $device . $version;
         }
     }
 

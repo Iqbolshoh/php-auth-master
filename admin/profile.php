@@ -33,12 +33,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             'updated_at' => date('Y-m-d H:i:s')
         ];
 
-        if (!empty($_POST['password'])) {
-            if (strlen($_POST['password']) < 8) {
+        if (!empty($_POST['password']) && !empty($_POST['confirm_password'])) {
+            $password = $_POST['password'];
+            $confirm_password = $_POST['confirm_password'];
+            if ($password !== $confirm_password) {
+                echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Passwords do not match!']);
+                exit;
+            }
+
+            if (strlen($password) < 8) {
                 echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Password must be at least 8 characters long!']);
                 exit;
             }
-            $data['password'] = $query->hashPassword($_POST['password']);
+            $data['password'] = $query->hashPassword($password);
             $query->delete('active_sessions', 'user_id = ? AND session_token <> ?', [$_SESSION['user']['id'], session_id()], 'is');
         }
 
@@ -172,7 +179,7 @@ $query->generate_csrf_token();
                             value="<?php echo htmlspecialchars($user['username']); ?>" maxlength="30" disabled>
                     </div>
                     <div class="mb-3 position-relative">
-                        <label class="form-label">Password</label>
+                        <label for="password" class="form-label">Password</label>
                         <div class="input-group">
                             <input type="password" id="password" name="password" class="form-control" maxlength="255">
                             <button type="button" id="toggle-password" class="btn btn-outline-secondary">
@@ -180,6 +187,17 @@ $query->generate_csrf_token();
                             </button>
                         </div>
                         <small id="password-message" class="text-danger"></small>
+                    </div>
+                    <div class="mb-3 position-relative">
+                        <label for="confirm_password" class="form-label">Confirm Password</label>
+                        <div class="input-group">
+                            <input type="password" id="confirm_password" name="confirm_password" class="form-control"
+                                maxlength="255">
+                            <button type="button" id="toggle-confirm-password" class="btn btn-outline-secondary">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <small id="confirm-password-message" class="text-danger"></small>
                     </div>
                     <div class="form-group">
                         <label class="form-label fw-bold">Upload Image</label>
@@ -219,42 +237,64 @@ $query->generate_csrf_token();
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    document.getElementById('toggle-password').addEventListener('click', function () {
+    document.addEventListener("DOMContentLoaded", function () {
         const passwordField = document.getElementById('password');
-        const toggleIcon = this.querySelector('i');
-        passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
-        toggleIcon.classList.toggle('fa-eye');
-        toggleIcon.classList.toggle('fa-eye-slash');
-    });
-
-    document.getElementById('password').addEventListener('input', function () {
+        const confirmPasswordField = document.getElementById('confirm_password');
+        const togglePassword = document.getElementById('toggle-password');
+        const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
         const passwordMessage = document.getElementById('password-message');
-        let submitBtn = document.getElementById('submit')
-        let isDisabled = this.value.length < 8;
-        submitBtn.disabled = isDisabled;
-        submitBtn.style.backgroundColor = !isDisabled ? '#007bff' : '#b8daff';
-        submitBtn.style.borderColor = !isDisabled ? '#007bff' : '#b8daff';
-        submitBtn.style.cursor = !isDisabled ? 'pointer' : 'not-allowed';
-        passwordMessage.textContent = isDisabled ? 'Password must be at least 8 characters long!' : '';
-    });
+        const confirmPasswordMessage = document.getElementById('confirm-password-message');
+        const submitBtn = document.getElementById('submit');
 
-    document.getElementById('editProfileForm').addEventListener('submit', function (event) {
-        event.preventDefault();
+        function toggleVisibility(field, icon) {
+            field.type = field.type === 'password' ? 'text' : 'password';
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        }
 
-        let formData = new FormData(this);
-        fetch('', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    Swal.fire({ icon: 'success', title: data.title, text: data.message, timer: 1500, showConfirmButton: false }).then(() => { window.location.reload(); })
-                } else {
-                    Swal.fire({ icon: 'error', title: data.title, text: data.message, showConfirmButton: true });
-                }
+        togglePassword.addEventListener('click', function () {
+            toggleVisibility(passwordField, this.querySelector('i'));
+        });
+
+        toggleConfirmPassword.addEventListener('click', function () {
+            toggleVisibility(confirmPasswordField, this.querySelector('i'));
+        });
+
+        function validatePasswords() {
+            const passwordValid = passwordField.value.length >= 8;
+            const passwordsMatch = passwordField.value === confirmPasswordField.value && passwordValid;
+
+            passwordMessage.textContent = passwordValid ? '' : 'Password must be at least 8 characters long!';
+            confirmPasswordMessage.textContent = passwordsMatch ? '' : 'Passwords do not match!';
+
+            submitBtn.disabled = !passwordsMatch;
+            submitBtn.style.backgroundColor = passwordsMatch ? '#007bff' : '#b8daff';
+            submitBtn.style.borderColor = passwordsMatch ? '#007bff' : '#b8daff';
+            submitBtn.style.cursor = passwordsMatch ? 'pointer' : 'not-allowed';
+        }
+
+        passwordField.addEventListener('input', validatePasswords);
+        confirmPasswordField.addEventListener('input', validatePasswords);
+
+        document.getElementById('editProfileForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            let formData = new FormData(this);
+
+            fetch('', {
+                method: 'POST',
+                body: formData
             })
-            .catch(error => console.error('Error:', error));
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        Swal.fire({ icon: 'success', title: data.title, text: data.message, timer: 1500, showConfirmButton: false }).then(() => { window.location.reload(); });
+                    } else {
+                        Swal.fire({ icon: 'error', title: data.title, text: data.message, showConfirmButton: true });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
     });
 </script>
 
