@@ -161,29 +161,19 @@ $query->generate_csrf_token();
             const passwordField = document.getElementById('password');
             const usernameError = document.getElementById('username-message');
             const passwordMessage = document.getElementById('password-message');
-            const submitButton = document.getElementById('submit');
             const togglePassword = document.getElementById('toggle-password');
             const loginForm = document.getElementById('loginForm');
-
-            const setButtonState = (disabled) => {
-                submitButton.disabled = disabled;
-                submitButton.style.cssText = disabled
-                    ? 'background-color: #b8daff; cursor: not-allowed; border-color: #b8daff;'
-                    : 'background-color: #007bff; cursor: pointer; border-color: #007bff;';
-            };
 
             const validateUsername = () => {
                 const username = usernameField.value.trim();
                 const isValid = /^[a-zA-Z0-9_]{3,30}$/.test(username);
                 usernameError.textContent = isValid ? '' : 'Username must be 3-30 characters: A-Z, a-z, 0-9, or _.';
-                setButtonState(!isValid);
                 return isValid;
             };
 
             const validatePassword = () => {
                 const isValid = passwordField.value.length >= 8;
                 passwordMessage.textContent = isValid ? '' : 'Password must be at least 8 characters long.';
-                setButtonState(!isValid);
                 return isValid;
             };
 
@@ -198,24 +188,35 @@ $query->generate_csrf_token();
 
             loginForm.addEventListener('submit', async (event) => {
                 event.preventDefault();
-                if (!validateUsername() || !validatePassword()) return;
 
                 try {
                     const formData = new FormData(loginForm);
-                    const response = await fetch('', { method: 'POST', body: formData });
-                    const data = await response.json();
+                    const response = await fetch('', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const responseText = await response.text();
+                    const data = JSON.parse(responseText);
 
                     Swal.fire({
                         icon: data.status === 'success' ? 'success' : 'error',
                         title: data.status === 'success' ? 'Login successful' : data.title,
-                        text: data.status === 'success' ? '' : data.message,
+                        text: data.message || '',
                         timer: data.status === 'success' ? 1500 : undefined,
                         showConfirmButton: data.status !== 'success'
                     }).then(() => {
                         if (data.status === 'success') window.location.href = data.redirect;
                     });
+
                 } catch (error) {
                     console.error('Fetch error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Something went wrong. Please try again later.',
+                        showConfirmButton: true
+                    });
                 }
             });
         });

@@ -24,8 +24,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             echo json_encode(['status' => 'error', 'message' => 'Device name cannot be empty!']);
             exit;
         }
-        $query->update('active_sessions', ['device_name' => $device_name], 'session_token = ? AND user_id = ?', [session_id(), $_SESSION['user']['id']], 'si');
-        echo json_encode(['status' => 'success', 'message' => 'Device name updated!', 'device_name' => $device_name]);
+        $updated = $query->update('active_sessions', ['device_name' => $device_name], 'session_token = ? AND user_id = ?', [session_id(), $_SESSION['user']['id']], 'si');
+        if ($updated) {
+            echo json_encode(['status' => 'success', 'message' => 'Device name updated!', 'device_name' => $device_name]);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Failed to update device name. Try again!']);
+        }
         exit;
     } elseif ($_POST['action'] === 'delete' && isset($_POST['token'])) {
         $deleted = $query->delete('active_sessions', 'user_id = ? AND session_token = ?', [$_SESSION['user']['id'], $_POST['token']], 'is');
@@ -147,7 +151,7 @@ $query->generate_csrf_token();
                         if (data.status === 'success') {
                             document.getElementById(`session-${data.token}`).remove();
                             Swal.fire({ title: 'Deleted!', text: data.message, icon: 'success', showConfirmButton: false, timer: 1500 }).then(() => {
-                                if ('<?= session_id() ?>' == token) {
+                                if ('<?= session_id() ?>' === token) {
                                     window.location.reload();
                                 }
                             });

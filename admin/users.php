@@ -106,16 +106,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             'updated_at' => date('Y-m-d H:i:s')
         ];
 
-        if (!empty($_POST['password']) && !empty($_POST['confirm_password'])) {
+        if (!empty($_POST['password']) && isset($_POST['confirm_password'])) {
             $password = $_POST['password'];
             $confirm_password = $_POST['confirm_password'];
-            if ($password !== $confirm_password) {
-                echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Passwords do not match!']);
-                exit;
-            }
-
             if (strlen($password) < 8) {
                 echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Password must be at least 8 characters long!']);
+                exit;
+            }
+            if ($password !== $confirm_password) {
+                echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Passwords do not match!']);
                 exit;
             }
             $data['password'] = $query->hashPassword(password: $password);
@@ -360,11 +359,6 @@ $query->generate_csrf_token();
 
                 passwordMessage.textContent = passwordValid ? '' : 'Password must be at least 8 characters long!';
                 confirmPasswordMessage.textContent = passwordsMatch ? '' : 'Passwords do not match!';
-
-                submitBtn.disabled = !passwordsMatch;
-                submitBtn.style.backgroundColor = passwordsMatch ? '#007bff' : '#b8daff';
-                submitBtn.style.borderColor = passwordsMatch ? '#007bff' : '#b8daff';
-                submitBtn.style.cursor = passwordsMatch ? 'pointer' : 'not-allowed';
             }
 
             passwordField.addEventListener('input', validatePasswords);
@@ -412,8 +406,6 @@ $query->generate_csrf_token();
     </script>
 
 <?php else: ?>
-
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
     <div class="row">
         <div class="col-md-8">
@@ -568,7 +560,7 @@ $query->generate_csrf_token();
             let availability = { email: false, username: false };
 
             const validators = {
-                email: email => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(email),
+                email: email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
                 username: username => /^[a-zA-Z0-9_]{3,30}$/.test(username),
                 password: password => password.length >= 8,
                 confirmPassword: () => fields.password.value === fields.confirmPassword.value
@@ -585,40 +577,36 @@ $query->generate_csrf_token();
                     .then(data => {
                         messages[type].textContent = data.exists ? `This ${type} is already taken!` : '';
                         availability[type] = !data.exists;
-                        updateSubmitState();
                     });
-            }
-
-            function updateSubmitState() {
-                const validEmail = fields.email.value.length === 0 || validators.email(fields.email.value) && availability.email;
-                const validUsername = fields.username.value.length === 0 || validators.username(fields.username.value) && availability.username;
-                const validPassword = fields.password.value.length === 0 || validators.password(fields.password.value);
-                const validConfirmPassword = fields.password.value.length === 0 || validators.confirmPassword();
-
-                messages.confirmPassword.textContent = validConfirmPassword ? '' : 'Passwords do not match!';
-
-                const isValid = validEmail && validUsername && validPassword && validConfirmPassword;
-                submitBtn.disabled = !isValid;
-                submitBtn.style.backgroundColor = isValid ? '#007bff' : '#b8daff';
-                submitBtn.style.borderColor = isValid ? '#007bff' : '#b8daff';
-                submitBtn.style.cursor = isValid ? 'pointer' : 'not-allowed'
             }
 
             Object.keys(fields).forEach(type => {
                 fields[type].addEventListener('input', function () {
                     if (!validators[type](this.value)) {
-                        messages[type].textContent = type === 'password'
-                            ? 'Password must be at least 8 characters long!'
-                            : type === 'confirmPassword'
-                                ? 'Passwords do not match!'
-                                : `Invalid ${type} format!`;
+                        messages[type].textContent =
+                            type === 'username' ? 'Username must be 3-30 characters: A-Z, a-z, 0-9, or _!' :
+                                type === 'password' ? 'Password must be at least 8 characters long!' :
+                                    type === 'confirmPassword' ? 'Passwords do not match!' :
+                                        `Invalid ${type} format!`;
+
                         availability[type] = false;
-                        updateSubmitState();
                         return;
                     }
+
                     messages[type].textContent = '';
+                    availability[type] = true;
+
+                    if (type === 'password' || type === 'confirmPassword') {
+                        if (fields.password.value !== fields.confirmPassword.value) {
+                            messages.confirmPassword.textContent = 'Passwords do not match!';
+                            availability.confirmPassword = false;
+                        } else {
+                            messages.confirmPassword.textContent = '';
+                            availability.confirmPassword = true;
+                        }
+                    }
+
                     if (type !== 'password' && type !== 'confirmPassword') checkAvailability(type, this.value);
-                    updateSubmitState();
                 });
             });
 

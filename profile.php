@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             'updated_at' => date('Y-m-d H:i:s')
         ];
 
-        if (!empty($_POST['password']) && !empty($_POST['confirm_password'])) {
+        if (!empty($_POST['password']) && isset($_POST['confirm_password'])) {
             $password = $_POST['password'];
             $confirm_password = $_POST['confirm_password'];
             if (strlen($password) < 8) {
@@ -265,11 +265,6 @@ $query->generate_csrf_token();
 
             passwordMessage.textContent = passwordValid ? '' : 'Password must be at least 8 characters long!';
             confirmPasswordMessage.textContent = passwordsMatch ? '' : 'Passwords do not match!';
-
-            submitBtn.disabled = !passwordsMatch;
-            submitBtn.style.backgroundColor = passwordsMatch ? '#007bff' : '#b8daff';
-            submitBtn.style.borderColor = passwordsMatch ? '#007bff' : '#b8daff';
-            submitBtn.style.cursor = passwordsMatch ? 'pointer' : 'not-allowed';
         }
 
         passwordField.addEventListener('input', validatePasswords);
