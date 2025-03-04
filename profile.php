@@ -5,7 +5,7 @@ include './config.php';
 $query = new Database();
 $query->check_session('user');
 
-$user = $query->select("users", '*', "id = ?", [$_SESSION['user']['id']], 'i')[0];
+$user = $query->select("users", '*', "id = ?", [$_SESSION['user']['id']])[0];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (
@@ -44,8 +44,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Passwords do not match!']);
                 exit;
             }
-            $data['password'] = $query->hashPassword($password);
-            $query->delete('active_sessions', 'user_id = ? AND session_token <> ?', [$_SESSION['user']['id'], session_id()], 'is');
+            $data['password'] = password_hash($password, PASSWORD_DEFAULT);
+            $query->delete('active_sessions', 'user_id = ? AND session_token <> ?', [$_SESSION['user']['id'], session_id()]);
         }
 
         if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
@@ -63,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
         }
 
-        $update = $query->update("users", $data, "id = ?", [$_SESSION['user']['id']], "i");
+        $update = $query->update("users", $data, "id = ?", [$_SESSION['user']['id']]);
 
         if ($update) {
             $_SESSION['user']['first_name'] = $data['first_name'];

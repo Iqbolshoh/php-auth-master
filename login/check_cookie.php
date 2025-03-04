@@ -17,22 +17,21 @@ if (!empty($_COOKIE['username']) && !empty($_COOKIE['session_token']) && session
 
 if (!empty($_COOKIE['username'])) {
     $username = $_COOKIE['username'];
-    $user = $query->select('users', '*', 'username = ?', [$username], 's')[0] ?? null;
+    $user = $query->select('users', '*', 'username = ?', [$username])[0] ?? null;
 
     if (!empty($user)) {
         unset($user['password']);
         $_SESSION['loggedin'] = true;
         $_SESSION['user'] = $user;
 
-        $active_session = $query->select('active_sessions', '*', 'session_token = ?', [session_id()], 's');
+        $active_session = $query->select('active_sessions', '*', 'session_token = ?', [session_id()]);
 
         if (!empty($active_session)) {
             $query->update(
                 'active_sessions',
                 ['last_activity' => date('Y-m-d H:i:s')],
                 'session_token = ?',
-                [session_id()],
-                's'
+                [session_id()]
             );
         }
 

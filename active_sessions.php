@@ -5,7 +5,7 @@ include './config.php';
 $query = new Database();
 $query->check_session('user');
 
-$active_sessions = $query->select('active_sessions', '*', 'user_id = ?', [$_SESSION['user']['id']], 'i');
+$active_sessions = $query->select('active_sessions', '*', 'user_id = ?', [$_SESSION['user']['id']]);
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (
@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             echo json_encode(['status' => 'error', 'message' => 'Device name cannot be empty!']);
             exit;
         }
-        $updated = $query->update('active_sessions', ['device_name' => $device_name], 'session_token = ? AND user_id = ?', [session_id(), $_SESSION['user']['id']], 'si');
+        $updated = $query->update('active_sessions', ['device_name' => $device_name], 'session_token = ? AND user_id = ?', [session_id(), $_SESSION['user']['id']]);
         if ($updated) {
             echo json_encode(['status' => 'success', 'message' => 'Device name updated!', 'device_name' => $device_name]);
         } else {
@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
         exit;
     } elseif ($_POST['action'] === 'delete' && isset($_POST['token'])) {
-        $deleted = $query->delete('active_sessions', 'user_id = ? AND session_token = ?', [$_SESSION['user']['id'], $_POST['token']], 'is');
+        $deleted = $query->delete('active_sessions', 'user_id = ? AND session_token = ?', [$_SESSION['user']['id'], $_POST['token']]);
         if ($deleted) {
             echo json_encode(['status' => 'success', 'message' => 'Session deleted!', 'token' => $_POST['token']]);
         } else {

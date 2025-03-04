@@ -35,11 +35,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Password must be at least 8 characters long!']);
             exit;
         }
-        $hashed_password = $query->hashPassword($password);
 
-        $user = $query->select('users', '*', 'username = ? AND password = ?', [$username, $hashed_password], 'ss')[0] ?? null;
-
-        if (!empty($user)) {
+        $user = $query->select('users', '*', 'username = ?', [$username])[0] ?? null;
+        if (!empty($user) && password_verify($password, $user['password'])) {
             unset($user['password']);
             $_SESSION['loggedin'] = true;
             $_SESSION['user'] = $user;

@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit;
         }
 
-        if (!empty($query->select('users', 'email', 'email = ?', [$email], 's'))) {
+        if (!empty($query->select('users', 'email', 'email = ?', [$email]))) {
             echo json_encode(['status' => 'error', 'title' => 'Email', 'message' => 'This email is already registered!']);
             exit;
         }
@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit;
         }
 
-        if (!empty($query->select('users', 'username', 'username = ?', [$username], 's'))) {
+        if (!empty($query->select('users', 'username', 'username = ?', [$username]))) {
             echo json_encode(['status' => 'error', 'title' => 'Username', 'message' => 'This username is already taken!']);
             exit;
         }
@@ -63,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Passwords do not match!']);
             exit;
         }
-        $hashed_password = $query->hashPassword($password);
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
         $query->insert(
             'users',
@@ -79,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             ]
         );
 
-        $user = $query->select('users', '*', 'username = ?', [$username], 's')[0] ?? null;
+        $user = $query->select('users', '*', 'username = ?', [$username])[0] ?? null;
 
         if (!empty($user)) {
             unset($user['password']);

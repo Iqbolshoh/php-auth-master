@@ -5,11 +5,11 @@ include '../config.php';
 $query = new Database();
 $query->check_session('admin');
 
-$users = $query->select('users', '*', 'id <> ?', [$_SESSION['user']['id']], 's');
+$users = $query->select('users', '*', 'id <> ?', [$_SESSION['user']['id']]);
 
 if (isset($_GET['id'])) {
     $user_id = intval($_GET['id']);
-    $user = $query->select('users', '*', 'id = ?', [$user_id], 'i')[0] ?? null;
+    $user = $query->select('users', '*', 'id = ?', [$user_id])[0] ?? null;
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit;
         }
 
-        if (!empty($query->select('users', 'email', 'email = ?', [$email], 's'))) {
+        if (!empty($query->select('users', 'email', 'email = ?', [$email]))) {
             echo json_encode(['status' => 'error', 'title' => 'Email', 'message' => 'This email is already registered!']);
             exit;
         }
@@ -57,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit;
         }
 
-        if (!empty($query->select('users', 'username', 'username = ?', [$username], 's'))) {
+        if (!empty($query->select('users', 'username', 'username = ?', [$username]))) {
             echo json_encode(['status' => 'error', 'title' => 'Username', 'message' => 'This username is already taken!']);
             exit;
         }
@@ -71,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Passwords do not match!']);
             exit;
         }
-        $hashed_password = $query->hashPassword($password);
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
         $data = [
             'first_name' => $first_name,
@@ -117,8 +117,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Passwords do not match!']);
                 exit;
             }
-            $data['password'] = $query->hashPassword(password: $password);
-            $query->delete('active_sessions', 'user_id = ?', [$user_id], 'i');
+            $data['password'] = password_hash($password, PASSWORD_DEFAULT);
+            $query->delete('active_sessions', 'user_id = ?', [$user_id]);
         }
 
         if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
@@ -135,7 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
         }
 
-        $update = $query->update("users", $data, "id = ?", [$user_id], "i");
+        $update = $query->update("users", $data, "id = ?", [$user_id]);
 
         if ($update) {
             echo json_encode(['status' => 'success', 'title' => 'Success!', 'message' => 'Profile updated successfully!']);
@@ -146,7 +146,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } elseif ($_POST['action'] === 'delete') {
         if (isset($_POST['delete_id'])) {
             $delete_id = $_POST['delete_id'];
-            $query->delete("users", "id = ?", [$delete_id], 'i');
+            $query->delete("users", "id = ?", [$delete_id]);
             header("Location: ./users.php");
             exit;
         }
