@@ -15,6 +15,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($_POST['action'] == 'login') {
         $username = trim(strtolower($_POST['username']));
         $password = $_POST['password'];
+        $ip = $_SERVER['REMOTE_ADDR'];
+        $max_attempts = 5;
+        $lockout_time = 60;
 
         if (empty($username) || empty($password)) {
             echo json_encode(['status' => 'error', 'title' => 'Validation Error', 'message' => 'All fields are required!']);
@@ -33,6 +36,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if (strlen($password) < 8) {
             echo json_encode(['status' => 'error', 'title' => 'Password', 'message' => 'Password must be at least 8 characters long!']);
+            exit;
+        }
+
+        $failed = $query->select('failed_logins', '*', 'ip_address = ?', [$ip])[0] ?? null;
+        $last_attempt_time = strtotime($failed['last_attempt'] ?? '1970-01-01 00:00:00');
+
+        if ($failed && $failed['attempts'] >= $max_attempts && (time() - $last_attempt_time) < $lockout_time) {
+            $remaining_time = $lockout_time - (time() - $last_attempt_time);
+
+            $minutes = str_pad(floor($remaining_time / 60), 2, '0', STR_PAD_LEFT); 
+            $seconds = str_pad($remaining_time % 60, 2, '0', STR_PAD_LEFT); 
+
+            echo json_encode([
+                'status' => 'error',
+                'title' => 'Too many attempts',
+                'message' => "Too many failed login attempts. Try again in {$minutes}:{$seconds}!"
+            ]);
             exit;
         }
 
@@ -57,6 +77,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 ]);
             }
 
+            $query->execute("DELETE FROM failed_logins WHERE ip_address = ?", [$ip]);
+
             $query->insert('active_sessions', [
                 'user_id' => $_SESSION['user']['id'],
                 'device_name' => get_device_name(),
@@ -67,6 +89,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             echo json_encode(['status' => 'success', 'redirect' => SITE_PATH . ROLES[$_SESSION['user']['role']]]);
         } else {
+            if ($failed) {
+                $query->execute("UPDATE failed_logins SET attempts = attempts + 1, last_attempt = ? WHERE ip_address = ?", [date('Y-m-d H:i:s'), $ip]);
+            } else {
+                $query->insert('failed_logins', ['ip_address' => $ip, 'attempts' => 1, 'last_attempt' => date('Y-m-d H:i:s')]);
+            }
             echo json_encode(['status' => 'error', 'title' => 'Oops...', 'message' => 'Login or password is incorrect']);
         }
         exit;

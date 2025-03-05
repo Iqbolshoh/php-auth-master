@@ -30,6 +30,14 @@ CREATE TABLE active_sessions (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- 3. FAILED LOGINS TABLE
+CREATE TABLE failed_logins (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    ip_address VARCHAR(45) NOT NULL UNIQUE,
+    attempts INT NOT NULL DEFAULT 1,
+    last_attempt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- ==============================  
 -- 📥 DATA INSERTION (COMPLETE)  
 -- ==============================  
@@ -38,5 +46,5 @@ CREATE TABLE active_sessions (
 
 -- INSERTING USERS
 INSERT INTO users (first_name, last_name, email, username, password, role, profile_picture) VALUES 
-('Iqbolshoh', 'Ilhomjonov', 'iilhomjonov777@gmail.com', 'iqbolshoh', '52be5ff91284c65bac56f280df55f797a5c505f7ef66317ff358e34791507027', 'admin', '790d5772254c72bf5c01d43920d8e6a6.jpeg'),
-('User', 'User', 'user@iqbolshoh.uz', 'user',  '52be5ff91284c65bac56f280df55f797a5c505f7ef66317ff358e34791507027',  'user', 'default.png');
+('Iqbolshoh', 'Ilhomjonov', 'iilhomjonov777@gmail.com', 'iqbolshoh', '$2y$10$FK1CG7WYwBbjC/rNTscuGOuH05Jqs.fxLxYB0rZ..Y1keEoDiEQMu', 'admin', '790d5772254c72bf5c01d43920d8e6a6.jpeg'),
+('User', 'User', 'user@iqbolshoh.uz', 'user',  '$2y$10$FK1CG7WYwBbjC/rNTscuGOuH05Jqs.fxLxYB0rZ..Y1keEoDiEQMu',  'user', 'default.png');
