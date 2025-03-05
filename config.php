@@ -144,15 +144,6 @@ class Database
      */
     public function check_session($role)
     {
-        // if (
-        //     ($_SESSION['loggedin'] ?? false) !== true || ($_SESSION['user']['role'] ?? '') !== $role ||
-        //     !$this->conn->query("SELECT 1 FROM active_sessions WHERE session_token = " . $this->conn->quote(session_id()))->fetchColumn()
-        // ) {
-        //     header("Location: " . SITE_PATH . "/logout/");
-        //     exit;
-        // }
-
-
         if (($_SESSION['loggedin'] ?? false) !== true || ($_SESSION['user']['role'] ?? '') !== $role) {
             header("Location: " . SITE_PATH . "/login/");
             exit;
@@ -162,14 +153,6 @@ class Database
             header("Location: " . SITE_PATH . "/logout/");
             exit;
         }
-
-        // if (
-        //     !($_SESSION['loggedin'] ?? false) || ($_SESSION['user']['role'] ?? '') !== $role ||
-        //     !$this->count('active_sessions', 'session_token = ?', [session_id()])
-        // ) {
-        //     header("Location: " . SITE_PATH . "/logout/");
-        //     exit;
-        // }
     }
 
     /**
