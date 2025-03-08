@@ -17,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $password = $_POST['password'];
         $ip = $_SERVER['REMOTE_ADDR'];
         $max_attempts = 5;
-        $lockout_time = 60;
+        $lockout_time = 900;
 
         if (empty($username) || empty($password)) {
             echo json_encode(['status' => 'error', 'title' => 'Validation Error', 'message' => 'All fields are required!']);
