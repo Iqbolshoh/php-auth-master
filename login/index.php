@@ -15,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($_POST['action'] == 'login') {
         $username = trim(strtolower($_POST['username']));
         $password = $_POST['password'];
-        $ip = $_SERVER['REMOTE_ADDR'];
+        $ip_address = $_SERVER['REMOTE_ADDR'];
         $max_attempts = 5;
         $lockout_time = 900;
 
@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit;
         }
 
-        $failed = $query->select('failed_logins', '*', 'ip_address = ?', [$ip])[0] ?? null;
+        $failed = $query->select('failed_logins', '*', 'ip_address = ?', [$ip_address])[0] ?? null;
         $last_attempt_time = strtotime($failed['last_attempt'] ?? '1970-01-01 00:00:00');
 
         if ($failed && $failed['attempts'] >= $max_attempts && (time() - $last_attempt_time) < $lockout_time) {
@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 ]);
             }
 
-            $query->execute("DELETE FROM failed_logins WHERE ip_address = ?", [$ip]);
+            $query->execute("DELETE FROM failed_logins WHERE ip_address = ?", [$ip_address]);
 
             $query->insert('active_sessions', [
                 'user_id' => $_SESSION['user']['id'],
@@ -90,9 +90,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             echo json_encode(['status' => 'success', 'redirect' => SITE_PATH . ROLES[$_SESSION['user']['role']]]);
         } else {
             if ($failed) {
-                $query->execute("UPDATE failed_logins SET attempts = attempts + 1, last_attempt = ? WHERE ip_address = ?", [date('Y-m-d H:i:s'), $ip]);
+                $query->execute("UPDATE failed_logins SET attempts = attempts + 1, last_attempt = ? WHERE ip_address = ?", [date('Y-m-d H:i:s'), $ip_address]);
             } else {
-                $query->insert('failed_logins', ['ip_address' => $ip, 'attempts' => 1, 'last_attempt' => date('Y-m-d H:i:s')]);
+                $query->insert('failed_logins', ['ip_address' => $ip_address, 'attempts' => 1, 'last_attempt' => date('Y-m-d H:i:s')]);
             }
             echo json_encode(['status' => 'error', 'title' => 'Oops...', 'message' => 'Login or password is incorrect']);
         }
