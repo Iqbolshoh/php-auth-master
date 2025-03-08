@@ -90,7 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             echo json_encode(['status' => 'success', 'redirect' => SITE_PATH . ROLES[$_SESSION['user']['role']]]);
         } else {
             if ($failed) {
-                $query->update('failed_logins', ['attempts' => 'attempts + 1', 'last_attempt' => date('Y-m-d H:i:s')], 'ip_address = ?', [$ip_address]);
+                $query->update('failed_logins', ['attempts' => $failed['attempts'] + 1, 'last_attempt' => date('Y-m-d H:i:s')], 'ip_address = ?', [$ip_address]);
             } else {
                 $query->insert('failed_logins', ['ip_address' => $ip_address, 'attempts' => 1, 'last_attempt' => date('Y-m-d H:i:s')]);
             }
