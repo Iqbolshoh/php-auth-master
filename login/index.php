@@ -45,8 +45,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($failed && $failed['attempts'] >= $max_attempts && (time() - $last_attempt_time) < $lockout_time) {
             $remaining_time = $lockout_time - (time() - $last_attempt_time);
 
-            $minutes = str_pad(floor($remaining_time / 60), 2, '0', STR_PAD_LEFT); 
-            $seconds = str_pad($remaining_time % 60, 2, '0', STR_PAD_LEFT); 
+            $minutes = str_pad(floor($remaining_time / 60), 2, '0', STR_PAD_LEFT);
+            $seconds = str_pad($remaining_time % 60, 2, '0', STR_PAD_LEFT);
 
             echo json_encode([
                 'status' => 'error',
@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 ]);
             }
 
-            $query->execute("DELETE FROM failed_logins WHERE ip_address = ?", [$ip_address]);
+            $query->delete('failed_logins', 'ip_address = ?', [$ip_address]);
 
             $query->insert('active_sessions', [
                 'user_id' => $_SESSION['user']['id'],
@@ -90,7 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             echo json_encode(['status' => 'success', 'redirect' => SITE_PATH . ROLES[$_SESSION['user']['role']]]);
         } else {
             if ($failed) {
-                $query->execute("UPDATE failed_logins SET attempts = attempts + 1, last_attempt = ? WHERE ip_address = ?", [date('Y-m-d H:i:s'), $ip_address]);
+                $query->update('failed_logins', ['attempts' => 'attempts + 1', 'last_attempt' => date('Y-m-d H:i:s')], 'ip_address = ?', [$ip_address]);
             } else {
                 $query->insert('failed_logins', ['ip_address' => $ip_address, 'attempts' => 1, 'last_attempt' => date('Y-m-d H:i:s')]);
             }
