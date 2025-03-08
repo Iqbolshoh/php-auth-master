@@ -42,6 +42,14 @@ if (!empty($_COOKIE['username'])) {
     }
 }
 
+function get_ip()
+{
+    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        return trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0]);
+    }
+    return $_SERVER['REMOTE_ADDR'];
+}
+
 function get_device_name()
 {
     $user_agent = $_SERVER['HTTP_USER_AGENT'];

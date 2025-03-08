@@ -15,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($_POST['action'] == 'login') {
         $username = trim(strtolower($_POST['username']));
         $password = $_POST['password'];
-        $ip_address = $_SERVER['REMOTE_ADDR'];
+        $ip_address = get_ip();
         $max_attempts = 5;
         $lockout_time = 900;
 
@@ -82,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $query->insert('active_sessions', [
                 'user_id' => $_SESSION['user']['id'],
                 'device_name' => get_device_name(),
-                'ip_address' => $_SERVER['REMOTE_ADDR'],
+                'ip_address' => get_ip(),
                 'last_activity' => date('Y-m-d H:i:s'),
                 'session_token' => session_id()
             ]);
