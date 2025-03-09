@@ -1,4 +1,4 @@
-# PHP Auth Master  
+# 🔑 PHP Auth Master  
 
 This repository is a user authentication and role management system built with PHP. It provides an easy-to-use admin panel and allows the creation and management of multiple user roles. Security is the top priority in **PHP Auth Master**, ensuring user data is well-protected.  
 
@@ -112,10 +112,10 @@ const ROLES = [
     'manager'=>'/manager/' // Add role
 ];
 ```
+
 ---
 
-## Technologies Used
-
+## 🖥 Technologies Used
 <div style="display: flex; flex-wrap: wrap; gap: 5px;">
     <img src="https://img.shields.io/badge/HTML-%23F06529.svg?style=for-the-badge&logo=html5&logoColor=white"
         alt="HTML">
@@ -127,58 +127,61 @@ const ROLES = [
         alt="MySQL">
 </div>
 
+---
 
-## Contributing
+## 🤝 Contributing  
 
-Contributions are welcome! If you have suggestions or want to enhance the project, feel free to fork the repository and submit a pull request.
+🎯 Contributions are welcome! If you have suggestions or want to enhance the project, feel free to fork the repository and submit a pull request.
 
+## 📬 Connect with Me  
 
-## Connect with Me
+💬 I love meeting new people and discussing tech, business, and creative ideas. Let’s connect! You can reach me on these platforms:
 
-I love connecting with new people and exploring new opportunities. Feel free to reach out to me through any of the platforms below:
-
-<table>
-    <tr>
-        <td>
-            <a href="https://github.com/iqbolshoh">
-                <img src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/github.svg"
-                    height="48" width="48" alt="GitHub" />
-            </a>
-        </td>
-        <td>
-            <a href="https://t.me/iqbolshoh_777">
-                <img src="https://github.com/gayanvoice/github-active-users-monitor/blob/master/public/images/icons/telegram.svg"
-                    height="48" width="48" alt="Telegram" />
-            </a>
-        </td>
-        <td>
-            <a href="https://www.linkedin.com/in/iiqbolshoh/">
-                <img src="https://github.com/gayanvoice/github-active-users-monitor/blob/master/public/images/icons/linkedin.svg"
-                    height="48" width="48" alt="LinkedIn" />
-            </a>
-        </td>
-        <td>
-            <a href="https://instagram.com/iqbolshoh_777" target="blank"><img align="center"
-                    src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/instagram.svg"
-                    alt="instagram" height="48" width="48" /></a>
-        </td>
-        <td>
-            <a href="https://wa.me/qr/22PVFQSMQQX4F1">
-                <img src="https://github.com/gayanvoice/github-active-users-monitor/blob/master/public/images/icons/whatsapp.svg"
-                    height="48" width="48" alt="WhatsApp" />
-            </a>
-        </td>
-        <td>
-            <a href="https://x.com/iqbolshoh_777">
-                <img src="https://img.shields.io/badge/X-000000?style=for-the-badge&logo=x&logoColor=white" height="48"
-                    width="48" alt="Twitter" />
-            </a>
-        </td>
-        <td>
-            <a href="mailto:iilhomjonov777@gmail.com">
-                <img src="https://github.com/gayanvoice/github-active-users-monitor/blob/master/public/images/icons/gmail.svg"
-                    height="48" width="48" alt="Email" />
-            </a>
-        </td>
-    </tr>
-</table>
+<div align="center">
+    <table>
+        <tr>
+            <td>
+                <a href="https://github.com/iqbolshoh">
+                    <img src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/github.svg"
+                        height="40" width="40" alt="GitHub" />
+                </a>
+            </td>
+            <td>
+                <a href="https://t.me/iqbolshoh_777">
+                    <img src="https://github.com/gayanvoice/github-active-users-monitor/blob/master/public/images/icons/telegram.svg"
+                        height="40" width="40" alt="Telegram" />
+                </a>
+            </td>
+            <td>
+                <a href="https://www.linkedin.com/in/iiqbolshoh/">
+                    <img src="https://github.com/gayanvoice/github-active-users-monitor/blob/master/public/images/icons/linkedin.svg"
+                        height="40" width="40" alt="LinkedIn" />
+                </a>
+            </td>
+            <td>
+                <a href="https://instagram.com/iqbolshoh_777" target="blank">
+                    <img src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/instagram.svg"
+                        alt="Instagram" height="40" width="40" />
+                </a>
+            </td>
+            <td>
+                <a href="https://wa.me/qr/22PVFQSMQQX4F1">
+                    <img src="https://github.com/gayanvoice/github-active-users-monitor/blob/master/public/images/icons/whatsapp.svg"
+                        height="40" width="40" alt="WhatsApp" />
+                </a>
+            </td>
+            <td>
+                <a href="https://x.com/iqbolshoh_777">
+                    <img src="https://img.shields.io/badge/X-000000?style=for-the-badge&logo=x&logoColor=white" height="40"
+                        width="40" alt="Twitter" />
+                </a>
+            </td>
+            <td>
+                <a href="mailto:iilhomjonov777@gmail.com">
+                    <img src="https://github.com/gayanvoice/github-active-users-monitor/blob/master/public/images/icons/gmail.svg"
+                        height="40" width="40" alt="Email" />
+                </a>
+            </td>
+        </tr>
+    </table>
+</div>
