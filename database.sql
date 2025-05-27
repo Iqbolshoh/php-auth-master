@@ -31,7 +31,7 @@ CREATE TABLE active_sessions (
 );
 
 -- 3. FAILED LOGINS TABLE
-CREATE TABLE failed_logins (
+CREATE TABLE failed_attempts (
     id INT PRIMARY KEY AUTO_INCREMENT,
     ip_address VARCHAR(45) NOT NULL UNIQUE,
     attempts INT NOT NULL DEFAULT 1,

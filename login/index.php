@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit;
         }
 
-        $failed = $query->select('failed_logins', '*', 'ip_address = ?', [$ip_address])[0] ?? null;
+        $failed = $query->select('failed_attempts', '*', 'ip_address = ?', [$ip_address])[0] ?? null;
         $last_attempt_time = strtotime($failed['last_attempt'] ?? '1970-01-01 00:00:00');
 
         if ($failed && $failed['attempts'] >= $max_attempts && (time() - $last_attempt_time) < $lockout_time) {
@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 ]);
             }
 
-            $query->delete('failed_logins', 'ip_address = ?', [$ip_address]);
+            $query->delete('failed_attempts', 'ip_address = ?', [$ip_address]);
 
             $query->insert('active_sessions', [
                 'user_id' => $_SESSION['user']['id'],
@@ -90,9 +90,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             echo json_encode(['status' => 'success', 'redirect' => SITE_PATH . ROLES[$_SESSION['user']['role']]]);
         } else {
             if ($failed) {
-                $query->update('failed_logins', ['attempts' => $failed['attempts'] + 1, 'last_attempt' => date('Y-m-d H:i:s')], 'ip_address = ?', [$ip_address]);
+                $query->update('failed_attempts', ['attempts' => $failed['attempts'] + 1, 'last_attempt' => date('Y-m-d H:i:s')], 'ip_address = ?', [$ip_address]);
             } else {
-                $query->insert('failed_logins', ['ip_address' => $ip_address, 'attempts' => 1, 'last_attempt' => date('Y-m-d H:i:s')]);
+                $query->insert('failed_attempts', ['ip_address' => $ip_address, 'attempts' => 1, 'last_attempt' => date('Y-m-d H:i:s')]);
             }
             echo json_encode(['status' => 'error', 'title' => 'Oops...', 'message' => 'Login or password is incorrect']);
         }
