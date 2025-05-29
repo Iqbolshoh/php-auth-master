@@ -4,7 +4,7 @@
 define("DB_SERVER", "localhost");
 define("DB_USERNAME", "root");
 define("DB_PASSWORD", "");
-define("DB_NAME", "auth_master");
+define("DB_NAME", "auth_master_db");
 
 // Dynamically determine the base site URL
 define("SITE_PATH", ($_SERVER['REQUEST_SCHEME'] ?? 'http') . "://" . $_SERVER['HTTP_HOST']);

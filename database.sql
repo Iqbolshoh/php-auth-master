@@ -1,9 +1,9 @@
 -- DROP DATABASE IF EXISTS
-DROP DATABASE IF EXISTS auth_master;
+DROP DATABASE IF EXISTS auth_master_db;
 
 -- CREATE DATABASE
-CREATE DATABASE auth_master;
-USE auth_master;
+CREATE DATABASE auth_master_db;
+USE auth_master_db;
 
 -- 1. USERS TABLE
 CREATE TABLE users (
